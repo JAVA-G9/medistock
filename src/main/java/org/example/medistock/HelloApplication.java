@@ -4,21 +4,35 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.example.medistock.config.AppConfig;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(
+        FXMLLoader loader = new FXMLLoader(
                 HelloApplication.class.getResource("hello-view.fxml")
         );
 
-        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Scene scene = new Scene(
+                loader.load(),
+                AppConfig.WINDOW_WIDTH,
+                AppConfig.WINDOW_HEIGHT
+        );
 
-        stage.setTitle("MediStock");
+        URL css = HelloApplication.class.getResource(AppConfig.MAIN_CSS);
+
+        if (css != null) {
+            scene.getStylesheets().add(css.toExternalForm());
+        } else {
+            System.out.println("CSS file not found!");
+        }
+
+        stage.setTitle(AppConfig.APP_TITLE);
         stage.setScene(scene);
         stage.show();
     }
