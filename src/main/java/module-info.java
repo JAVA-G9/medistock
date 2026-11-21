@@ -15,4 +15,8 @@ module com.medistock {
     exports com.medistock.repository.memory;
     exports com.medistock.concurrency;
     exports com.medistock.util;
+    opens org.example.medistock to javafx.fxml;
+    opens org.example.medistock.model to javafx.base;
+
+    exports org.example.medistock;
 }
