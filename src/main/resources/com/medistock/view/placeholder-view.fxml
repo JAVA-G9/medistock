@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="20.0" styleClass="placeholder-root"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.medistock.controller.PlaceholderController">
+
+    <VBox maxWidth="700.0" styleClass="placeholder-card" spacing="16.0">
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                <Label fx:id="moduleTitleLabel" text="Module Title" styleClass="placeholder-title"/>
+                <Label fx:id="moduleOwnerLabel" text="Owner: Member X" styleClass="placeholder-owner"/>
+            </VBox>
+            <Label text="TEAM INTEGRATION" styleClass="badge-integration"/>
+        </HBox>
+
+        <Separator/>
+
+        <!-- Description -->
+        <VBox spacing="6.0">
+            <Label text="Module Description &amp; Scope:" styleClass="placeholder-section-title"/>
+            <Label fx:id="moduleDescriptionLabel" text="Description details..." wrapText="true" styleClass="placeholder-description"/>
+        </VBox>
+
+        <!-- Classes -->
+        <VBox spacing="6.0">
+            <Label text="Owned Classes &amp; Components:" styleClass="placeholder-section-title"/>
+            <Label fx:id="classesLabel" text="Class list..." wrapText="true" styleClass="placeholder-code"/>
+        </VBox>
+
+        <!-- Concurrency Topics -->
+        <VBox spacing="6.0">
+            <Label text="Assigned Concurrency Syllabus:" styleClass="placeholder-section-title"/>
+            <Label fx:id="concurrencyTopicLabel" text="Concurrency topics..." wrapText="true" styleClass="placeholder-concurrency"/>
+        </VBox>
+
+        <Separator/>
+
+        <Label text="💡 Note for Evaluation 1: Coordinated integration architecture by Member 1." styleClass="text-muted"/>
+    </VBox>
+
+</VBox>

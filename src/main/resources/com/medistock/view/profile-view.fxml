@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="view-content-root"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.medistock.controller.ProfileController">
+
+    <!-- View Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+            <Label text="Pharmacy Facility Profile" styleClass="view-title"/>
+            <Label text="Manage your pharmacy licensure details and authorized pharmacist credentials." styleClass="view-subtitle"/>
+        </VBox>
+        <Label fx:id="pharmacyIdBadge" text="ID: PHARM-001 | License: DL-2024-APEX01" styleClass="license-badge-pill"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" styleClass="view-scroll" VBox.vgrow="ALWAYS">
+        <VBox spacing="20.0" styleClass="view-scroll-content">
+
+            <!-- Card 1: Pharmacy Facility Information -->
+            <VBox spacing="14.0" styleClass="form-card">
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Label text="🏥  Licensed Pharmacy Information" styleClass="card-section-title"/>
+                    <Label text="VERIFIED FACILITY" styleClass="verified-badge"/>
+                </HBox>
+
+                <HBox spacing="16.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="Pharmacy Name *" styleClass="field-label"/>
+                        <TextField fx:id="pharmacyNameField" styleClass="input-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="Drug Authority License Number *" styleClass="field-label"/>
+                        <TextField fx:id="licenseNumberField" styleClass="input-field"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="16.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="City / Municipal Jurisdiction *" styleClass="field-label"/>
+                        <TextField fx:id="cityField" styleClass="input-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="Physical Address" styleClass="field-label"/>
+                        <TextField fx:id="addressField" styleClass="input-field"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="16.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="Direct Phone Number" styleClass="field-label"/>
+                        <TextField fx:id="phoneField" styleClass="input-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="Official Contact Email" styleClass="field-label"/>
+                        <TextField fx:id="emailField" styleClass="input-field"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Card 2: Lead Pharmacist Account -->
+            <VBox spacing="14.0" styleClass="form-card">
+                <Label text="👤  Authorized Pharmacist Credentials" styleClass="card-section-title"/>
+
+                <HBox spacing="16.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="Pharmacist Full Name *" styleClass="field-label"/>
+                        <TextField fx:id="fullNameField" styleClass="input-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="Role / Designation" styleClass="field-label"/>
+                        <TextField fx:id="roleField" styleClass="input-field"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="16.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="System Username" styleClass="field-label"/>
+                        <TextField fx:id="usernameField" editable="false" styleClass="input-field, field-readonly"/>
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label text="Update Password (leave blank to retain)" styleClass="field-label"/>
+                        <PasswordField fx:id="passwordField" promptText="••••••••" styleClass="input-field"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Status & Action Bar -->
+            <HBox spacing="14.0" alignment="CENTER_LEFT">
+                <Button text="💾  Save Profile Changes" onAction="#handleSaveProfile" styleClass="btn-primary"/>
+                <Button text="↺  Reset Fields" onAction="#handleReset" styleClass="btn-secondary"/>
+                <Label fx:id="statusMessageLabel" visible="false" text="Saved successfully!" styleClass="success-label"/>
+            </HBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>
