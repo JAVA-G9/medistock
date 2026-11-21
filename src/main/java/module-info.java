@@ -5,4 +5,6 @@ module org.example.medistock {
 
     opens org.example.medistock to javafx.fxml;
     exports org.example.medistock;
+
+
 }
