@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="view-content-root"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.medistock.controller.ThreadMonitorController">
+
+    <!-- Header Section -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+            <Label text="Concurrency &amp; Thread Monitoring Lab" styleClass="view-title"/>
+            <Label text="Evaluation 1 Core Multithreading: Thread Lifecycle, Daemon Threads, Priorities &amp; Tracing." styleClass="view-subtitle"/>
+        </VBox>
+        <VBox alignment="CENTER_RIGHT" spacing="4.0">
+            <Label fx:id="daemonStatusLabel" text="Daemon: RUNNING" styleClass="badge-daemon"/>
+            <Label fx:id="activeThreadsLabel" text="Active Tracked Threads: 2" styleClass="badge-active-threads"/>
+        </VBox>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" styleClass="view-scroll" VBox.vgrow="ALWAYS">
+        <VBox spacing="16.0" styleClass="view-scroll-content">
+
+            <!-- Interactive Concurrency Control Toolbar -->
+            <VBox spacing="10.0" styleClass="lab-control-card">
+                <Label text="⚡ Interactive Concurrency Controls &amp; Syllabus Demonstrators" styleClass="card-section-title"/>
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Button text="🔬 Stage All 6 Thread States" onAction="#handleDemonstrateSixStates" styleClass="btn-lab-primary"/>
+                    <Button fx:id="daemonToggleButton" text="Toggle Daemon Monitor" onAction="#handleToggleDaemon" styleClass="btn-lab-secondary"/>
+                    <Button text="▲ Pri 10 (MAX)" onAction="#handleSpawnMaxPriorityWorker" styleClass="btn-lab-pri-high"/>
+                    <Button text="● Pri 5 (NORM)" onAction="#handleSpawnNormPriorityWorker" styleClass="btn-lab-pri-norm"/>
+                    <Button text="▼ Pri 1 (MIN)" onAction="#handleSpawnMinPriorityWorker" styleClass="btn-lab-pri-low"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-secondary"/>
+                </HBox>
+            </VBox>
+
+            <!-- Table 1: Tracked Thread Snapshots -->
+            <VBox spacing="8.0" styleClass="table-card">
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Label text="📋 Live Tracked Thread Snapshots" styleClass="card-section-title"/>
+                    <Label text="(Inspecting Thread.State, Daemon &amp; Priority)" styleClass="text-muted"/>
+                </HBox>
+                <TableView fx:id="threadTable" prefHeight="200.0" styleClass="medistock-table">
+                    <columns>
+                        <TableColumn fx:id="colId" text="Thread ID" prefWidth="80.0"/>
+                        <TableColumn fx:id="colName" text="Thread Name" prefWidth="250.0"/>
+                        <TableColumn fx:id="colPriority" text="Priority" prefWidth="75.0"/>
+                        <TableColumn fx:id="colDaemon" text="Daemon" prefWidth="75.0"/>
+                        <TableColumn fx:id="colState" text="Current State" prefWidth="140.0"/>
+                        <TableColumn fx:id="colAlive" text="Is Alive" prefWidth="75.0"/>
+                        <TableColumn fx:id="colPurpose" text="Assigned Role / Purpose" prefWidth="300.0"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Table 2: Real-Time Execution Trace Log -->
+            <VBox spacing="8.0" styleClass="table-card">
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Label text="📝 Real-Time Thread Execution Trace Stream" styleClass="card-section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Clear Log" onAction="#handleClearLogs" styleClass="btn-xs"/>
+                </HBox>
+                <TableView fx:id="logTable" prefHeight="200.0" styleClass="medistock-table">
+                    <columns>
+                        <TableColumn fx:id="colLogTime" text="Timestamp" prefWidth="110.0"/>
+                        <TableColumn fx:id="colLogThread" text="Thread Name" prefWidth="240.0"/>
+                        <TableColumn fx:id="colLogPriority" text="Pri" prefWidth="55.0"/>
+                        <TableColumn fx:id="colLogState" text="State" prefWidth="120.0"/>
+                        <TableColumn fx:id="colLogMessage" text="Trace Message / Operation" prefWidth="480.0"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Educational / Evaluation Architecture Notes Card -->
+            <VBox spacing="10.0" styleClass="info-card">
+                <Label text="📖 Multithreading Concepts Demonstrable in Member 1 Module:" styleClass="info-title"/>
+                <Label text="• Thread Lifecycle (6 States): NEW (instantiated), RUNNABLE (executing), BLOCKED (intrinsic lock contention), WAITING (monitor.wait), TIMED_WAITING (sleep), TERMINATED (completed)." styleClass="info-bullet"/>
+                <Label text="• Daemon Threads: ExpiryMonitorThread runs as setDaemon(true), providing background sweeps that terminate cleanly upon application close." styleClass="info-bullet"/>
+                <Label text="• Thread Priorities: ReportWorker demonstrates priority assignment (MIN=1, NORM=5, MAX=10) with execution tracing." styleClass="info-bullet"/>
+                <Label text="• Execution Tracing: Central ThreadLogger captures timestamps, states, priorities, and names for audit trail verification." styleClass="info-bullet"/>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>
