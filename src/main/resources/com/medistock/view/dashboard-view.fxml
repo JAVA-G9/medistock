@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox styleClass="dashboard-root"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.medistock.controller.DashboardController">
+
+    <!-- Left Navigation Sidebar -->
+    <VBox prefWidth="270.0" styleClass="sidebar">
+        <!-- Logo Branding -->
+        <VBox spacing="4.0" styleClass="sidebar-brand-box">
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Label text="✚" styleClass="brand-icon"/>
+                <Label text="MediStock" styleClass="sidebar-brand-title"/>
+            </HBox>
+            <Label text="Pharmacy Exchange Network" styleClass="sidebar-brand-sub"/>
+        </VBox>
+
+        <!-- Current Pharmacy Card -->
+        <VBox styleClass="sidebar-user-card" spacing="4.0">
+            <Label fx:id="sidebarPharmacyName" text="Pharmacy Name" styleClass="user-card-pharmacy"/>
+            <Label fx:id="sidebarLicenseBadge" text="License: DL-2024-XXXX" styleClass="user-card-license"/>
+            <Label fx:id="sidebarUserRole" text="User Full Name | Role" styleClass="user-card-user"/>
+        </VBox>
+
+        <Separator styleClass="sidebar-separator"/>
+
+        <!-- Navigation Menu -->
+        <ScrollPane fitToWidth="true" styleClass="sidebar-scroll" VBox.vgrow="ALWAYS">
+            <VBox spacing="6.0" styleClass="sidebar-menu">
+                <Label text="MEMBER 1 MODULES" styleClass="sidebar-section-header"/>
+                <Button fx:id="btnNavDashboard" text="📊  Dashboard Overview" onAction="#handleNavDashboard" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavProfile" text="🏥  Pharmacy Profile" onAction="#handleNavProfile" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavThreadMonitor" text="🧵  Thread Monitor &amp; Lab" onAction="#handleNavThreadMonitor" maxWidth="Infinity" styleClass="nav-button"/>
+
+                <Label text="TEAM MODULES" styleClass="sidebar-section-header"/>
+                <Button fx:id="btnNavInventory" text="📦  My Inventory (M2)" onAction="#handleNavInventory" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavMarketplace" text="🔄  Marketplace (M3)" onAction="#handleNavMarketplace" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavRequests" text="📬  Exchange Requests (M3)" onAction="#handleNavRequests" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavExpiry" text="⏳  Expiry &amp; Alerts (M4)" onAction="#handleNavExpiry" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavReports" text="📈  Reports &amp; Queue (M4)" onAction="#handleNavReports" maxWidth="Infinity" styleClass="nav-button"/>
+            </VBox>
+        </ScrollPane>
+
+        <Separator styleClass="sidebar-separator"/>
+
+        <!-- Sidebar Footer / Logout -->
+        <VBox spacing="8.0" styleClass="sidebar-footer">
+            <Label fx:id="daemonStatusMini" text="Daemon Monitor: ACTIVE" styleClass="daemon-mini-label"/>
+            <Button text="🚪  Sign Out" onAction="#handleLogout" maxWidth="Infinity" styleClass="btn-logout"/>
+        </VBox>
+    </VBox>
+
+    <!-- Main Content Area Container -->
+    <StackPane fx:id="contentArea" HBox.hgrow="ALWAYS" styleClass="content-container">
+
+        <!-- Default Dashboard Home View -->
+        <VBox fx:id="dashboardHomeContent" spacing="20.0" styleClass="dashboard-home">
+            <ScrollPane fitToWidth="true" styleClass="dashboard-scroll" VBox.vgrow="ALWAYS">
+                <VBox spacing="20.0" styleClass="dashboard-scroll-content">
+
+                    <!-- Welcome Hero Card -->
+                    <HBox alignment="CENTER_LEFT" styleClass="hero-banner">
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <Label fx:id="welcomeHeader" text="Welcome back!" styleClass="hero-title"/>
+                            <Label fx:id="welcomeSubheader" text="Operating licensed branch" styleClass="hero-subtitle"/>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" spacing="4.0">
+                            <Label text="EVALUATION 1 PROTOTYPE" styleClass="hero-badge"/>
+                            <Label text="In-Memory Persistence Active" styleClass="hero-meta"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- 4 KPI Stat Cards -->
+                    <HBox spacing="16.0" styleClass="kpi-container">
+                        <!-- Card 1 -->
+                        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-teal">
+                            <Label text="TOTAL MEDICINE ITEMS" styleClass="kpi-label"/>
+                            <Label fx:id="metricTotalStock" text="142" styleClass="kpi-value"/>
+                            <Label text="Batches in local inventory" styleClass="kpi-subtext"/>
+                        </VBox>
+
+                        <!-- Card 2 -->
+                        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-amber">
+                            <Label text="NEAR-EXPIRY BATCHES" styleClass="kpi-label"/>
+                            <Label fx:id="metricNearExpiry" text="18" styleClass="kpi-value"/>
+                            <Label text="Expiring within 30 days" styleClass="kpi-subtext"/>
+                        </VBox>
+
+                        <!-- Card 3 -->
+                        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-blue">
+                            <Label text="ACTIVE LISTINGS" styleClass="kpi-label"/>
+                            <Label fx:id="metricPendingRequests" text="5" styleClass="kpi-value"/>
+                            <Label text="Surplus stock published" styleClass="kpi-subtext"/>
+                        </VBox>
+
+                        <!-- Card 4 -->
+                        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-purple">
+                            <Label text="ACTIVE THREADS" styleClass="kpi-label"/>
+                            <Label fx:id="metricActiveThreads" text="2" styleClass="kpi-value"/>
+                            <Label text="Live background workers" styleClass="kpi-subtext"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Quick Actions Strip -->
+                    <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="action-strip">
+                        <Label text="Quick Actions:" styleClass="action-strip-title"/>
+                        <Button text="▶  Run Report Worker" onAction="#handleQuickRunReport" styleClass="btn-action-primary"/>
+                        <Button text="⚡  Toggle Daemon Monitor" onAction="#handleQuickToggleDaemon" styleClass="btn-action-secondary"/>
+                        <Button text="🧵  Open Thread Monitor" onAction="#handleNavThreadMonitor" styleClass="btn-action-secondary"/>
+                        <Button text="✎  Edit Profile" onAction="#handleNavProfile" styleClass="btn-action-secondary"/>
+                    </HBox>
+
+                    <!-- Two Content Sections: Live Thread Logs & Partner Pharmacies -->
+                    <VBox spacing="16.0">
+                        <!-- Live Multithreading Activity Stream -->
+                        <VBox spacing="8.0" styleClass="table-card">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label text="🧵 Live Concurrency &amp; Background Execution Stream" styleClass="card-section-title"/>
+                                <Label text="(Member 1 Multithreading Tracing)" styleClass="text-muted"/>
+                            </HBox>
+                            <TableView fx:id="liveLogTable" prefHeight="170.0" styleClass="medistock-table">
+                                <columns>
+                                    <TableColumn fx:id="colLogTime" text="Time" prefWidth="110.0"/>
+                                    <TableColumn fx:id="colLogThread" text="Thread Name" prefWidth="250.0"/>
+                                    <TableColumn fx:id="colLogState" text="State" prefWidth="120.0"/>
+                                    <TableColumn fx:id="colLogMessage" text="Execution Trace / Message" prefWidth="480.0"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+
+                        <!-- Partner Pharmacies Network Table -->
+                        <VBox spacing="8.0" styleClass="table-card">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label text="🏥 Connected Partner Pharmacies Network" styleClass="card-section-title"/>
+                                <Label text="(Ready for stock requests &amp; transfers)" styleClass="text-muted"/>
+                            </HBox>
+                            <TableView fx:id="partnerPharmaciesTable" prefHeight="170.0" styleClass="medistock-table">
+                                <columns>
+                                    <TableColumn fx:id="colPartnerName" text="Pharmacy Facility" prefWidth="240.0"/>
+                                    <TableColumn fx:id="colPartnerLicense" text="Drug License #" prefWidth="160.0"/>
+                                    <TableColumn fx:id="colPartnerCity" text="City" prefWidth="140.0"/>
+                                    <TableColumn fx:id="colPartnerStock" text="Inventory Items" prefWidth="130.0"/>
+                                    <TableColumn fx:id="colPartnerListings" text="Marketplace Listings" prefWidth="160.0"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </StackPane>
+</HBox>

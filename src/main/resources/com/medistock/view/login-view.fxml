@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="20.0" styleClass="auth-background"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.medistock.controller.LoginController">
+
+    <!-- Brand Header -->
+    <VBox alignment="CENTER" spacing="6.0">
+        <HBox alignment="CENTER" spacing="10.0">
+            <Label fx:id="titleLabel" text="MediStock" styleClass="brand-title"/>
+            <Label text="EVALUATION 1" styleClass="badge-eval"/>
+        </HBox>
+        <Label fx:id="taglineLabel" text="Pharmacy-to-Pharmacy Surplus Stock &amp; Expiry Exchange" styleClass="brand-tagline"/>
+        <Label text="Member 1: Pharmacy, Dashboard &amp; Concurrency System" styleClass="brand-subtext"/>
+    </VBox>
+
+    <!-- Authentication Card -->
+    <VBox maxWidth="560.0" styleClass="auth-card" spacing="16.0">
+        <TabPane fx:id="authTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="auth-tab-pane">
+            <tabs>
+                <!-- Sign In Tab -->
+                <Tab text="  Sign In  ">
+                    <VBox spacing="14.0" styleClass="auth-tab-content">
+                        <Label text="Sign In to Your Pharmacy Account" styleClass="section-header"/>
+                        <Label text="Access real-time inventory exchange and background monitoring." styleClass="text-muted"/>
+
+                        <VBox spacing="6.0">
+                            <Label text="Username" styleClass="field-label"/>
+                            <TextField fx:id="loginUsernameField" promptText="Enter your username (e.g. admin)" styleClass="input-field"/>
+                        </VBox>
+
+                        <VBox spacing="6.0">
+                            <Label text="Password" styleClass="field-label"/>
+                            <PasswordField fx:id="loginPasswordField" promptText="Enter your password" styleClass="input-field"/>
+                        </VBox>
+
+                        <Label fx:id="loginErrorLabel" visible="false" managed="true" styleClass="error-label"/>
+
+                        <Button text="Sign In to Dashboard" onAction="#handleLogin" maxWidth="Infinity" styleClass="btn-primary"/>
+
+                        <!-- Fast Demo Access -->
+                        <VBox spacing="8.0" styleClass="demo-box">
+                            <Label text="Quick Demo Accounts (Evaluation 1 In-Memory):" styleClass="demo-title"/>
+                            <HBox spacing="8.0" alignment="CENTER">
+                                <Button text="Apex Care (admin)" onAction="#handleQuickApex" styleClass="btn-demo"/>
+                                <Button text="City Health" onAction="#handleQuickCity" styleClass="btn-demo"/>
+                                <Button text="GreenCross" onAction="#handleQuickGreen" styleClass="btn-demo"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </Tab>
+
+                <!-- Registration Tab -->
+                <Tab text="  Register Pharmacy  ">
+                    <VBox spacing="12.0" styleClass="auth-tab-content">
+                        <Label text="Register a Licensed Pharmacy" styleClass="section-header"/>
+                        <Label text="Enroll in the MediStock surplus exchange network." styleClass="text-muted"/>
+
+                        <!-- Pharmacy Details -->
+                        <HBox spacing="10.0">
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Pharmacy Name *" styleClass="field-label"/>
+                                <TextField fx:id="regPharmacyNameField" promptText="e.g. Metro Care Pharmacy" styleClass="input-field"/>
+                            </VBox>
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Drug License Number *" styleClass="field-label"/>
+                                <TextField fx:id="regLicenseField" promptText="e.g. DL-2024-MTR99" styleClass="input-field"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="City *" styleClass="field-label"/>
+                                <TextField fx:id="regCityField" promptText="e.g. Metro City" styleClass="input-field"/>
+                            </VBox>
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Address" styleClass="field-label"/>
+                                <TextField fx:id="regAddressField" promptText="Street address" styleClass="input-field"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Contact Phone" styleClass="field-label"/>
+                                <TextField fx:id="regPhoneField" promptText="+1 (555) 000-0000" styleClass="input-field"/>
+                            </VBox>
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Official Email" styleClass="field-label"/>
+                                <TextField fx:id="regEmailField" promptText="pharmacy@domain.com" styleClass="input-field"/>
+                            </VBox>
+                        </HBox>
+
+                        <!-- Lead Pharmacist Account -->
+                        <Label text="Lead Pharmacist Credentials" styleClass="field-section-title"/>
+
+                        <HBox spacing="10.0">
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Full Name *" styleClass="field-label"/>
+                                <TextField fx:id="regFullNameField" promptText="Dr. First Last, PharmD" styleClass="input-field"/>
+                            </VBox>
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Role / Title" styleClass="field-label"/>
+                                <TextField fx:id="regRoleField" promptText="Chief Pharmacist" styleClass="input-field"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Account Username *" styleClass="field-label"/>
+                                <TextField fx:id="regUsernameField" promptText="Choose username" styleClass="input-field"/>
+                            </VBox>
+                            <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                <Label text="Password *" styleClass="field-label"/>
+                                <PasswordField fx:id="regPasswordField" promptText="At least 4 characters" styleClass="input-field"/>
+                            </VBox>
+                        </HBox>
+
+                        <Label fx:id="regErrorLabel" visible="false" managed="true" styleClass="error-label"/>
+
+                        <Button text="Complete Registration &amp; Enter Dashboard" onAction="#handleRegister" maxWidth="Infinity" styleClass="btn-primary"/>
+                    </VBox>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </VBox>
+</VBox>

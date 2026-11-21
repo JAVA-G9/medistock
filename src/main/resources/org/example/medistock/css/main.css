@@ -1,0 +1,364 @@
+/* =========================================
+   MEDISTOCK - SHARED DESIGN SYSTEM
+   Used by all four team members
+   ========================================= */
+
+/* 1. GLOBAL THEME */
+.root {
+    -fx-font-family: "Segoe UI";
+
+    -fx-primary: #0f766e;
+    -fx-primary-dark: #115e59;
+    -fx-primary-light: #14b8a6;
+    -fx-primary-faint: #ccfbf1;
+
+    -fx-sidebar-bg: #0f172a;
+    -fx-sidebar-hover: #1e293b;
+    -fx-sidebar-active: #0d9488;
+
+    -fx-bg: #f8fafc;
+    -fx-card-bg: #ffffff;
+
+    -fx-text-main: #0f172a;
+    -fx-text-muted: #64748b;
+    -fx-medistock-border: #e2e8f0;
+
+    -fx-background-color: -fx-bg;
+}
+
+/* 2. SCREEN LAYOUT */
+.view-content-root {
+    -fx-background-color: -fx-bg;
+}
+
+.view-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.view-scroll-content {
+    -fx-background-color: -fx-bg;
+    -fx-padding: 24;
+    -fx-spacing: 18;
+}
+
+/* 3. CARDS */
+.table-card,
+.form-card,
+.info-card,
+.action-strip {
+    -fx-background-color: -fx-card-bg;
+    -fx-background-radius: 12;
+    -fx-border-color: -fx-medistock-border;
+    -fx-border-radius: 12;
+    -fx-padding: 18;
+}
+
+.table-card,
+.form-card,
+.info-card {
+    -fx-effect: dropshadow(gaussian, #0000000a, 8, 0, 0, 2);
+}
+
+/* 4. KPI CARDS */
+.kpi-card {
+    -fx-background-color: -fx-card-bg;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: -fx-medistock-border;
+    -fx-padding: 18;
+    -fx-min-width: 150;
+}
+
+.kpi-teal {
+    -fx-border-color: #14b8a6;
+}
+
+.kpi-amber {
+    -fx-border-color: #f59e0b;
+}
+
+.kpi-blue {
+    -fx-border-color: #3b82f6;
+}
+
+.kpi-purple {
+    -fx-border-color: #a855f7;
+}
+
+.kpi-label {
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.kpi-value {
+    -fx-text-fill: -fx-text-main;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.kpi-subtext {
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size: 11px;
+}
+
+/* 5. BUTTONS */
+.btn-primary,
+.btn-action-primary,
+.btn-lab-primary {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 18;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover,
+.btn-action-primary:hover,
+.btn-lab-primary:hover {
+    -fx-background-color: -fx-primary-dark;
+}
+
+.btn-secondary,
+.btn-action-secondary {
+    -fx-background-color: white;
+    -fx-text-fill: -fx-text-main;
+    -fx-border-color: -fx-medistock-border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 18;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover,
+.btn-action-secondary:hover {
+    -fx-background-color: -fx-bg;
+}
+
+.btn-lab-pri-high {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+    -fx-background-radius: 7;
+    -fx-cursor: hand;
+}
+
+.btn-lab-pri-norm {
+    -fx-background-color: #d97706;
+    -fx-text-fill: white;
+    -fx-background-radius: 7;
+    -fx-cursor: hand;
+}
+
+.btn-lab-pri-low {
+    -fx-background-color: #0d9488;
+    -fx-text-fill: white;
+    -fx-background-radius: 7;
+    -fx-cursor: hand;
+}
+
+.btn-logout {
+    -fx-background-color: transparent;
+    -fx-text-fill: #fca5a5;
+    -fx-cursor: hand;
+    -fx-padding: 9 14;
+}
+
+.btn-logout:hover {
+    -fx-background-color: #7f1d1d;
+}
+
+.btn-xs {
+    -fx-font-size: 11px;
+    -fx-padding: 5 10;
+    -fx-background-radius: 6;
+}
+
+/* 6. FORMS */
+.field-label {
+    -fx-text-fill: -fx-text-main;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.label.field-section-title {
+    -fx-text-fill: -fx-primary;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.input-field,
+.text-field.input-field,
+.password-field.input-field,
+.text-area.input-field,
+.combo-box.input-field,
+.date-picker.input-field {
+    -fx-background-color: white;
+    -fx-border-color: -fx-medistock-border;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-padding: 9;
+    -fx-text-fill: -fx-text-main;
+}
+
+.input-field:focused {
+    -fx-border-color: -fx-primary;
+    -fx-border-width: 1.5;
+}
+
+.field-readonly {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: -fx-text-muted;
+}
+
+.error-label {
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 11px;
+}
+
+.success-label {
+    -fx-text-fill: #15803d;
+    -fx-font-size: 11px;
+}
+
+.text-muted {
+    -fx-text-fill: -fx-text-muted;
+}
+
+/* 7. TABLES */
+.medistock-table {
+    -fx-background-color: white;
+    -fx-border-color: -fx-medistock-border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-table-cell-border-color: #f1f5f9;
+}
+
+.medistock-table .column-header-background {
+    -fx-background-color: #f1f5f9;
+}
+
+.medistock-table .column-header {
+    -fx-background-color: #f1f5f9;
+    -fx-size: 40px;
+    -fx-border-color: transparent transparent -fx-medistock-border transparent;
+}
+
+.medistock-table .column-header .label {
+    -fx-text-fill: -fx-text-main;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.medistock-table .table-cell {
+    -fx-text-fill: -fx-text-main;
+    -fx-padding: 10 8;
+    -fx-font-size: 12px;
+}
+
+.medistock-table .table-row-cell {
+    -fx-background-color: white;
+}
+
+.medistock-table .table-row-cell:odd {
+    -fx-background-color: #f8fafc;
+}
+
+.medistock-table .table-row-cell:selected {
+    -fx-background-color: -fx-primary-faint;
+}
+
+/* 8. SIDEBAR */
+.sidebar {
+    -fx-background-color: -fx-sidebar-bg;
+    -fx-padding: 18;
+}
+
+.sidebar .label {
+    -fx-text-fill: white;
+}
+
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #cbd5e1;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 11 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: -fx-sidebar-hover;
+}
+
+.sidebar-button.active {
+    -fx-background-color: -fx-sidebar-active;
+    -fx-text-fill: white;
+}
+
+/* 9. BADGES */
+.license-badge-pill,
+.verified-badge,
+.badge-daemon,
+.badge-active-threads,
+.badge-integration,
+.badge-eval {
+    -fx-background-radius: 20;
+    -fx-padding: 5 10;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.license-badge-pill {
+    -fx-background-color: #ccfbf1;
+    -fx-text-fill: #115e59;
+}
+
+.verified-badge {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #166534;
+}
+
+.badge-daemon {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1d4ed8;
+}
+
+.badge-active-threads {
+    -fx-background-color: #f3e8ff;
+    -fx-text-fill: #7e22ce;
+}
+
+.badge-integration {
+    -fx-background-color: #fef3c7;
+    -fx-text-fill: #92400e;
+}
+
+.badge-eval {
+    -fx-background-color: #e0e7ff;
+    -fx-text-fill: #3730a3;
+}
+
+/* 10. GENERAL CONTROLS */
+.label {
+    -fx-text-fill: -fx-text-main;
+}
+
+.check-box {
+    -fx-text-fill: -fx-text-main;
+}
+
+.separator .line {
+    -fx-border-color: -fx-medistock-border;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 8;
+}
