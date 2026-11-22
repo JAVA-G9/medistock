@@ -75,14 +75,14 @@
         </HBox>
     </VBox>
 
-    <!-- Expanded Table Card Container -->
-    <VBox spacing="6.0" VBox.vgrow="ALWAYS" styleClass="table-card" minHeight="240.0">
+    <!-- Table Card Container (Calibrated for 8 entries) -->
+    <VBox spacing="6.0" styleClass="table-card">
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <Label text="📦 Available Surplus Medicine Listings" styleClass="card-section-title" minWidth="-Infinity"/>
             <Region HBox.hgrow="ALWAYS"/>
         </HBox>
 
-        <TableView fx:id="listingsTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="200.0" prefHeight="360.0">
+        <TableView fx:id="listingsTable" fixedCellSize="28.0" prefHeight="256.0" minHeight="256.0" maxHeight="256.0" styleClass="medistock-table">
             <columns>
                 <TableColumn fx:id="colListingId" prefWidth="80.0" text="Listing ID" />
                 <TableColumn fx:id="colMedicine" prefWidth="170.0" text="Medicine Name" />
