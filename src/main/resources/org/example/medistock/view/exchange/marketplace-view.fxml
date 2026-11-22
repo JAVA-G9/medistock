@@ -48,38 +48,24 @@
         </VBox>
     </HBox>
 
-    <!-- Responsive 2-Row Action Strip -->
-    <VBox spacing="8.0" styleClass="action-strip">
-        <!-- Row 1: Active Facility Selection & Live Search Filter -->
-        <HBox spacing="10.0" alignment="CENTER_LEFT">
-            <Label text="Active Pharmacy:" styleClass="field-label" minWidth="-Infinity"/>
-            <ComboBox fx:id="pharmacyComboBox" prefWidth="260.0" minWidth="180.0" styleClass="input-field"/>
+    <!-- Responsive Action Strip -->
+    <HBox spacing="8.0" alignment="CENTER_LEFT" styleClass="action-strip">
+        <Label text="Pharmacy:" styleClass="field-label" minWidth="-Infinity"/>
+        <ComboBox fx:id="pharmacyComboBox" prefWidth="180.0" minWidth="120.0" styleClass="input-field"/>
+        <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
 
-            <Region HBox.hgrow="ALWAYS"/>
+        <Region HBox.hgrow="ALWAYS"/>
 
-            <Label text="Search / Filter:" styleClass="field-label" minWidth="-Infinity"/>
-            <TextField fx:id="searchField" prefWidth="200.0" minWidth="140.0" promptText="Filter medicine, batch, seller..." styleClass="input-field"/>
-            <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
-        </HBox>
+        <Label text="Search:" styleClass="field-label" minWidth="-Infinity"/>
+        <TextField fx:id="searchField" prefWidth="140.0" minWidth="90.0" promptText="Filter records..." styleClass="input-field"/>
+    </HBox>
 
-        <!-- Row 2: Action Buttons & Status Feedback -->
-        <HBox spacing="8.0" alignment="CENTER_LEFT">
-            <Label text="Actions:" styleClass="field-label" minWidth="-Infinity"/>
-            <Button text="➕ Publish Surplus" onAction="#handlePublishListing" styleClass="btn-action-primary" minWidth="-Infinity"/>
-            <Button text="📥 Request Stock" onAction="#handleRequestStock" styleClass="btn-action-primary" minWidth="-Infinity"/>
-            <Button text="⚡ Concurrency Test" onAction="#handleRunConcurrencyTest" styleClass="btn-lab-primary, btn-compact" minWidth="-Infinity"/>
-            <Button text="❌ Cancel Listing" onAction="#handleCancelListing" styleClass="btn-lab-pri-high, btn-compact" minWidth="-Infinity"/>
-
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="statusLabel" text="Ready" styleClass="text-muted" minWidth="-Infinity"/>
-        </HBox>
-    </VBox>
-
-    <!-- Table Card Container (Calibrated for 8 entries) -->
-    <VBox spacing="6.0" styleClass="table-card">
+    <!-- Table Card Container (Calibrated for 8 entries + Action Buttons) -->
+    <VBox spacing="8.0" styleClass="table-card">
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <Label text="📦 Available Surplus Medicine Listings" styleClass="card-section-title" minWidth="-Infinity"/>
             <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Showing 18 listings" styleClass="text-muted" minWidth="-Infinity"/>
         </HBox>
 
         <TableView fx:id="listingsTable" fixedCellSize="28.0" prefHeight="256.0" minHeight="256.0" maxHeight="256.0" styleClass="medistock-table">
@@ -99,6 +85,17 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
         </TableView>
+
+        <!-- Action Buttons & Status Feedback Row directly below Table -->
+        <HBox spacing="8.0" alignment="CENTER_LEFT">
+            <Button text="➕ Publish Surplus" onAction="#handlePublishListing" styleClass="btn-action-primary" minWidth="-Infinity"/>
+            <Button text="📥 Request Stock" onAction="#handleRequestStock" styleClass="btn-action-primary" minWidth="-Infinity"/>
+            <Button text="⚡ Concurrency Test" onAction="#handleRunConcurrencyTest" styleClass="btn-lab-primary, btn-compact" minWidth="-Infinity"/>
+            <Button text="❌ Cancel Listing" onAction="#handleCancelListing" styleClass="btn-secondary, btn-compact" minWidth="-Infinity"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" text="Ready" styleClass="text-muted" minWidth="-Infinity"/>
+        </HBox>
     </VBox>
 
     <!-- Compact Multithreading & Event Execution Trace (Info Card) -->
