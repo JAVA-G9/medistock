@@ -18,7 +18,7 @@
     </HBox>
 
     <!-- Main Navigation TabPane -->
-    <TabPane fx:id="exchangeTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+    <TabPane fx:id="exchangeTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="medistock-tab-pane">
         <Tab fx:id="tabMarketplace" text="🛒 Marketplace &amp; Surplus Listings">
             <fx:include fx:id="marketplaceView" source="marketplace-view.fxml"/>
         </Tab>

@@ -47,82 +47,91 @@ public class ExchangeService {
     }
 
     private void initSampleData() {
+        final String PHARM1_ID = "PHARM-001";
+        final String PHARM1_NAME = "Apex Care Pharmacy (Metro City)";
+        final String PHARM2_ID = "PHARM-002";
+        final String PHARM2_NAME = "City Health Drugstore (Riverdale)";
+        final String PHARM3_ID = "PHARM-003";
+        final String PHARM3_NAME = "GreenCross LifeSciences (Green Valley)";
+
         // --- Antibiotics & Anti-Infectives ---
-        ExchangeListing l1 = createListing("PHARM-001", "Apollo Pharmacy (Central)", "Amoxicillin 500mg",
+        ExchangeListing l1 = createListing(PHARM1_ID, PHARM1_NAME, "Amoxicillin 500mg",
                 "AMX-2024-09", LocalDate.now().plusMonths(3), 120, 85.0, "Surplus stock, 35% discount for bulk exchange");
 
-        ExchangeListing l2 = createListing("PHARM-002", "MedPlus Chemist (West)", "Azithromycin 500mg",
+        ExchangeListing l2 = createListing(PHARM2_ID, PHARM2_NAME, "Azithromycin 500mg",
                 "AZI-2024-10", LocalDate.now().plusMonths(2), 70, 115.0, "Near-expiry batch, blister-packed");
 
-        ExchangeListing l3 = createListing("PHARM-003", "CareChem Druggists (South)", "Ciprofloxacin 500mg",
+        ExchangeListing l3 = createListing(PHARM1_ID, PHARM1_NAME, "Ciprofloxacin 500mg",
                 "CIP-2024-11", LocalDate.now().plusMonths(4), 90, 62.0, "Surplus warehouse stock");
 
-        ExchangeListing l4 = createListing("PHARM-001", "Apollo Pharmacy (Central)", "Augmentin 625 Duo",
+        ExchangeListing l4 = createListing(PHARM1_ID, PHARM1_NAME, "Augmentin 625 Duo",
                 "AUG-2024-08", LocalDate.now().plusMonths(2), 50, 165.0, "High demand antibiotic, exp in 60 days");
 
         // --- Analgesics & Antipyretics ---
-        ExchangeListing l5 = createListing("PHARM-002", "MedPlus Chemist (West)", "Paracetamol 650mg (Dolo)",
+        ExchangeListing l5 = createListing(PHARM2_ID, PHARM2_NAME, "Paracetamol 650mg (Dolo)",
                 "PCM-2024-12", LocalDate.now().plusMonths(5), 350, 28.0, "Overstocked monsoon batch, fast-moving");
 
-        ExchangeListing l6 = createListing("PHARM-003", "CareChem Druggists (South)", "Ibuprofen 400mg",
+        ExchangeListing l6 = createListing(PHARM2_ID, PHARM2_NAME, "Ibuprofen 400mg",
                 "IBU-2024-09", LocalDate.now().plusMonths(3), 140, 34.0, "Surplus inventory from seasonal order");
 
-        ExchangeListing l7 = createListing("PHARM-001", "Apollo Pharmacy (Central)", "Tramadol 50mg",
+        ExchangeListing l7 = createListing(PHARM1_ID, PHARM1_NAME, "Tramadol 50mg",
                 "TRM-2024-11", LocalDate.now().plusMonths(4), 60, 92.0, "Schedule H1 drug, verified chain-of-custody");
 
         // --- Chronic Care: Cardiac & Diabetes ---
-        ExchangeListing l8 = createListing("PHARM-001", "Apollo Pharmacy (Central)", "Metformin 500mg SR",
+        ExchangeListing l8 = createListing(PHARM1_ID, PHARM1_NAME, "Metformin 500mg SR",
                 "MET-2024-10", LocalDate.now().plusMonths(4), 180, 42.0, "Surplus diabetes maintenance stock");
 
-        ExchangeListing l9 = createListing("PHARM-002", "MedPlus Chemist (West)", "Glimepiride 2mg",
+        ExchangeListing l9 = createListing(PHARM2_ID, PHARM2_NAME, "Glimepiride 2mg",
                 "GLM-2024-12", LocalDate.now().plusMonths(6), 110, 55.0, "Standard strip packs, verified storage");
 
-        ExchangeListing l10 = createListing("PHARM-003", "CareChem Druggists (South)", "Telmisartan 40mg",
+        ExchangeListing l10 = createListing(PHARM1_ID, PHARM1_NAME, "Telmisartan 40mg",
                 "TEL-2024-09", LocalDate.now().plusMonths(3), 130, 78.0, "Hypertension maintenance surplus");
 
-        ExchangeListing l11 = createListing("PHARM-001", "Apollo Pharmacy (Central)", "Atorvastatin 10mg",
+        ExchangeListing l11 = createListing(PHARM1_ID, PHARM1_NAME, "Atorvastatin 10mg",
                 "ATV-2024-11", LocalDate.now().plusMonths(5), 85, 95.0, "Lipid-lowering surplus stock");
 
-        ExchangeListing l12 = createListing("PHARM-002", "MedPlus Chemist (West)", "Amlodipine 5mg",
+        ExchangeListing l12 = createListing(PHARM2_ID, PHARM2_NAME, "Amlodipine 5mg",
                 "AML-2024-08", LocalDate.now().plusMonths(2), 160, 32.0, "Near expiry 60-day batch, 40% discount");
 
         // --- Gastrointestinal & Antacids ---
-        ExchangeListing l13 = createListing("PHARM-003", "CareChem Druggists (South)", "Pantoprazole 40mg (Pan-40)",
+        ExchangeListing l13 = createListing(PHARM2_ID, PHARM2_NAME, "Pantoprazole 40mg (Pan-40)",
                 "PAN-2024-10", LocalDate.now().plusMonths(4), 220, 72.0, "High demand PPI, original carton");
 
-        ExchangeListing l14 = createListing("PHARM-001", "Apollo Pharmacy (Central)", "Omeprazole 20mg",
+        ExchangeListing l14 = createListing(PHARM1_ID, PHARM1_NAME, "Omeprazole 20mg",
                 "OME-2024-09", LocalDate.now().plusMonths(3), 95, 46.0, "Surplus capsules batch");
 
-        ExchangeListing l15 = createListing("PHARM-002", "MedPlus Chemist (West)", "Ondansetron 4mg",
+        ExchangeListing l15 = createListing(PHARM2_ID, PHARM2_NAME, "Ondansetron 4mg",
                 "OND-2024-11", LocalDate.now().plusMonths(5), 75, 48.0, "Antiemetic stock, dry storage maintained");
 
         // --- Respiratory & Antiallergic ---
-        ExchangeListing l16 = createListing("PHARM-003", "CareChem Druggists (South)", "Montelukast + Levocetirizine",
-                "MLC-2024-09", LocalDate.now().plusMonths(3), 150, 108.0, "Montair-LC equivalent, seasonal surplus");
+        // Exactly ONE listing initially published by GreenCross LifeSciences (Green Valley)
+        ExchangeListing l16 = createListing(PHARM3_ID, PHARM3_NAME, "Montelukast + Levocetirizine",
+                "MLC-2024-09", LocalDate.now().plusMonths(3), 150, 108.0, "Montair-LC equivalent, seasonal surplus from Green Valley");
 
-        ExchangeListing l17 = createListing("PHARM-001", "Apollo Pharmacy (Central)", "Cetirizine 10mg",
+        ExchangeListing l17 = createListing(PHARM1_ID, PHARM1_NAME, "Cetirizine 10mg",
                 "CET-2024-12", LocalDate.now().plusMonths(6), 260, 18.0, "Bulk antihistamine strips");
 
-        ExchangeListing l18 = createListing("PHARM-002", "MedPlus Chemist (West)", "Budesonide Inhaler 200mcg",
+        ExchangeListing l18 = createListing(PHARM2_ID, PHARM2_NAME, "Budesonide Inhaler 200mcg",
                 "BUD-2024-07", LocalDate.now().plusMonths(2), 30, 275.0, "Sealed inhalers, temp-controlled storage");
 
-        // Pre-populate sample exchange interactions
+        // Pre-populate realistic cross-pharmacy exchange interactions
         try {
-            submitRequest(l4.getListingId(), "PHARM-002", "MedPlus Chemist (West)",
+            // 1. City Health requests 15 units of Augmentin from Apex Care (Pending in Escrow)
+            submitRequest(l4.getListingId(), PHARM2_ID, PHARM2_NAME,
                     15, 165.0, "Urgent requirement for local clinic prescription");
 
-            ExchangeRequest req2 = submitRequest(l5.getListingId(), "PHARM-001", "Apollo Pharmacy (Central)",
-                    50, 28.0, "Seasonal restocking for outpatient dispensary");
-            StockTransfer trf1 = approveRequest(req2.getRequestId(), "PHARM-002");
+            // 2. Apex Care requests 25 units of Montelukast from Green Valley (Pending for Green Valley to Approve/Reject)
+            submitRequest(l16.getListingId(), PHARM1_ID, PHARM1_NAME,
+                    25, 108.0, "Prescription demand from Metro City outpatient branch");
+
+            // 3. Green Valley requested 50 units of Paracetamol from City Health, which was Approved & Dispatched
+            ExchangeRequest req3 = submitRequest(l5.getListingId(), PHARM3_ID, PHARM3_NAME,
+                    50, 28.0, "Seasonal restocking for Green Valley dispensary");
+            StockTransfer trf1 = approveRequest(req3.getRequestId(), PHARM2_ID);
             updateTransferStatus(trf1.getTransferId(), StockTransfer.TransferStatus.DISPATCHED);
         } catch (Exception ignored) {
         }
     }
-
-    // ==========================================
-    // LISTING OPERATIONS
-    // ==========================================
-
     public ExchangeListing createListing(String sellerPharmacyId, String sellerPharmacyName,
                                          String medicineName, String batchNumber,
                                          LocalDate expiryDate, int totalQuantity,

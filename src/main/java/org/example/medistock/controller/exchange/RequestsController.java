@@ -102,8 +102,12 @@ public class RequestsController implements Initializable {
             pharmacyComboBox.setValue(sessionPharmacy);
             this.activePharmacy = sessionPharmacy;
         } else if (!pharmacies.isEmpty()) {
-            pharmacyComboBox.setValue(pharmacies.get(0));
-            this.activePharmacy = pharmacies.get(0);
+            Pharmacy preferred = pharmacies.stream()
+                    .filter(p -> p.getId().equalsIgnoreCase("PHARM-003"))
+                    .findFirst()
+                    .orElse(pharmacies.get(0));
+            pharmacyComboBox.setValue(preferred);
+            this.activePharmacy = preferred;
         }
 
         pharmacyComboBox.setOnAction(event -> {
@@ -124,7 +128,7 @@ public class RequestsController implements Initializable {
         if (session != null) {
             return session;
         }
-        return new Pharmacy("PHARM-001", "Apollo Pharmacy (Central)", "DL-APO-9821", "12 Park Avenue", "Delhi", "+91 98765 43210", "apollo@medistock.com");
+        return new Pharmacy("PHARM-001", "Apex Care Pharmacy (Metro City)", "DL-APO-9821", "12 Park Avenue", "Delhi", "+91 98765 43210", "apollo@medistock.com");
     }
 
     private void setupIncomingTable() {
