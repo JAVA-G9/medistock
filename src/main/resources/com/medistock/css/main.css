@@ -16,6 +16,8 @@
     -fx-text-main: #0f172a;
     -fx-text-muted: #64748b;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -391,6 +393,8 @@
     -fx-padding: 16 18;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 6, 0, 0, 2);
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 10;
     -fx-border-width: 1;
 }
@@ -438,6 +442,8 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 8;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 8;
     -fx-padding: 12 16;
 }
@@ -485,6 +491,8 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 10;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 10;
     -fx-padding: 16;
 }
@@ -498,6 +506,8 @@
 .medistock-table {
     -fx-background-color: transparent;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 6;
 }
 
@@ -654,6 +664,8 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 10;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 10;
     -fx-padding: 20;
 }
@@ -688,6 +700,8 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 12;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 12;
     -fx-padding: 28;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
@@ -750,6 +764,8 @@
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-width: 1px;
     -fx-padding: 14px;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 6, 0, 0, 2);
@@ -801,10 +817,30 @@
 }
 
 /* ==========================================================================
-   Modern MediStock TabPanes & Switchers
+   Modern MediStock TabPanes & Segmented Switchers
    ========================================================================== */
 
-/* Main Level TabPane */
+/* Universal Focus Removal - Completely eliminates the blue focus border/ring on tab click */
+.tab-pane,
+.tab-pane:focused,
+.tab-pane *.tab-header-area,
+.tab-pane:focused *.tab-header-area,
+.tab,
+.tab:focused,
+.tab:selected:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.tab .focus-indicator,
+.tab:focused .focus-indicator {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: null;
+}
+
+/* Base TabPane - Segmented Pill Switcher Theme */
 .tab-pane,
 .medistock-tab-pane {
     -fx-tab-min-height: 38px;
@@ -813,12 +849,15 @@
 
 .tab-pane .tab-header-area,
 .medistock-tab-pane .tab-header-area {
-    -fx-padding: 0 0 4 0;
+    -fx-padding: 4 6 10 6;
 }
 
 .tab-pane .tab-header-area .tab-header-background,
 .medistock-tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: transparent;
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
 }
 
 .tab-pane .tab-header-area .headers-region,
@@ -826,30 +865,29 @@
     -fx-effect: null;
 }
 
+/* Individual Tab */
 .tab-pane .tab,
 .medistock-tab-pane .tab {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: transparent;
     -fx-background-insets: 0;
-    -fx-background-radius: 8 8 0 0;
-    -fx-border-color: #e2e8f0 #e2e8f0 transparent #e2e8f0;
-    -fx-border-width: 1 1 0 1;
-    -fx-border-radius: 8 8 0 0;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
     -fx-padding: 8 22;
     -fx-cursor: hand;
 }
 
 .tab-pane .tab:hover,
 .medistock-tab-pane .tab:hover {
-    -fx-background-color: #ccfbf1;
-    -fx-border-color: #99f6e4 #99f6e4 transparent #99f6e4;
+    -fx-background-color: rgba(15, 118, 110, 0.12);
 }
 
 .tab-pane .tab:selected,
 .medistock-tab-pane .tab:selected {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #0f766e #e2e8f0 transparent #e2e8f0;
-    -fx-border-width: 3 1 0 1;
-    -fx-border-radius: 8 8 0 0;
+    -fx-background-color: #0f766e;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
 }
 
 .tab-pane .tab .tab-label,
@@ -866,19 +904,18 @@
 
 .tab-pane .tab:selected .tab-label,
 .medistock-tab-pane .tab:selected .tab-label {
-    -fx-text-fill: #0f766e;
+    -fx-text-fill: #ffffff;
     -fx-font-weight: bold;
 }
 
 .tab-pane:top *.tab-content-area,
 .medistock-tab-pane:top *.tab-content-area {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e2e8f0;
-    -fx-border-width: 1 0 0 0;
-    -fx-padding: 12 0 0 0;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 6 0 0 0;
 }
 
-/* Sub-TabPane - Segmented Pill Switcher (for Requests & Transfers) */
+/* Sub-TabPane - Segmented Pill Switcher (for Requests & Transfers inside cards) */
 .sub-tab-pane {
     -fx-tab-min-height: 34px;
     -fx-tab-max-height: 36px;
@@ -912,6 +949,7 @@
     -fx-background-color: #0f766e;
     -fx-background-radius: 6px;
     -fx-border-color: transparent;
+    -fx-border-width: 0;
 }
 
 .sub-tab-pane .tab .tab-label {
