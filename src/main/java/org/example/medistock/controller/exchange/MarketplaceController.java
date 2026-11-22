@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
  * Controller for the Marketplace screen.
  * Folder: controller/exchange/
  * Owned by Member 3 (Stock Exchange & Requests).
+ * Styled according to MediStock Unified Design System.
  */
 public class MarketplaceController implements Initializable {
 
@@ -43,6 +44,12 @@ public class MarketplaceController implements Initializable {
     @FXML private TableColumn<ExchangeListing, Double> colPrice;
     @FXML private TableColumn<ExchangeListing, String> colSeller;
     @FXML private TableColumn<ExchangeListing, String> colStatus;
+
+    // Header Badges & KPI Stat Labels
+    @FXML private Label badgeFacility;
+    @FXML private Label kpiTotalListings;
+    @FXML private Label kpiMyListings;
+    @FXML private Label kpiReservedStock;
 
     @FXML private Label statusLabel;
     @FXML private TextArea logArea;
@@ -115,7 +122,27 @@ public class MarketplaceController implements Initializable {
     public void loadListings() {
         List<ExchangeListing> listings = exchangeService.getAllListings();
         listingsData.setAll(listings);
-        statusLabel.setText("Loaded " + listings.size() + " listings.");
+
+        Pharmacy cur = getActivePharmacy();
+        long activeCount = listings.stream().filter(l -> l.getStatus() == ExchangeListing.ListingStatus.AVAILABLE).count();
+        long myCount = listings.stream().filter(l -> l.getSellerPharmacyId().equalsIgnoreCase(cur.getId())).count();
+        int reservedUnits = listings.stream().mapToInt(ExchangeListing::getReservedQuantity).sum();
+
+        if (kpiTotalListings != null) {
+            kpiTotalListings.setText(String.valueOf(activeCount));
+        }
+        if (kpiMyListings != null) {
+            kpiMyListings.setText(String.valueOf(myCount));
+        }
+        if (kpiReservedStock != null) {
+            kpiReservedStock.setText(reservedUnits + " units");
+        }
+        if (badgeFacility != null) {
+            badgeFacility.setText("PHARMACY: " + cur.getName() + " (" + cur.getCity() + ")");
+        }
+        if (statusLabel != null) {
+            statusLabel.setText("Showing " + listings.size() + " listings in marketplace.");
+        }
     }
 
     private void filterListings(String query) {
@@ -124,7 +151,9 @@ public class MarketplaceController implements Initializable {
         } else {
             List<ExchangeListing> filtered = exchangeService.searchListings(query);
             listingsData.setAll(filtered);
-            statusLabel.setText("Found " + filtered.size() + " matching listings.");
+            if (statusLabel != null) {
+                statusLabel.setText("Found " + filtered.size() + " matching listings.");
+            }
         }
     }
 
@@ -142,7 +171,7 @@ public class MarketplaceController implements Initializable {
         dialog.setTitle("Publish Surplus Medicine Listing");
         dialog.setHeaderText("Add surplus medicine to the PharmaExchange Marketplace\nSeller: " + currentPharmacy.getName());
 
-        ButtonType publishButtonType = new ButtonType("Publish", ButtonBar.ButtonData.OK_DONE);
+        ButtonType publishButtonType = new ButtonType("Publish Listing", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(publishButtonType, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
@@ -152,15 +181,26 @@ public class MarketplaceController implements Initializable {
 
         TextField medNameField = new TextField();
         medNameField.setPromptText("e.g. Ciprofloxacin 500mg");
+        medNameField.getStyleClass().add("input-field");
+
         TextField batchField = new TextField();
         batchField.setPromptText("e.g. CIP-2024-05");
+        batchField.getStyleClass().add("input-field");
+
         DatePicker expiryPicker = new DatePicker(LocalDate.now().plusMonths(3));
+        expiryPicker.getStyleClass().add("input-field");
+
         TextField qtyField = new TextField();
         qtyField.setPromptText("e.g. 100");
+        qtyField.getStyleClass().add("input-field");
+
         TextField priceField = new TextField();
         priceField.setPromptText("e.g. 45.00");
+        priceField.getStyleClass().add("input-field");
+
         TextField notesField = new TextField();
         notesField.setPromptText("e.g. Surplus batch, ready to dispatch");
+        notesField.getStyleClass().add("input-field");
 
         grid.add(new Label("Medicine Name:"), 0, 0);
         grid.add(medNameField, 1, 0);

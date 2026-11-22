@@ -44,6 +44,8 @@ public class ExchangeBackendVerification {
 
         if (passedTests != totalTests) {
             System.exit(1);
+        } else {
+            System.exit(0);
         }
     }
 
