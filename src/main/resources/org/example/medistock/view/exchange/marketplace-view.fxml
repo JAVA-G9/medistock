@@ -8,72 +8,81 @@
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.medistock.controller.exchange.MarketplaceController">
 
-    <!-- Compact Header Block -->
+    <!-- Responsive Header Block -->
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label text="🛒 Surplus Medicine Marketplace" styleClass="card-section-title"/>
+        <Label text="🛒 Surplus Medicine Marketplace" styleClass="card-section-title" minWidth="-Infinity"/>
         <Label text="• Peer-to-peer exchange with atomic reservation escrow" styleClass="text-muted"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label fx:id="badgeFacility" text="LICENSED FACILITY" styleClass="license-badge-pill"/>
-        <Label text="MEMBER 3 • EVALUATION 1" styleClass="badge-eval"/>
+        <Label fx:id="badgeFacility" text="LICENSED FACILITY" styleClass="license-badge-pill" minWidth="-Infinity"/>
+        <Label text="MEMBER 3 • EVALUATION 1" styleClass="badge-eval" minWidth="-Infinity"/>
     </HBox>
 
     <!-- Compact KPI Metric Stat Cards -->
     <HBox spacing="10.0">
         <!-- Teal KPI: Total Available Listings -->
-        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-teal">
-            <Label text="TOTAL ACTIVE LISTINGS" styleClass="kpi-label"/>
+        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-teal" minWidth="140.0">
+            <Label text="TOTAL ACTIVE LISTINGS" styleClass="kpi-label" minWidth="-Infinity"/>
             <Label fx:id="kpiTotalListings" text="18" styleClass="kpi-value"/>
-            <Label text="Available on marketplace" styleClass="kpi-subtext"/>
+            <Label text="Available on marketplace" styleClass="kpi-subtext" minWidth="-Infinity"/>
         </VBox>
 
         <!-- Blue KPI: My Active Listings -->
-        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-blue">
-            <Label text="MY PHARMACY LISTINGS" styleClass="kpi-label"/>
+        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-blue" minWidth="140.0">
+            <Label text="MY PHARMACY LISTINGS" styleClass="kpi-label" minWidth="-Infinity"/>
             <Label fx:id="kpiMyListings" text="1" styleClass="kpi-value"/>
-            <Label text="Published by current facility" styleClass="kpi-subtext"/>
+            <Label text="Published by current facility" styleClass="kpi-subtext" minWidth="-Infinity"/>
         </VBox>
 
         <!-- Amber KPI: Reserved Units -->
-        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-amber">
-            <Label text="RESERVED ESCROW UNITS" styleClass="kpi-label"/>
+        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-amber" minWidth="140.0">
+            <Label text="RESERVED ESCROW UNITS" styleClass="kpi-label" minWidth="-Infinity"/>
             <Label fx:id="kpiReservedStock" text="40 units" styleClass="kpi-value"/>
-            <Label text="Locked in pending requests" styleClass="kpi-subtext"/>
+            <Label text="Locked in pending requests" styleClass="kpi-subtext" minWidth="-Infinity"/>
         </VBox>
 
         <!-- Purple KPI: Concurrency Engine -->
-        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-purple">
-            <Label text="CONCURRENCY ENGINE" styleClass="kpi-label"/>
+        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-purple" minWidth="140.0">
+            <Label text="CONCURRENCY ENGINE" styleClass="kpi-label" minWidth="-Infinity"/>
             <Label text="ACTIVE" styleClass="kpi-value"/>
-            <Label text="Intrinsic lock • Zero overselling" styleClass="kpi-subtext"/>
+            <Label text="Intrinsic lock • Zero overselling" styleClass="kpi-subtext" minWidth="-Infinity"/>
         </VBox>
     </HBox>
 
-    <!-- Toolbar / Action Strip -->
-    <HBox spacing="8.0" alignment="CENTER_LEFT" styleClass="action-strip">
-        <Label text="Active Pharmacy:" styleClass="field-label"/>
-        <ComboBox fx:id="pharmacyComboBox" prefWidth="220.0" styleClass="input-field"/>
+    <!-- Responsive 2-Row Action Strip -->
+    <VBox spacing="8.0" styleClass="action-strip">
+        <!-- Row 1: Active Facility Selection & Live Search Filter -->
+        <HBox spacing="10.0" alignment="CENTER_LEFT">
+            <Label text="Active Pharmacy:" styleClass="field-label" minWidth="-Infinity"/>
+            <ComboBox fx:id="pharmacyComboBox" prefWidth="260.0" minWidth="180.0" styleClass="input-field"/>
 
-        <Region HBox.hgrow="ALWAYS"/>
-
-        <Label text="Filter:" styleClass="field-label"/>
-        <TextField fx:id="searchField" prefWidth="160.0" promptText="Filter medicine, seller..." styleClass="input-field"/>
-
-        <Button text="➕ Publish Surplus" onAction="#handlePublishListing" styleClass="btn-action-primary"/>
-        <Button text="📥 Request Stock" onAction="#handleRequestStock" styleClass="btn-action-primary"/>
-        <Button text="⚡ Concurrency Test" onAction="#handleRunConcurrencyTest" styleClass="btn-lab-primary, btn-compact"/>
-        <Button text="❌ Cancel Listing" onAction="#handleCancelListing" styleClass="btn-lab-pri-high, btn-compact"/>
-        <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary"/>
-    </HBox>
-
-    <!-- Expanded Table Card Container -->
-    <VBox spacing="6.0" VBox.vgrow="ALWAYS" styleClass="table-card">
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label text="📦 Available Surplus Medicine Listings" styleClass="card-section-title"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="statusLabel" text="Ready" styleClass="text-muted"/>
+
+            <Label text="Search / Filter:" styleClass="field-label" minWidth="-Infinity"/>
+            <TextField fx:id="searchField" prefWidth="200.0" minWidth="140.0" promptText="Filter medicine, batch, seller..." styleClass="input-field"/>
+            <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
         </HBox>
 
-        <TableView fx:id="listingsTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="240.0" prefHeight="380.0">
+        <!-- Row 2: Action Buttons & Status Feedback -->
+        <HBox spacing="8.0" alignment="CENTER_LEFT">
+            <Label text="Actions:" styleClass="field-label" minWidth="-Infinity"/>
+            <Button text="➕ Publish Surplus" onAction="#handlePublishListing" styleClass="btn-action-primary" minWidth="-Infinity"/>
+            <Button text="📥 Request Stock" onAction="#handleRequestStock" styleClass="btn-action-primary" minWidth="-Infinity"/>
+            <Button text="⚡ Concurrency Test" onAction="#handleRunConcurrencyTest" styleClass="btn-lab-primary, btn-compact" minWidth="-Infinity"/>
+            <Button text="❌ Cancel Listing" onAction="#handleCancelListing" styleClass="btn-lab-pri-high, btn-compact" minWidth="-Infinity"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" text="Ready" styleClass="text-muted" minWidth="-Infinity"/>
+        </HBox>
+    </VBox>
+
+    <!-- Expanded Table Card Container -->
+    <VBox spacing="6.0" VBox.vgrow="ALWAYS" styleClass="table-card" minHeight="240.0">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label text="📦 Available Surplus Medicine Listings" styleClass="card-section-title" minWidth="-Infinity"/>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <TableView fx:id="listingsTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="200.0" prefHeight="360.0">
             <columns>
                 <TableColumn fx:id="colListingId" prefWidth="80.0" text="Listing ID" />
                 <TableColumn fx:id="colMedicine" prefWidth="170.0" text="Medicine Name" />
@@ -95,11 +104,11 @@
     <!-- Compact Multithreading & Event Execution Trace (Info Card) -->
     <VBox spacing="3.0" styleClass="info-card">
         <HBox alignment="CENTER_LEFT" spacing="8.0">
-            <Label text="⚡ Multithreading &amp; Concurrency Trace" styleClass="info-title"/>
+            <Label text="⚡ Multithreading &amp; Concurrency Trace" styleClass="info-title" minWidth="-Infinity"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="Intrinsic monitor locks • Atomic reservations • EventProducer daemon" styleClass="info-bullet"/>
         </HBox>
-        <TextArea fx:id="logArea" editable="false" prefHeight="48.0" minHeight="44.0" styleClass="console-area" wrapText="true"/>
+        <TextArea fx:id="logArea" editable="false" prefHeight="48.0" minHeight="42.0" styleClass="console-area" wrapText="true"/>
     </VBox>
 
 </VBox>
