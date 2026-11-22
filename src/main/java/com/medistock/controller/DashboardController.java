@@ -27,6 +27,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import org.example.medistock.controller.exchange.ExchangeController;
 import java.io.IOException;
 
 /**

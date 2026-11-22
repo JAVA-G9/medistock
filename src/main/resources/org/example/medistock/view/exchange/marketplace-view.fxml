@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.medistock.controller.exchange.MarketplaceController"
+      stylesheets="@../../css/main.css">
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+
+    <!-- Top Action Bar -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="card">
+        <Label style="-fx-font-weight: bold; -fx-text-fill: #1565c0;" text="Active Pharmacy:" />
+        <ComboBox fx:id="pharmacyComboBox" prefWidth="250.0" />
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <Label text="Search Marketplace:" />
+        <TextField fx:id="searchField" prefWidth="220.0" promptText="Filter by medicine, batch, seller..." />
+
+        <Button onAction="#handleRefresh" styleClass="btn-secondary" text="🔄 Refresh" />
+    </HBox>
+
+    <!-- Table of Listings -->
+    <VBox spacing="8.0" VBox.vgrow="ALWAYS" styleClass="card">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0d47a1;"
+                   text="Available Surplus Medicine Listings" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="statusLabel" style="-fx-text-fill: #546e7a;" text="Ready" />
+        </HBox>
+
+        <TableView fx:id="listingsTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colListingId" prefWidth="90.0" text="Listing ID" />
+                <TableColumn fx:id="colMedicine" prefWidth="180.0" text="Medicine Name" />
+                <TableColumn fx:id="colBatch" prefWidth="110.0" text="Batch No" />
+                <TableColumn fx:id="colExpiry" prefWidth="100.0" text="Expiry Date" />
+                <TableColumn fx:id="colAvailQty" prefWidth="90.0" text="Available" />
+                <TableColumn fx:id="colReservedQty" prefWidth="90.0" text="Reserved" />
+                <TableColumn fx:id="colTotalQty" prefWidth="90.0" text="Total Qty" />
+                <TableColumn fx:id="colPrice" prefWidth="90.0" text="Unit Price (₹)" />
+                <TableColumn fx:id="colSeller" prefWidth="180.0" text="Seller Pharmacy" />
+                <TableColumn fx:id="colStatus" prefWidth="100.0" text="Status" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+
+        <!-- Action Buttons Row -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <Button onAction="#handlePublishListing" styleClass="btn-success" text="➕ Publish Surplus Batch" />
+            <Button onAction="#handleRequestStock" styleClass="btn-primary" text="📥 Request Stock" />
+            <Button onAction="#handleCancelListing" styleClass="btn-danger" text="❌ Cancel My Listing" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <!-- Multithreading Feature Button -->
+            <Button onAction="#handleRunConcurrencyTest" styleClass="btn-warning"
+                    text="⚡ Run Concurrency Stress Test" />
+        </HBox>
+    </VBox>
+
+    <!-- Console / Execution Trace Log Area -->
+    <VBox spacing="4.0" styleClass="card">
+        <HBox alignment="CENTER_LEFT" spacing="8.0">
+            <Label style="-fx-font-weight: bold; -fx-text-fill: #37474f;" text="Multithreading &amp; Event Execution Trace:" />
+            <Label style="-fx-font-size: 11px; -fx-text-fill: #78909c;" text="(Thread names, atomic reservations &amp; EventProducer log)" />
+        </HBox>
+        <TextArea fx:id="logArea" editable="false" prefHeight="100.0" styleClass="console-area" wrapText="true" />
+    </VBox>
+
+</VBox>

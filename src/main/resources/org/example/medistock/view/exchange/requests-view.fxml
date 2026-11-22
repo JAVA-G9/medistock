@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.medistock.controller.exchange.RequestsController"
+      stylesheets="@../../css/main.css">
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+
+    <!-- Top Pharmacy Selector -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="card">
+        <Label style="-fx-font-weight: bold; -fx-text-fill: #1565c0;" text="Active Pharmacy:" />
+        <ComboBox fx:id="pharmacyComboBox" prefWidth="250.0" />
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <Label fx:id="statusLabel" style="-fx-text-fill: #546e7a;" text="Ready" />
+        <Button onAction="#handleRefresh" styleClass="btn-secondary" text="🔄 Refresh All" />
+    </HBox>
+
+    <!-- Tab Pane for Requests and Transfers -->
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="card">
+        <!-- Tab 1: Incoming Requests -->
+        <Tab text="📥 Incoming Requests (For My Listings)">
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                </padding>
+                <TableView fx:id="incomingTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colIncId" prefWidth="90.0" text="Request ID" />
+                        <TableColumn fx:id="colIncListing" prefWidth="90.0" text="Listing ID" />
+                        <TableColumn fx:id="colIncRequester" prefWidth="180.0" text="Requester Pharmacy" />
+                        <TableColumn fx:id="colIncMedicine" prefWidth="180.0" text="Medicine Name" />
+                        <TableColumn fx:id="colIncQty" prefWidth="80.0" text="Qty" />
+                        <TableColumn fx:id="colIncPrice" prefWidth="90.0" text="Unit Price (₹)" />
+                        <TableColumn fx:id="colIncTotal" prefWidth="100.0" text="Total (₹)" />
+                        <TableColumn fx:id="colIncStatus" prefWidth="100.0" text="Status" />
+                        <TableColumn fx:id="colIncDate" prefWidth="130.0" text="Request Date" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+                <HBox spacing="10.0">
+                    <Button onAction="#handleApproveRequest" styleClass="btn-success" text="✅ Approve Selected Request" />
+                    <Button onAction="#handleRejectRequest" styleClass="btn-danger" text="❌ Reject Selected Request (Release Stock)" />
+                </HBox>
+            </VBox>
+        </Tab>
+
+        <!-- Tab 2: Outgoing Requests -->
+        <Tab text="📤 My Outgoing Requests">
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                </padding>
+                <TableView fx:id="outgoingTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colOutId" prefWidth="90.0" text="Request ID" />
+                        <TableColumn fx:id="colOutListing" prefWidth="90.0" text="Listing ID" />
+                        <TableColumn fx:id="colOutSeller" prefWidth="160.0" text="Seller Pharmacy" />
+                        <TableColumn fx:id="colOutMedicine" prefWidth="180.0" text="Medicine Name" />
+                        <TableColumn fx:id="colOutQty" prefWidth="80.0" text="Qty" />
+                        <TableColumn fx:id="colOutPrice" prefWidth="90.0" text="Unit Price (₹)" />
+                        <TableColumn fx:id="colOutTotal" prefWidth="100.0" text="Total (₹)" />
+                        <TableColumn fx:id="colOutStatus" prefWidth="100.0" text="Status" />
+                        <TableColumn fx:id="colOutDate" prefWidth="130.0" text="Request Date" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+                <HBox spacing="10.0">
+                    <Button onAction="#handleCancelOutgoingRequest" styleClass="btn-danger" text="🚫 Cancel Selected Request" />
+                </HBox>
+            </VBox>
+        </Tab>
+
+        <!-- Tab 3: Stock Transfers & Tracking -->
+        <Tab text="🚚 Stock Transfers &amp; Tracking">
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                </padding>
+                <TableView fx:id="transfersTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colTrfId" prefWidth="90.0" text="Transfer ID" />
+                        <TableColumn fx:id="colTrfMedicine" prefWidth="180.0" text="Medicine Name" />
+                        <TableColumn fx:id="colTrfQty" prefWidth="70.0" text="Qty" />
+                        <TableColumn fx:id="colTrfSource" prefWidth="160.0" text="Source Pharmacy" />
+                        <TableColumn fx:id="colTrfDest" prefWidth="160.0" text="Destination Pharmacy" />
+                        <TableColumn fx:id="colTrfTracking" prefWidth="120.0" text="Tracking No" />
+                        <TableColumn fx:id="colTrfStatus" prefWidth="110.0" text="Status" />
+                        <TableColumn fx:id="colTrfCreated" prefWidth="130.0" text="Created" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+                <HBox spacing="10.0">
+                    <Button onAction="#handleMarkDispatched" styleClass="btn-warning" text="🚚 Mark as Dispatched" />
+                    <Button onAction="#handleMarkDelivered" styleClass="btn-primary" text="📦 Mark as Delivered" />
+                    <Button onAction="#handleVerifyAndComplete" styleClass="btn-success" text="✔️ Verify &amp; Complete Transfer (Finalize Stock)" />
+                </HBox>
+            </VBox>
+        </Tab>
+    </TabPane>
+
+    <!-- Log Console -->
+    <VBox spacing="4.0" styleClass="card">
+        <Label style="-fx-font-weight: bold; -fx-text-fill: #37474f;" text="Activity &amp; Event Log:" />
+        <TextArea fx:id="logArea" editable="false" prefHeight="100.0" styleClass="console-area" wrapText="true" />
+    </VBox>
+
+</VBox>
