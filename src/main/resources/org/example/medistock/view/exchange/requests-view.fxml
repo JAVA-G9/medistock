@@ -52,15 +52,15 @@
         <Button text="⟳ Refresh All" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
     </HBox>
 
-    <!-- Expanded Tab Pane for Requests and Transfers -->
-    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="table-card, sub-tab-pane" minHeight="280.0">
+    <!-- Tab Pane for Requests and Transfers (Calibrated for 5 entries) -->
+    <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="265.0" minHeight="265.0" maxHeight="265.0" styleClass="table-card, sub-tab-pane">
         <!-- Tab 1: Incoming Requests -->
         <Tab text="📥 Incoming Requests (For My Listings)">
             <VBox spacing="8.0">
                 <padding>
                     <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                 </padding>
-                <TableView fx:id="incomingTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="180.0" prefHeight="320.0">
+                <TableView fx:id="incomingTable" fixedCellSize="28.0" prefHeight="172.0" minHeight="172.0" maxHeight="172.0" styleClass="medistock-table">
                     <columns>
                         <TableColumn fx:id="colIncId" prefWidth="80.0" text="Request ID" />
                         <TableColumn fx:id="colIncListing" prefWidth="80.0" text="Listing ID" />
@@ -89,7 +89,7 @@
                 <padding>
                     <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                 </padding>
-                <TableView fx:id="outgoingTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="180.0" prefHeight="320.0">
+                <TableView fx:id="outgoingTable" fixedCellSize="28.0" prefHeight="172.0" minHeight="172.0" maxHeight="172.0" styleClass="medistock-table">
                     <columns>
                         <TableColumn fx:id="colOutId" prefWidth="80.0" text="Request ID" />
                         <TableColumn fx:id="colOutListing" prefWidth="80.0" text="Listing ID" />
@@ -117,7 +117,7 @@
                 <padding>
                     <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                 </padding>
-                <TableView fx:id="transfersTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="180.0" prefHeight="320.0">
+                <TableView fx:id="transfersTable" fixedCellSize="28.0" prefHeight="172.0" minHeight="172.0" maxHeight="172.0" styleClass="medistock-table">
                     <columns>
                         <TableColumn fx:id="colTrfId" prefWidth="80.0" text="Transfer ID" />
                         <TableColumn fx:id="colTrfMedicine" prefWidth="170.0" text="Medicine Name" />
