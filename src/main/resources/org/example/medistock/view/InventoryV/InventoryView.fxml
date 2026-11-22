@@ -9,8 +9,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="541.0" prefWidth="655.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.medistock.controller.inventory.inventoryController">
+<AnchorPane prefHeight="539.0" prefWidth="658.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.medistock.controller.inventory.inventoryController">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ccfbf1" height="464.0" layoutX="4.0" layoutY="75.0" stroke="#ccfbf1" strokeType="INSIDE" width="647.0" />
       <Label alignment="CENTER" layoutY="-1.0" prefHeight="74.0" prefWidth="655.0" style="-fx-background-color: #115E59; -fx-font-family: Segoe UI;" text="Medistock" textFill="#fff8f8">
