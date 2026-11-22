@@ -8,48 +8,48 @@
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.medistock.controller.exchange.RequestsController">
 
-    <!-- Compact Header Block -->
+    <!-- Responsive Header Block -->
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label text="📋 Exchange Requests &amp; Stock Transfer Tracking" styleClass="card-section-title"/>
+        <Label text="📋 Exchange Requests &amp; Stock Transfer Tracking" styleClass="card-section-title" minWidth="-Infinity"/>
         <Label text="• Multi-pharmacy approval workflow and secure transit verification" styleClass="text-muted"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label fx:id="badgeFacilityReq" text="FACILITY" styleClass="license-badge-pill"/>
-        <Label text="MEMBER 3 • EVALUATION 1" styleClass="badge-eval"/>
+        <Label fx:id="badgeFacilityReq" text="FACILITY" styleClass="license-badge-pill" minWidth="-Infinity"/>
+        <Label text="MEMBER 3 • EVALUATION 1" styleClass="badge-eval" minWidth="-Infinity"/>
     </HBox>
 
     <!-- Compact KPI Metric Cards -->
     <HBox spacing="10.0">
         <!-- Amber KPI: Incoming Requests Awaiting Approval -->
-        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-amber">
-            <Label text="INCOMING PENDING REQUESTS" styleClass="kpi-label"/>
+        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-amber" minWidth="150.0">
+            <Label text="INCOMING PENDING REQUESTS" styleClass="kpi-label" minWidth="-Infinity"/>
             <Label fx:id="kpiIncomingPending" text="1" styleClass="kpi-value"/>
-            <Label text="Requires approval or rejection" styleClass="kpi-subtext"/>
+            <Label text="Requires approval or rejection" styleClass="kpi-subtext" minWidth="-Infinity"/>
         </VBox>
 
         <!-- Blue KPI: Outgoing Requests Placed -->
-        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-blue">
-            <Label text="OUTGOING STOCK REQUESTS" styleClass="kpi-label"/>
+        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-blue" minWidth="150.0">
+            <Label text="OUTGOING STOCK REQUESTS" styleClass="kpi-label" minWidth="-Infinity"/>
             <Label fx:id="kpiOutgoingRequests" text="1" styleClass="kpi-value"/>
-            <Label text="Requested from peer pharmacies" styleClass="kpi-subtext"/>
+            <Label text="Requested from peer pharmacies" styleClass="kpi-subtext" minWidth="-Infinity"/>
         </VBox>
 
         <!-- Teal KPI: Active Transfers -->
-        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-teal">
-            <Label text="ACTIVE STOCK TRANSFERS" styleClass="kpi-label"/>
+        <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-teal" minWidth="150.0">
+            <Label text="ACTIVE STOCK TRANSFERS" styleClass="kpi-label" minWidth="-Infinity"/>
             <Label fx:id="kpiActiveTransfers" text="1" styleClass="kpi-value"/>
-            <Label text="In-transit &amp; pending verification" styleClass="kpi-subtext"/>
+            <Label text="In-transit &amp; pending verification" styleClass="kpi-subtext" minWidth="-Infinity"/>
         </VBox>
     </HBox>
 
-    <!-- Toolbar / Action Strip -->
-    <HBox spacing="8.0" alignment="CENTER_LEFT" styleClass="action-strip">
-        <Label text="Active Pharmacy:" styleClass="field-label"/>
-        <ComboBox fx:id="pharmacyComboBox" prefWidth="230.0" styleClass="input-field"/>
+    <!-- Responsive Toolbar / Action Strip -->
+    <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="action-strip">
+        <Label text="Active Pharmacy:" styleClass="field-label" minWidth="-Infinity"/>
+        <ComboBox fx:id="pharmacyComboBox" prefWidth="260.0" minWidth="180.0" styleClass="input-field"/>
 
         <Region HBox.hgrow="ALWAYS"/>
 
-        <Label fx:id="statusLabel" text="Ready" styleClass="text-muted"/>
-        <Button text="⟳ Refresh All" onAction="#handleRefresh" styleClass="btn-action-secondary"/>
+        <Label fx:id="statusLabel" text="Ready" styleClass="text-muted" minWidth="-Infinity"/>
+        <Button text="⟳ Refresh All" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
     </HBox>
 
     <!-- Expanded Tab Pane for Requests and Transfers -->
@@ -60,7 +60,7 @@
                 <padding>
                     <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                 </padding>
-                <TableView fx:id="incomingTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="200.0" prefHeight="340.0">
+                <TableView fx:id="incomingTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="180.0" prefHeight="320.0">
                     <columns>
                         <TableColumn fx:id="colIncId" prefWidth="80.0" text="Request ID" />
                         <TableColumn fx:id="colIncListing" prefWidth="80.0" text="Listing ID" />
@@ -76,9 +76,9 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                     </columnResizePolicy>
                 </TableView>
-                <HBox spacing="8.0" alignment="CENTER_LEFT">
-                    <Button onAction="#handleApproveRequest" styleClass="btn-action-primary" text="✅ Approve Selected Request" />
-                    <Button onAction="#handleRejectRequest" styleClass="btn-secondary, btn-compact" text="❌ Reject (Release Escrow)" />
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Button onAction="#handleApproveRequest" styleClass="btn-action-primary" text="✅ Approve Selected Request" minWidth="-Infinity"/>
+                    <Button onAction="#handleRejectRequest" styleClass="btn-secondary, btn-compact" text="❌ Reject (Release Escrow)" minWidth="-Infinity"/>
                 </HBox>
             </VBox>
         </Tab>
@@ -89,7 +89,7 @@
                 <padding>
                     <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                 </padding>
-                <TableView fx:id="outgoingTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="200.0" prefHeight="340.0">
+                <TableView fx:id="outgoingTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="180.0" prefHeight="320.0">
                     <columns>
                         <TableColumn fx:id="colOutId" prefWidth="80.0" text="Request ID" />
                         <TableColumn fx:id="colOutListing" prefWidth="80.0" text="Listing ID" />
@@ -105,8 +105,8 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                     </columnResizePolicy>
                 </TableView>
-                <HBox spacing="8.0" alignment="CENTER_LEFT">
-                    <Button onAction="#handleCancelOutgoingRequest" styleClass="btn-secondary, btn-compact" text="🚫 Cancel Selected Request" />
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Button onAction="#handleCancelOutgoingRequest" styleClass="btn-secondary, btn-compact" text="🚫 Cancel Selected Request" minWidth="-Infinity"/>
                 </HBox>
             </VBox>
         </Tab>
@@ -117,7 +117,7 @@
                 <padding>
                     <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                 </padding>
-                <TableView fx:id="transfersTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="200.0" prefHeight="340.0">
+                <TableView fx:id="transfersTable" VBox.vgrow="ALWAYS" styleClass="medistock-table" minHeight="180.0" prefHeight="320.0">
                     <columns>
                         <TableColumn fx:id="colTrfId" prefWidth="80.0" text="Transfer ID" />
                         <TableColumn fx:id="colTrfMedicine" prefWidth="170.0" text="Medicine Name" />
@@ -133,9 +133,9 @@
                     </columnResizePolicy>
                 </TableView>
                 <HBox spacing="8.0" alignment="CENTER_LEFT">
-                    <Button onAction="#handleMarkDispatched" styleClass="btn-action-secondary" text="🚚 Mark Dispatched" />
-                    <Button onAction="#handleMarkDelivered" styleClass="btn-action-primary" text="📦 Mark Delivered" />
-                    <Button onAction="#handleVerifyAndComplete" styleClass="btn-action-primary" text="✔️ Verify &amp; Complete Transfer" />
+                    <Button onAction="#handleMarkDispatched" styleClass="btn-action-secondary" text="🚚 Mark Dispatched" minWidth="-Infinity"/>
+                    <Button onAction="#handleMarkDelivered" styleClass="btn-action-primary" text="📦 Mark Delivered" minWidth="-Infinity"/>
+                    <Button onAction="#handleVerifyAndComplete" styleClass="btn-action-primary" text="✔️ Verify &amp; Complete Transfer" minWidth="-Infinity"/>
                 </HBox>
             </VBox>
         </Tab>
@@ -143,8 +143,8 @@
 
     <!-- Compact Activity & Event Log (Info Card) -->
     <VBox spacing="3.0" styleClass="info-card">
-        <Label text="⚡ Activity &amp; Event Notification Log" styleClass="info-title"/>
-        <TextArea fx:id="logArea" editable="false" prefHeight="48.0" minHeight="44.0" styleClass="console-area" wrapText="true"/>
+        <Label text="⚡ Activity &amp; Event Notification Log" styleClass="info-title" minWidth="-Infinity"/>
+        <TextArea fx:id="logArea" editable="false" prefHeight="48.0" minHeight="42.0" styleClass="console-area" wrapText="true"/>
     </VBox>
 
 </VBox>
