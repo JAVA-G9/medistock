@@ -10,7 +10,7 @@
 
     <!-- Top Exchange Module Header -->
     <HBox alignment="CENTER_LEFT" spacing="12.0">
-        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+        <VBox spacing="2.0" HBox.hgrow="ALWAYS">
             <Label text="PharmaExchange — Stock Exchange &amp; Requests" styleClass="view-title"/>
             <Label text="Peer-to-Peer Pharmacy Surplus Marketplace • Atomic Stock Reservation Escrow • Transfer Verification" styleClass="view-subtitle"/>
         </VBox>
