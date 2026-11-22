@@ -55,7 +55,7 @@
     </HBox>
 
     <!-- Tab Pane for Requests and Transfers -->
-    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="table-card">
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="table-card, sub-tab-pane">
         <!-- Tab 1: Incoming Requests -->
         <Tab text="📥 Incoming Requests (For My Listings)">
             <VBox spacing="12.0">
