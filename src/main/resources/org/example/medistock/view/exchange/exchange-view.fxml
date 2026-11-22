@@ -3,29 +3,27 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="700.0" prefWidth="1050.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+<VBox prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.medistock.controller.exchange.ExchangeController"
-      stylesheets="@../../css/main.css">
+      stylesheets="@/com/medistock/css/main.css"
+      styleClass="view-content-root">
 
-    <!-- Top Exchange Header Banner -->
-    <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="card" style="-fx-background-color: linear-gradient(to right, #0d47a1, #1976d2); -fx-padding: 12px 20px; -fx-background-radius: 0;">
-        <VBox spacing="2.0">
-            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"
-                   text="PharmaExchange — Medicine Surplus Marketplace &amp; Requests" />
-            <Label style="-fx-text-fill: #e3f2fd; -fx-font-size: 12px;"
-                   text="Member 3: Peer-to-Peer Pharmacy Stock Exchange • Atomic Concurrency Reservation • Transfer Tracking" />
+    <!-- Top Exchange Module Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+            <Label text="PharmaExchange — Stock Exchange &amp; Requests" styleClass="view-title"/>
+            <Label text="Peer-to-Peer Pharmacy Surplus Marketplace • Atomic Stock Reservation Escrow • Transfer Verification" styleClass="view-subtitle"/>
         </VBox>
-        <Region HBox.hgrow="ALWAYS" />
-        <Label style="-fx-text-fill: #bbdefb; -fx-font-weight: bold;" text="Member 3 • Evaluation 1" />
+        <Label text="MEMBER 3 MODULE" styleClass="badge-eval"/>
     </HBox>
 
     <!-- Main Navigation TabPane -->
     <TabPane fx:id="exchangeTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab fx:id="tabMarketplace" text="🛒 Marketplace &amp; Surplus Listings">
-            <fx:include fx:id="marketplaceView" source="marketplace-view.fxml" />
+            <fx:include fx:id="marketplaceView" source="marketplace-view.fxml"/>
         </Tab>
         <Tab fx:id="tabRequests" text="📋 Exchange Requests &amp; Transfer Tracking">
-            <fx:include fx:id="requestsView" source="requests-view.fxml" />
+            <fx:include fx:id="requestsView" source="requests-view.fxml"/>
         </Tab>
     </TabPane>
 

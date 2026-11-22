@@ -223,27 +223,55 @@ public class DashboardController {
 
     @FXML
     private void handleNavMarketplace(ActionEvent event) {
-        showPlaceholder(
-                "Stock Marketplace & Listings",
-                "Member 3 — Stock Exchange & Requests",
-                "Marketplace allowing pharmacies to browse surplus medicine batches from other licensed facilities and publish surplus listings with discounted unit rates.",
-                "Owned Classes: MarketplaceController, RequestsController, ExchangeListing, ExchangeRequest, StockTransfer, ExchangeService, ExchangeRepository, EventProducer, ExchangeWorker",
-                "Multithreading Syllabus: Concurrent exchange requests, stock reservation coordination, event production, shared-resource access, and notification queue dispatch."
-        );
-        highlightActiveNavButton(btnNavMarketplace);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXCHANGE_VIEW));
+            Parent view = loader.load();
+            ExchangeController controller = loader.getController();
+            if (controller != null) {
+                controller.selectMarketplaceTab();
+            }
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
+            highlightActiveNavButton(btnNavMarketplace);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder(
+                    "Stock Marketplace & Listings",
+                    "Member 3 - Stock Exchange & Requests",
+                    "Marketplace allowing pharmacies to browse surplus medicine batches from other licensed facilities and publish surplus listings with discounted unit rates.",
+                    "Owned Classes: MarketplaceController, RequestsController, ExchangeListing, ExchangeRequest, StockTransfer, ExchangeService, ExchangeRepository, EventProducer, ExchangeWorker",
+                    "Multithreading Syllabus: Concurrent exchange requests, stock reservation coordination, event production, shared-resource access, and notification queue dispatch."
+            );
+            highlightActiveNavButton(btnNavMarketplace);
+        }
     }
 
     @FXML
     private void handleNavRequests(ActionEvent event) {
-        showPlaceholder(
-                "Exchange Requests & Transfer Tracking",
-                "Member 3 — Stock Exchange & Requests",
-                "Track inbound and outbound medicine transfer requests, approve or reject stock reservations, and track secure medicine transfers.",
-                "Owned Classes: RequestsController, ExchangeRequest, StockTransfer, ExchangeService",
-                "Multithreading Syllabus: Multi-pharmacy concurrent reservation locks and transactional consistency."
-        );
-        highlightActiveNavButton(btnNavRequests);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXCHANGE_VIEW));
+            Parent view = loader.load();
+            ExchangeController controller = loader.getController();
+            if (controller != null) {
+                controller.selectRequestsTab();
+            }
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
+            highlightActiveNavButton(btnNavRequests);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder(
+                    "Exchange Requests & Transfer Tracking",
+                    "Member 3 - Stock Exchange & Requests",
+                    "Track inbound and outbound medicine transfer requests, approve or reject stock reservations, and track secure medicine transfers.",
+                    "Owned Classes: RequestsController, ExchangeRequest, StockTransfer, ExchangeService",
+                    "Multithreading Syllabus: Multi-pharmacy concurrent reservation locks and transactional consistency."
+            );
+            highlightActiveNavButton(btnNavRequests);
+        }
     }
+
+
 
     @FXML
     private void handleNavExpiry(ActionEvent event) {

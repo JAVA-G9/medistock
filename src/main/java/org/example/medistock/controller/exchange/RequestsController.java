@@ -23,10 +23,17 @@ import java.util.ResourceBundle;
  * Controller for managing Exchange Requests and Stock Transfers.
  * Folder: controller/exchange/
  * Owned by Member 3 (Stock Exchange & Requests).
+ * Styled according to MediStock Unified Design System.
  */
 public class RequestsController implements Initializable {
 
     @FXML private ComboBox<Pharmacy> pharmacyComboBox;
+
+    // Header Badges & KPI Stat Labels
+    @FXML private Label badgeFacilityReq;
+    @FXML private Label kpiIncomingPending;
+    @FXML private Label kpiOutgoingRequests;
+    @FXML private Label kpiActiveTransfers;
 
     // Incoming Requests Table
     @FXML private TableView<ExchangeRequest> incomingTable;
@@ -172,9 +179,23 @@ public class RequestsController implements Initializable {
         List<StockTransfer> transfers = exchangeService.getTransfersForPharmacy(cur.getId());
         transfersData.setAll(transfers);
 
+        long pendingIncoming = incoming.stream().filter(r -> r.getStatus() == ExchangeRequest.RequestStatus.PENDING).count();
+
+        if (kpiIncomingPending != null) {
+            kpiIncomingPending.setText(String.valueOf(pendingIncoming));
+        }
+        if (kpiOutgoingRequests != null) {
+            kpiOutgoingRequests.setText(String.valueOf(outgoing.size()));
+        }
+        if (kpiActiveTransfers != null) {
+            kpiActiveTransfers.setText(String.valueOf(transfers.size()));
+        }
+        if (badgeFacilityReq != null) {
+            badgeFacilityReq.setText("FACILITY: " + cur.getName() + " (" + cur.getLicenseNumber() + ")");
+        }
         if (statusLabel != null) {
-            statusLabel.setText(String.format("Pharmacy: %s | Incoming: %d | Outgoing: %d | Transfers: %d",
-                    cur.getName(), incoming.size(), outgoing.size(), transfers.size()));
+            statusLabel.setText(String.format("Incoming: %d | Outgoing: %d | Transfers: %d",
+                    incoming.size(), outgoing.size(), transfers.size()));
         }
     }
 
@@ -202,7 +223,7 @@ public class RequestsController implements Initializable {
             StockTransfer transfer = exchangeService.approveRequest(selected.getRequestId(), currentPharmacy.getId());
             refreshAllData();
             logMessage("APPROVED Request " + selected.getRequestId() + ". Created Transfer: " + transfer.getTransferId());
-            showInfo("Request Approved", "Request has been approved and Stock Transfer " + transfer.getTransferId() + " has been initiated.");
+            showInfo("Request Approved", "Request approved! Stock Transfer " + transfer.getTransferId() + " has been initiated.");
         } catch (Exception e) {
             showError("Approval Error", e.getMessage());
             logMessage("APPROVE ERROR: " + e.getMessage());
