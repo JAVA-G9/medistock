@@ -16,6 +16,8 @@
     -fx-text-main: #0f172a;
     -fx-text-muted: #64748b;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -338,11 +340,12 @@
 }
 
 .view-content-root {
-    -fx-padding: 24;
+    -fx-padding: 12 16 14 16;
+    -fx-spacing: 10;
 }
 
 .view-title {
-    -fx-font-size: 24px;
+    -fx-font-size: 20px;
     -fx-font-weight: 800;
     -fx-text-fill: #0f172a;
 }
@@ -388,9 +391,11 @@
 .kpi-card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 10;
-    -fx-padding: 16 18;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 6, 0, 0, 2);
+    -fx-padding: 8 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 1);
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 10;
     -fx-border-width: 1;
 }
@@ -416,20 +421,20 @@
 }
 
 .kpi-label {
-    -fx-font-size: 11px;
+    -fx-font-size: 10px;
     -fx-font-weight: bold;
     -fx-text-fill: #64748b;
 }
 
 .kpi-value {
-    -fx-font-size: 32px;
+    -fx-font-size: 20px;
     -fx-font-weight: 800;
     -fx-text-fill: #0f172a;
-    -fx-padding: 4 0;
+    -fx-padding: 1 0;
 }
 
 .kpi-subtext {
-    -fx-font-size: 11px;
+    -fx-font-size: 10px;
     -fx-text-fill: #94a3b8;
 }
 
@@ -438,8 +443,10 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 8;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 8;
-    -fx-padding: 12 16;
+    -fx-padding: 6 12;
 }
 
 .action-strip-title {
@@ -451,9 +458,9 @@
 .btn-action-primary {
     -fx-background-color: #0f766e;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 12px;
+    -fx-font-size: 11.5px;
     -fx-font-weight: bold;
-    -fx-padding: 6 14;
+    -fx-padding: 5 11;
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
@@ -468,9 +475,9 @@
     -fx-border-radius: 6;
     -fx-background-radius: 6;
     -fx-text-fill: #334155;
-    -fx-font-size: 12px;
+    -fx-font-size: 11.5px;
     -fx-font-weight: bold;
-    -fx-padding: 6 14;
+    -fx-padding: 5 11;
     -fx-cursor: hand;
 }
 
@@ -483,10 +490,12 @@
    ========================================================================== */
 .table-card {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 10;
+    -fx-background-radius: 8;
     -fx-border-color: #e2e8f0;
-    -fx-border-radius: 10;
-    -fx-padding: 16;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-radius: 8;
+    -fx-padding: 8 12;
 }
 
 .card-section-title {
@@ -497,31 +506,92 @@
 
 .medistock-table {
     -fx-background-color: transparent;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: #cbd5e1;
     -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.medistock-table .column-header-background {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: transparent transparent #cbd5e1 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-background-radius: 6 6 0 0;
+    -fx-pref-height: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
 }
 
 .medistock-table .column-header {
-    -fx-background-color: #f8fafc;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #475569;
-    -fx-border-color: transparent transparent #e2e8f0 transparent;
-    -fx-padding: 8;
+    -fx-background-color: #f1f5f9;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0f172a;
+    -fx-border-color: transparent #e2e8f0 #cbd5e1 transparent;
+    -fx-border-width: 0 1 1 0;
+    -fx-pref-height: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
+    -fx-size: 28px;
+    -fx-padding: 0 8;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.medistock-table .column-header .label {
+    -fx-text-fill: #0f172a;
+    -fx-font-weight: 800;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.medistock-table .filler {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: transparent transparent #cbd5e1 transparent;
+    -fx-border-width: 0 0 1 0;
 }
 
 .medistock-table .table-row-cell {
-    -fx-cell-size: 32px;
-    -fx-font-size: 12px;
+    -fx-background-color: #ffffff;
+    -fx-cell-size: 28px;
+    -fx-pref-height: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
+    -fx-font-size: 11.5px;
+    -fx-text-fill: #0f172a;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1 0;
 }
 
 .medistock-table .table-row-cell:odd {
-    -fx-background-color: #fbfcfd;
+    -fx-background-color: #f8fafc;
+}
+
+.medistock-table .table-row-cell:hover {
+    -fx-background-color: #f0fdfa;
 }
 
 .medistock-table .table-row-cell:selected {
     -fx-background-color: #ccfbf1;
     -fx-text-fill: #042f2e;
+}
+
+.medistock-table .table-row-cell:selected .text {
+    -fx-fill: #042f2e;
+    -fx-font-weight: bold;
+}
+
+.medistock-table .table-cell {
+    -fx-text-fill: #0f172a;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 8;
+}
+
+.medistock-table .table-cell:selected {
+    -fx-text-fill: #042f2e;
+}
+
+.medistock-table .table-cell:selected .text {
+    -fx-fill: #042f2e;
 }
 
 /* ==========================================================================
@@ -654,6 +724,8 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 10;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 10;
     -fx-padding: 20;
 }
@@ -688,6 +760,8 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 12;
     -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
     -fx-border-radius: 12;
     -fx-padding: 28;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
@@ -739,4 +813,234 @@
     -fx-font-size: 13px;
     -fx-text-fill: #7c3aed;
     -fx-font-weight: 500;
+}
+
+
+/* =========================================
+   Member 3 Exchange Styles
+   ========================================= */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 6, 0, 0, 2);
+}
+
+.btn-success {
+    -fx-background-color: #10b981;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+.btn-success:hover {
+    -fx-background-color: #059669;
+}
+
+.btn-danger {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+.btn-danger:hover {
+    -fx-background-color: #dc2626;
+}
+
+.btn-warning {
+    -fx-background-color: #f59e0b;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+.btn-warning:hover {
+    -fx-background-color: #d97706;
+}
+
+.console-area {
+    -fx-font-family: 'Consolas', 'Courier New', monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: #1e293b;
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 4px;
+}
+
+/* ==========================================================================
+   Modern MediStock TabPanes & Segmented Switchers
+   ========================================================================== */
+
+/* Universal Focus Removal - Completely eliminates the blue focus border/ring on tab click */
+.tab-pane,
+.tab-pane:focused,
+.tab-pane *.tab-header-area,
+.tab-pane:focused *.tab-header-area,
+.tab,
+.tab:focused,
+.tab:selected:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.tab .focus-indicator,
+.tab:focused .focus-indicator {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: null;
+}
+
+/* Base TabPane - Segmented Pill Switcher Theme */
+.tab-pane,
+.medistock-tab-pane {
+    -fx-tab-min-height: 38px;
+    -fx-tab-max-height: 42px;
+}
+
+.tab-pane .tab-header-area,
+.medistock-tab-pane .tab-header-area {
+    -fx-padding: 4 6 10 6;
+}
+
+.tab-pane .tab-header-area .tab-header-background,
+.medistock-tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+}
+
+.tab-pane .tab-header-area .headers-region,
+.medistock-tab-pane .tab-header-area .headers-region {
+    -fx-effect: null;
+}
+
+/* Individual Tab */
+.tab-pane .tab,
+.medistock-tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 8 22;
+    -fx-cursor: hand;
+}
+
+.tab-pane .tab:hover,
+.medistock-tab-pane .tab:hover {
+    -fx-background-color: rgba(15, 118, 110, 0.12);
+}
+
+.tab-pane .tab:selected,
+.medistock-tab-pane .tab:selected {
+    -fx-background-color: #0f766e;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.tab-pane .tab .tab-label,
+.medistock-tab-pane .tab .tab-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.tab-pane .tab:hover .tab-label,
+.medistock-tab-pane .tab:hover .tab-label {
+    -fx-text-fill: #0f766e;
+}
+
+.tab-pane .tab:selected .tab-label,
+.medistock-tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.tab-pane:top *.tab-content-area,
+.medistock-tab-pane:top *.tab-content-area {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 6 0 0 0;
+}
+
+/* Sub-TabPane - Segmented Pill Switcher (for Requests & Transfers inside cards) */
+.sub-tab-pane {
+    -fx-tab-min-height: 34px;
+    -fx-tab-max-height: 36px;
+}
+
+.sub-tab-pane .tab-header-area {
+    -fx-padding: 4 6 10 6;
+}
+
+.sub-tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+}
+
+.sub-tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 6 18;
+    -fx-cursor: hand;
+}
+
+.sub-tab-pane .tab:hover {
+    -fx-background-color: rgba(15, 118, 110, 0.12);
+}
+
+.sub-tab-pane .tab:selected {
+    -fx-background-color: #0f766e;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.sub-tab-pane .tab .tab-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+}
+
+.sub-tab-pane .tab:hover .tab-label {
+    -fx-text-fill: #0f766e;
+}
+
+.sub-tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.sub-tab-pane:top *.tab-content-area {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 6 0 0 0;
+}
+.exchange-tab-content {
+    -fx-padding: 8 12 10 12;
+    -fx-spacing: 8;
+}
+
+.btn-compact {
+    -fx-font-size: 11.5px;
+    -fx-padding: 5 12;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
 }

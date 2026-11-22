@@ -21,6 +21,7 @@ public final class AppConfig {
     public static final String PROFILE_VIEW = VIEW_PATH + "profile-view.fxml";
     public static final String THREAD_MONITOR_VIEW = VIEW_PATH + "thread-monitor-view.fxml";
     public static final String PLACEHOLDER_VIEW = VIEW_PATH + "placeholder-view.fxml";
+    public static final String EXCHANGE_VIEW = "/org/example/medistock/view/exchange/exchange-view.fxml";
 
     public static final String MAIN_CSS = "/com/medistock/css/main.css";
 
