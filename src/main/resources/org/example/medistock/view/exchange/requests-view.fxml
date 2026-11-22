@@ -42,18 +42,18 @@
     </HBox>
 
     <!-- Responsive Toolbar / Action Strip -->
-    <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="action-strip">
+    <HBox spacing="8.0" alignment="CENTER_LEFT" styleClass="action-strip">
         <Label text="Active Pharmacy:" styleClass="field-label" minWidth="-Infinity"/>
-        <ComboBox fx:id="pharmacyComboBox" prefWidth="260.0" minWidth="180.0" styleClass="input-field"/>
+        <ComboBox fx:id="pharmacyComboBox" prefWidth="220.0" minWidth="150.0" styleClass="input-field"/>
+        <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
 
         <Region HBox.hgrow="ALWAYS"/>
 
-        <Label fx:id="statusLabel" text="Ready" styleClass="text-muted" minWidth="-Infinity"/>
-        <Button text="⟳ Refresh All" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
+        <Label fx:id="statusLabel" text="Ready" styleClass="text-muted"/>
     </HBox>
 
-    <!-- Tab Pane for Requests and Transfers (Calibrated for 5 entries) -->
-    <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="265.0" minHeight="265.0" maxHeight="265.0" styleClass="table-card, sub-tab-pane">
+    <!-- Tab Pane for Requests and Transfers (Calibrated for 5 entries + Action Buttons) -->
+    <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="310.0" minHeight="310.0" styleClass="table-card, sub-tab-pane">
         <!-- Tab 1: Incoming Requests -->
         <Tab text="📥 Incoming Requests (For My Listings)">
             <VBox spacing="8.0">
