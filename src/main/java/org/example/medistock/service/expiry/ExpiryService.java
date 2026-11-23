@@ -302,7 +302,6 @@ public class ExpiryService {
                         }
                     }
                 }
-                return list;
                 if (!list.isEmpty()) {
                     return list;
                 }
@@ -401,7 +400,6 @@ public class ExpiryService {
 
     public List<ExpiryRecord> getAllExpiryRecords(String pharmacyId) {
         List<MedicineBatch> batches = fetchBatchesFromDB(pharmacyId);
-        List<MedicineBatch> batches = new ArrayList<>(inMemoryBatches);
         List<ExpiryRecord> records = new ArrayList<>();
         LocalDate today = LocalDate.now();
 

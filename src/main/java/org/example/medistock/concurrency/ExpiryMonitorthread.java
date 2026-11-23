@@ -32,7 +32,6 @@ public class ExpiryMonitorthread extends Thread {
 
     public ExpiryMonitorthread() {
         this(5000);
-        this(10000);
     }
 
     public ExpiryMonitorthread(long intervalMillis) {
@@ -73,7 +72,6 @@ public class ExpiryMonitorthread extends Thread {
     }
 
     public void addListener(ScanListener listener) {
-        if (listener != null && !listeners.contains(listener)) {
         if (listener != null) {
             listeners.removeIf(l -> l.getClass().equals(listener.getClass()));
             listeners.add(listener);
@@ -101,16 +99,6 @@ public class ExpiryMonitorthread extends Thread {
                 flaggedCount.set(urgentRecords != null ? urgentRecords.size() : 0);
 
                 System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Sweep successfully completed. Flagged %d at-risk/expired batches.%n",
-                int cycle = scanCycle.incrementAndGet();
-                lastScanTime.set(System.currentTimeMillis());
-
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Scanning medicine batches for expiration risks...%n", cycle);
-
-                // Run sweep through ExpiryService
-                List<ExpiryRecord> urgentRecords = ExpiryService.getInstance().checkAndProcessExpiries("PHARM-001");
-                flaggedCount.set(urgentRecords != null ? urgentRecords.size() : 0);
-
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Sweep complete. Flagged %d at-risk/expired batches.%n",
                         cycle, flaggedCount.get());
 
                 // Notify UI listeners safely

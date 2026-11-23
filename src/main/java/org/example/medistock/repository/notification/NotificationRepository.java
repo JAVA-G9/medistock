@@ -124,7 +124,6 @@ public class NotificationRepository {
                         }
                     }
                 }
-                return list;
                 if (!list.isEmpty()) {
                     return list;
                 }
@@ -155,7 +154,6 @@ public class NotificationRepository {
                         }
                     }
                 }
-                return list;
                 if (!list.isEmpty()) {
                     return list;
                 }
