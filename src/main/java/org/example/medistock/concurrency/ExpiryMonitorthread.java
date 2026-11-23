@@ -88,16 +88,16 @@ public class ExpiryMonitorthread extends Thread {
 
         while (running) {
             try {
-                int cycle = scanCycle.incrementAndGet();
                 lastScanTime.set(System.currentTimeMillis());
 
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Scanning medicine batches for expiration risks...%n", cycle);
-
-                // Run sweep through ExpiryService
+                // Run sweep through ExpiryService first
                 List<ExpiryRecord> urgentRecords = ExpiryService.getInstance().checkAndProcessExpiries("PHARM-001");
+
+                // Increment ONLY after successful sweep execution
+                int cycle = scanCycle.incrementAndGet();
                 flaggedCount.set(urgentRecords != null ? urgentRecords.size() : 0);
 
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Sweep complete. Flagged %d at-risk/expired batches.%n",
+                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Sweep successfully completed. Flagged %d at-risk/expired batches.%n",
                         cycle, flaggedCount.get());
 
                 // Notify UI listeners safely

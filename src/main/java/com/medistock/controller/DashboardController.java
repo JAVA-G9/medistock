@@ -292,14 +292,6 @@ public class DashboardController {
             );
             highlightActiveNavButton(btnNavExpiry);
         }
-        showPlaceholder(
-                "Expiry Monitoring & Notifications",
-                "Member 4 — Expiry, Notifications & Reports",
-                "Real-time monitoring of medicine batches nearing expiry with automatic threshold alerts and notifications.",
-                "Owned Classes: ExpiryController, Notification, AppEvent, ExpiryService, NotificationService, CustomEventQueue, EventConsumer, NotificationWorker",
-                "Multithreading Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
-        );
-        highlightActiveNavButton(btnNavExpiry);
     }
 
     @FXML
@@ -321,14 +313,6 @@ public class DashboardController {
             );
             highlightActiveNavButton(btnNavReports);
         }
-        showPlaceholder(
-                "Reports & Asynchronous Event Queue Monitor",
-                "Member 4 — Expiry, Notifications & Reports",
-                "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
-                "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
-                "Multithreading Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
-        );
-        highlightActiveNavButton(btnNavReports);
     }
 
     @FXML
