@@ -428,8 +428,8 @@
 .kpi-card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 10;
-    -fx-padding: 8 12;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 4, 0, 0, 1);
+    -fx-padding: 10 14;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 6, 0, 0, 2);
     -fx-border-color: #e2e8f0;
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
@@ -438,7 +438,7 @@
 }
 
 .kpi-teal {
-    -fx-border-color: #14b8a6 #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-color: #0d9488 #e2e8f0 #e2e8f0 #e2e8f0;
     -fx-border-width: 3 1 1 1;
 }
 
@@ -448,31 +448,31 @@
 }
 
 .kpi-blue {
-    -fx-border-color: #3b82f6 #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-color: #0284c7 #e2e8f0 #e2e8f0 #e2e8f0;
     -fx-border-width: 3 1 1 1;
 }
 
 .kpi-purple {
-    -fx-border-color: #8b5cf6 #e2e8f0 #e2e8f0 #e2e8f0;
+    -fx-border-color: #7c3aed #e2e8f0 #e2e8f0 #e2e8f0;
     -fx-border-width: 3 1 1 1;
 }
 
 .kpi-label {
-    -fx-font-size: 10px;
-    -fx-font-weight: bold;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 800;
     -fx-text-fill: #64748b;
 }
 
 .kpi-value {
-    -fx-font-size: 20px;
+    -fx-font-size: 23px;
     -fx-font-weight: 800;
     -fx-text-fill: #0f172a;
-    -fx-padding: 1 0;
+    -fx-padding: 2 0;
 }
 
 .kpi-subtext {
-    -fx-font-size: 10px;
-    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748b;
 }
 
 /* Action Strip */
@@ -483,7 +483,8 @@
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
     -fx-border-radius: 8;
-    -fx-padding: 6 12;
+    -fx-padding: 8 14;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.02), 4, 0, 0, 1);
 }
 
 .action-strip-title {
@@ -495,9 +496,9 @@
 .btn-action-primary {
     -fx-background-color: #0f766e;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 11.5px;
+    -fx-font-size: 12.5px;
     -fx-font-weight: bold;
-    -fx-padding: 5 11;
+    -fx-padding: 7 15;
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
@@ -507,24 +508,23 @@
 }
 
 .btn-action-secondary {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: #f8fafc;
     -fx-border-color: #cbd5e1;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
-    -fx-text-fill: #334155;
-    -fx-font-size: 11.5px;
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 12.5px;
     -fx-font-weight: bold;
-    -fx-padding: 5 11;
+    -fx-padding: 7 14;
     -fx-cursor: hand;
 }
 
 .btn-action-secondary:hover {
-    -fx-background-color: #e2e8f0;
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #94a3b8;
 }
 
-/* ==========================================================================
-   Table Views & Cards
-   ========================================================================== */
+/* Table Views & Cards */
 .table-card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 8;
@@ -532,11 +532,12 @@
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
     -fx-border-radius: 8;
-    -fx-padding: 8 12;
+    -fx-padding: 10 14;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.02), 4, 0, 0, 1);
 }
 
 .card-section-title {
-    -fx-font-size: 15px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-text-fill: #0f172a;
 }
@@ -555,23 +556,23 @@
     -fx-border-color: transparent transparent #cbd5e1 transparent;
     -fx-border-width: 0 0 1 0;
     -fx-background-radius: 6 6 0 0;
-    -fx-pref-height: 28px;
-    -fx-min-height: 28px;
-    -fx-max-height: 28px;
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-max-height: 32px;
 }
 
 .medistock-table .column-header {
     -fx-background-color: #f1f5f9;
-    -fx-font-size: 11.5px;
+    -fx-font-size: 12.5px;
     -fx-font-weight: 800;
     -fx-text-fill: #0f172a;
     -fx-border-color: transparent #e2e8f0 #cbd5e1 transparent;
     -fx-border-width: 0 1 1 0;
-    -fx-pref-height: 28px;
-    -fx-min-height: 28px;
-    -fx-max-height: 28px;
-    -fx-size: 28px;
-    -fx-padding: 0 8;
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-max-height: 32px;
+    -fx-size: 32px;
+    -fx-padding: 0 6;
     -fx-alignment: CENTER_LEFT;
 }
 
@@ -589,11 +590,11 @@
 
 .medistock-table .table-row-cell {
     -fx-background-color: #ffffff;
-    -fx-cell-size: 28px;
-    -fx-pref-height: 28px;
-    -fx-min-height: 28px;
-    -fx-max-height: 28px;
-    -fx-font-size: 11.5px;
+    -fx-cell-size: 32px;
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-max-height: 32px;
+    -fx-font-size: 12.5px;
     -fx-text-fill: #0f172a;
     -fx-border-color: transparent transparent #f1f5f9 transparent;
     -fx-border-width: 0 0 1 0;
@@ -620,7 +621,7 @@
 .medistock-table .table-cell {
     -fx-text-fill: #0f172a;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 0 8;
+    -fx-padding: 0 6;
 }
 
 .medistock-table .table-cell:selected {
@@ -1014,12 +1015,12 @@
 
 /* Sub-TabPane - Segmented Pill Switcher (for Requests & Transfers inside cards) */
 .sub-tab-pane {
-    -fx-tab-min-height: 34px;
-    -fx-tab-max-height: 36px;
+    -fx-tab-min-height: 36px;
+    -fx-tab-max-height: 38px;
 }
 
 .sub-tab-pane .tab-header-area {
-    -fx-padding: 4 6 10 6;
+    -fx-padding: 4 6 8 6;
 }
 
 .sub-tab-pane .tab-header-area .tab-header-background {
@@ -1050,7 +1051,7 @@
 }
 
 .sub-tab-pane .tab .tab-label {
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-font-weight: 600;
     -fx-text-fill: #475569;
 }

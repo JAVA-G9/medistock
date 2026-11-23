@@ -1,34 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="740.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.medistock.controller.exchange.ExchangeController"
-      stylesheets="@../../css/main.css"
-      styleClass="view-content-root">
-
-    <!-- Top Exchange Module Header -->
-    <HBox alignment="CENTER_LEFT" spacing="12.0">
-        <VBox spacing="2.0" HBox.hgrow="ALWAYS">
-            <Label text="PharmaExchange — Stock Exchange &amp; Requests" styleClass="view-title" minWidth="-Infinity"/>
-            <Label text="Peer-to-Peer Pharmacy Surplus Marketplace • Atomic Stock Reservation Escrow • Transfer Verification" styleClass="view-subtitle"/>
-        </VBox>
-        <Label text="MEMBER 3 MODULE" styleClass="badge-eval" minWidth="-Infinity"/>
-    </HBox>
-
-    <!-- Main Navigation TabPane -->
-    <TabPane fx:id="exchangeTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="medistock-tab-pane">
-        <Tab fx:id="tabMarketplace" text="🛒 Marketplace &amp; Surplus Listings">
-            <ScrollPane fitToWidth="true" styleClass="view-scroll" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
-                <fx:include fx:id="marketplaceView" source="marketplace-view.fxml"/>
-            </ScrollPane>
-        </Tab>
-        <Tab fx:id="tabRequests" text="📋 Exchange Requests &amp; Transfer Tracking">
-            <ScrollPane fitToWidth="true" styleClass="view-scroll" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
-                <fx:include fx:id="requestsView" source="requests-view.fxml"/>
-            </ScrollPane>
-        </Tab>
-    </TabPane>
-
+      VBox.vgrow="ALWAYS">
+    <fx:include fx:id="marketplaceView" source="marketplace-view.fxml" VBox.vgrow="ALWAYS"/>
 </VBox>
