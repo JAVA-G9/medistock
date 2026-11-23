@@ -24,6 +24,9 @@ public final class AppConfig {
     public static final String EXCHANGE_VIEW = "/org/example/medistock/view/exchange/exchange-view.fxml";
     public static final String MARKETPLACE_VIEW = "/org/example/medistock/view/exchange/marketplace-view.fxml";
     public static final String REQUESTS_VIEW = "/org/example/medistock/view/exchange/requests-view.fxml";
+    public static final String EXPIRY_VIEW = "/org/example/medistock/view/expiry/expiry-view.fxml";
+    public static final String NOTIFICATIONS_VIEW = "/org/example/medistock/view/notifications/notifications-view.fxml";
+    public static final String REPORTS_VIEW = "/org/example/medistock/view/reports/reports-view.fxml";
 
     public static final String MAIN_CSS = "/com/medistock/css/main.css";
 
