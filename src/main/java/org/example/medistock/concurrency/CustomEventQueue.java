@@ -103,4 +103,8 @@ public class CustomEventQueue {
     public synchronized boolean isShutdown() {
         return isShutdown;
     }
+
+    public int getCapacity() {
+        return capacity;
+    }
 }
