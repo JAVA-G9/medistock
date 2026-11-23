@@ -40,17 +40,17 @@
         <!-- Navigation Menu -->
         <ScrollPane fitToWidth="true" styleClass="sidebar-scroll" VBox.vgrow="ALWAYS">
             <VBox spacing="6.0" styleClass="sidebar-menu">
-                <Label text="MEMBER 1 MODULES" styleClass="sidebar-section-header"/>
+                <Label text="MAIN MENU" styleClass="sidebar-section-header"/>
                 <Button fx:id="btnNavDashboard" text="📊  Dashboard Overview" onAction="#handleNavDashboard" maxWidth="Infinity" styleClass="nav-button"/>
                 <Button fx:id="btnNavProfile" text="🏥  Pharmacy Profile" onAction="#handleNavProfile" maxWidth="Infinity" styleClass="nav-button"/>
                 <Button fx:id="btnNavThreadMonitor" text="🧵  Thread Monitor &amp; Lab" onAction="#handleNavThreadMonitor" maxWidth="Infinity" styleClass="nav-button"/>
 
-                <Label text="TEAM MODULES" styleClass="sidebar-section-header"/>
-                <Button fx:id="btnNavInventory" text="📦  My Inventory (M2)" onAction="#handleNavInventory" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button fx:id="btnNavMarketplace" text="🔄  Marketplace (M3)" onAction="#handleNavMarketplace" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button fx:id="btnNavRequests" text="📬  Exchange Requests (M3)" onAction="#handleNavRequests" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button fx:id="btnNavExpiry" text="⏳  Expiry &amp; Alerts (M4)" onAction="#handleNavExpiry" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button fx:id="btnNavReports" text="📈  Reports &amp; Queue (M4)" onAction="#handleNavReports" maxWidth="Infinity" styleClass="nav-button"/>
+                <Label text="OPERATIONS &amp; EXCHANGE" styleClass="sidebar-section-header"/>
+                <Button fx:id="btnNavInventory" text="📦  My Inventory" onAction="#handleNavInventory" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavMarketplace" text="🔄  Surplus Marketplace" onAction="#handleNavMarketplace" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavRequests" text="📬  Exchange Requests" onAction="#handleNavRequests" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavExpiry" text="⏳  Expiry &amp; Alerts" onAction="#handleNavExpiry" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavReports" text="📈  Reports &amp; Queue" onAction="#handleNavReports" maxWidth="Infinity" styleClass="nav-button"/>
             </VBox>
         </ScrollPane>
 
@@ -78,8 +78,8 @@
                             <Label fx:id="welcomeSubheader" text="Operating licensed branch" styleClass="hero-subtitle"/>
                         </VBox>
                         <VBox alignment="CENTER_RIGHT" spacing="4.0">
-                            <Label text="EVALUATION 1 PROTOTYPE" styleClass="hero-badge"/>
-                            <Label text="In-Memory Persistence Active" styleClass="hero-meta"/>
+                            <Label text="HEALTHCARE NETWORK" styleClass="hero-badge"/>
+                            <Label text="Online &amp; Active" styleClass="hero-meta"/>
                         </VBox>
                     </HBox>
 
@@ -129,7 +129,7 @@
                         <VBox spacing="8.0" styleClass="table-card">
                             <HBox alignment="CENTER_LEFT" spacing="10.0">
                                 <Label text="🧵 Live Concurrency &amp; Background Execution Stream" styleClass="card-section-title"/>
-                                <Label text="(Member 1 Multithreading Tracing)" styleClass="text-muted"/>
+                                <Label text="(Real-time daemon tracing)" styleClass="text-muted"/>
                             </HBox>
                             <TableView fx:id="liveLogTable" prefHeight="170.0" styleClass="medistock-table">
                                 <columns>

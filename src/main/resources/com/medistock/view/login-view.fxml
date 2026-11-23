@@ -18,10 +18,10 @@
     <VBox alignment="CENTER" spacing="6.0">
         <HBox alignment="CENTER" spacing="10.0">
             <Label fx:id="titleLabel" text="MediStock" styleClass="brand-title"/>
-            <Label text="EVALUATION 1" styleClass="badge-eval"/>
+            <Label text="ENTERPRISE" styleClass="badge-eval"/>
         </HBox>
         <Label fx:id="taglineLabel" text="Pharmacy-to-Pharmacy Surplus Stock &amp; Expiry Exchange" styleClass="brand-tagline"/>
-        <Label text="Member 1: Pharmacy, Dashboard &amp; Concurrency System" styleClass="brand-subtext"/>
+        <Label text="Professional Pharmacy Inventory, Surplus Stock &amp; Expiry Network" styleClass="brand-subtext"/>
     </VBox>
 
     <!-- Authentication Card -->
@@ -50,7 +50,7 @@
 
                         <!-- Fast Demo Access -->
                         <VBox spacing="8.0" styleClass="demo-box">
-                            <Label text="Quick Demo Accounts (Evaluation 1 In-Memory):" styleClass="demo-title"/>
+                            <Label text="Quick Demo Accounts:" styleClass="demo-title"/>
                             <HBox spacing="8.0" alignment="CENTER">
                                 <Button text="Apex Care (admin)" onAction="#handleQuickApex" styleClass="btn-demo"/>
                                 <Button text="City Health" onAction="#handleQuickCity" styleClass="btn-demo"/>
