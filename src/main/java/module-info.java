@@ -32,9 +32,9 @@ module org.example.medistock {
     exports org.example.medistock.service.reports;
     exports org.example.medistock.repository.exchange;
     exports org.example.medistock.repository.notification;
-    exports org.example.medistock.model;
-    exports org.example.medistock.service.exchange;
-    exports org.example.medistock.repository.exchange;
+//    exports org.example.medistock.model;
+//    exports org.example.medistock.service.exchange;
+//    exports org.example.medistock.repository.exchange;
     exports org.example.medistock.concurrency;
 
     exports com.medistock;
