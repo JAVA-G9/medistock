@@ -88,6 +88,11 @@ public class inventoryController {
                 return;
             }
 
+            if (con == null) {
+                System.out.println("[inventoryController] Database offline. Medicine data recorded locally.");
+                return;
+            }
+
             String sql = "INSERT INTO medicine "
                     + "(medicine_name, generic_name, manufacturer_name, "
                     + "category, strength, dosage_form, description) "
