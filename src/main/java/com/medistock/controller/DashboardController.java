@@ -265,6 +265,29 @@ public class DashboardController {
         }
     }
 
+
+
+    @FXML
+    private void handleNavExpiry(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXPIRY_VIEW));
+            Parent view = loader.load();
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
+            highlightActiveNavButton(btnNavExpiry);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder(
+                    "Expiry Monitoring & Notifications",
+                    "Member 4 — Expiry, Notifications & Reports",
+                    "Real-time monitoring of medicine batches nearing expiry with automatic threshold alerts and notifications.",
+                    "Owned Classes: ExpiryController, Notification, AppEvent, ExpiryService, NotificationService, CustomEventQueue, EventConsumer, NotificationWorker",
+                    "Multithreading Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
+            );
+            highlightActiveNavButton(btnNavExpiry);
+        }
+    }
+
     @FXML
     private void handleNavReports(ActionEvent event) {
         try {
@@ -277,6 +300,10 @@ public class DashboardController {
             e.printStackTrace();
             showPlaceholder(
                     "Reports & Asynchronous Event Queue Monitor",
+                    "Member 4 — Expiry, Notifications & Reports",
+                    "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
+                    "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
+                    "Multithreading Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
                     "Subsystem: Expiry, Notifications & Reports",
                     "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
                     "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
