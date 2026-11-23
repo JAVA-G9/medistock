@@ -211,14 +211,23 @@ public class DashboardController {
 
     @FXML
     private void handleNavInventory(ActionEvent event) {
-        showPlaceholder(
-                "My Inventory & Batch Management",
-                "Subsystem: Inventory & Batch Management",
-                "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
-                "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
-                "Architecture Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
-        );
-        highlightActiveNavButton(btnNavInventory);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.INVENTORY_VIEW));
+            Parent view = loader.load();
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
+            highlightActiveNavButton(btnNavInventory);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder(
+                    "My Inventory & Batch Management",
+                    "Subsystem: Inventory & Batch Management",
+                    "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
+                    "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
+                    "Architecture Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
+            );
+            highlightActiveNavButton(btnNavInventory);
+        }
     }
 
     @FXML

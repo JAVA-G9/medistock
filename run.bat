@@ -24,7 +24,13 @@ set /p choice="Select an option (1, 2, or 3) [Default: 1]: "
 if "%choice%"=="" set choice=1
 
 set JAVAFX_PATH=%USERPROFILE%\.m2\repository\org\openjfx
-set MODULE_PATH=target\classes;%JAVAFX_PATH%\javafx-base\21.0.6\javafx-base-21.0.6-win.jar;%JAVAFX_PATH%\javafx-controls\21.0.6\javafx-controls-21.0.6-win.jar;%JAVAFX_PATH%\javafx-fxml\21.0.6\javafx-fxml-21.0.6-win.jar;%JAVAFX_PATH%\javafx-graphics\21.0.6\javafx-graphics-21.0.6-win.jar
+set MYSQL_JAR=%USERPROFILE%\.m2\repository\com\mysql\mysql-connector-j\8.4.0\mysql-connector-j-8.4.0.jar
+set MODULE_PATH=target\classes;%MYSQL_JAR%;%JAVAFX_PATH%\javafx-base\21.0.6\javafx-base-21.0.6-win.jar;%JAVAFX_PATH%\javafx-controls\21.0.6\javafx-controls-21.0.6-win.jar;%JAVAFX_PATH%\javafx-fxml\21.0.6\javafx-fxml-21.0.6-win.jar;%JAVAFX_PATH%\javafx-graphics\21.0.6\javafx-graphics-21.0.6-win.jar
+
+if not exist "target\classes\module-info.class" (
+    echo [INFO] Compiling project classes before initial launch...
+    call .\mvnw.cmd test-compile
+)
 
 if "%choice%"=="1" (
     echo Starting Member 3 Standalone UI...

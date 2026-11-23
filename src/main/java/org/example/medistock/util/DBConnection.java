@@ -14,6 +14,7 @@ public class DBConnection {
         Connection con = null;
 
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(
                     DatabaseConfig.getUrl(),
                     DatabaseConfig.getUsername(),
@@ -21,7 +22,7 @@ public class DBConnection {
             );
             System.out.println("Database Connected Successfully");
         }
-        catch (SQLException e) {
+        catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
 
