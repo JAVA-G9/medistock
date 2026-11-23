@@ -1,14 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox spacing="16.0" styleClass="view-content-root"
+      stylesheets="/com/medistock/css/main.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.medistock.controller.reports.ReportsController">
 
-</AnchorPane>
+    <!-- Screen Title Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+            <Label text="Inventory Expiry Reports &amp; Concurrency Analytics" styleClass="view-title"/>
+            <Label text="Comprehensive inventory health analysis, at-risk valuation &amp; multithreaded queue metrics."
+                   styleClass="view-subtitle"/>
+        </VBox>
+        <Label text="ANALYTICS &amp; THREADS" styleClass="badge-active-threads"/>
+        <Label text="MEMBER 4" styleClass="badge-eval"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" styleClass="view-scroll" VBox.vgrow="ALWAYS">
+        <VBox spacing="16.0" styleClass="view-scroll-content">
+
+            <!-- KPI Metric Cards -->
+            <HBox spacing="16.0">
+                <!-- Teal KPI: Inventory Health Score -->
+                <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-teal">
+                    <Label text="INVENTORY HEALTH SCORE" styleClass="kpi-label"/>
+                    <Label fx:id="lblHealthScore" text="92.5%" styleClass="kpi-value"/>
+                    <Label text="Weighted safety percentage" styleClass="kpi-subtext"/>
+                </VBox>
+
+                <!-- Blue KPI: Total Tracked Batches -->
+                <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-blue">
+                    <Label text="TOTAL ACTIVE BATCHES" styleClass="kpi-label"/>
+                    <Label fx:id="lblTotalBatches" text="0" styleClass="kpi-value"/>
+                    <Label fx:id="lblTotalUnits" text="0 total units" styleClass="kpi-subtext"/>
+                </VBox>
+
+                <!-- Amber KPI: At-Risk Financial Value -->
+                <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-amber">
+                    <Label text="AT-RISK EXPIRY VALUE" styleClass="kpi-label"/>
+                    <Label fx:id="lblAtRiskValue" text="0.00" styleClass="kpi-value"/>
+                    <Label fx:id="lblAtRiskBatches" text="0 batches needing action" styleClass="kpi-subtext"/>
+                </VBox>
+
+                <!-- Purple KPI: Event Queue Buffer -->
+                <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-purple">
+                    <Label text="BOUNDED EVENT QUEUE LOAD" styleClass="kpi-label"/>
+                    <Label fx:id="lblQueueLoad" text="0 / 50" styleClass="kpi-value"/>
+                    <Label text="Producer-Consumer buffer" styleClass="kpi-subtext"/>
+                </VBox>
+            </HBox>
+
+            <!-- Multithreading & Concurrency Operations Card -->
+            <VBox spacing="12.0" styleClass="info-card">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <Label text="⚡ Multithreading Architecture: Custom Bounded Blocking Queue &amp; Daemon Sweeper"
+                               style="-fx-font-weight: bold; -fx-text-fill: #1e3a8a; -fx-font-size: 14px;"/>
+                        <Label text="Guarded blocks with wait() / notifyAll() coordination between Member 3 (Producer) and Member 4 (Consumer)."
+                               styleClass="text-muted"/>
+                    </VBox>
+                    <Button text="⚡ Produce Event" onAction="#handleProduceEvent" styleClass="btn-action-primary"/>
+                    <Button text="📥 Consume Event" onAction="#handleConsumeEvent" styleClass="btn-lab-primary"/>
+                    <Button fx:id="btnToggleDaemon" text="⏸ Toggle Daemon" onAction="#handleToggleDaemon" styleClass="btn-action-secondary"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="16.0">
+                    <Label text="Buffer Capacity Load:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #334155;"/>
+                    <ProgressBar fx:id="queueProgressBar" prefWidth="320.0" progress="0.0"/>
+                    <Label fx:id="lblQueuePercent" text="0% full" styleClass="text-muted"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblEventsProcessed" text="Total Events Consumed: 0" style="-fx-font-weight: bold; -fx-text-fill: #0f766e;"/>
+                </HBox>
+            </VBox>
+
+            <!-- Risk Classification Summary Table -->
+            <VBox spacing="8.0" styleClass="table-card">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Label text="📊 Expiry Risk Breakdown &amp; Action Plan" styleClass="card-section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="⟳ Refresh Analytics" onAction="#handleRefresh" styleClass="btn-xs"/>
+                </HBox>
+
+                <TableView fx:id="riskTableView" styleClass="medistock-table" prefHeight="180.0">
+                    <columns>
+                        <TableColumn fx:id="colRiskCategory" text="Risk Category" prefWidth="180.0"/>
+                        <TableColumn fx:id="colRiskBatches" text="Batch Count" prefWidth="120.0"/>
+                        <TableColumn fx:id="colRiskUnits" text="Total Units" prefWidth="120.0"/>
+                        <TableColumn fx:id="colRiskValue" text="Financial Value ($)" prefWidth="160.0"/>
+                        <TableColumn fx:id="colRiskAction" text="Recommended Action" prefWidth="380.0"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Active Concurrency Thread Inspection Table -->
+            <VBox spacing="8.0" styleClass="table-card">
+                <Label text="🧵 Background Worker Threads Status" styleClass="card-section-title"/>
+                <TableView fx:id="threadTableView" styleClass="medistock-table" prefHeight="160.0">
+                    <columns>
+                        <TableColumn fx:id="colThreadName" text="Thread Name" prefWidth="240.0"/>
+                        <TableColumn fx:id="colThreadType" text="Type" prefWidth="120.0"/>
+                        <TableColumn fx:id="colThreadPriority" text="Priority" prefWidth="90.0"/>
+                        <TableColumn fx:id="colThreadState" text="Current State" prefWidth="140.0"/>
+                        <TableColumn fx:id="colThreadRole" text="Responsibility / Concurrency Syllabus Role" prefWidth="380.0"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>
