@@ -229,5 +229,7 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
             loadRecords();
             updateDaemonUiStatus();
         });
+        loadRecords();
+        updateDaemonUiStatus();
     }
 }

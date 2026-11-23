@@ -46,6 +46,15 @@ public class ExchangeService {
         return instance;
     }
 
+    private org.example.medistock.concurrency.ExchangeWorker exchangeWorker;
+
+    public synchronized void ensureWorkerStarted() {
+        if (exchangeWorker == null) {
+            exchangeWorker = new org.example.medistock.concurrency.ExchangeWorker(this, 5000);
+            exchangeWorker.start();
+        }
+    }
+
     private void initSampleData() {
         final String PHARM1_ID = "PHARM-001";
         final String PHARM1_NAME = "Apex Care Pharmacy (Metro City)";
