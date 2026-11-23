@@ -211,64 +211,35 @@ public class DashboardController {
 
     @FXML
     private void handleNavInventory(ActionEvent event) {
-        showPlaceholder(
-                "My Inventory & Batch Management",
-                "Member 2 — Inventory Management",
-                "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
-                "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
-                "Multithreading Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
-        );
-        highlightActiveNavButton(btnNavInventory);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.INVENTORY_VIEW));
+            Parent view = loader.load();
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
+            highlightActiveNavButton(btnNavInventory);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder(
+                    "My Inventory & Batch Management",
+                    "Subsystem: Inventory & Batch Management",
+                    "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
+                    "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
+                    "Architecture Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
+            );
+            highlightActiveNavButton(btnNavInventory);
+        }
     }
 
     @FXML
     private void handleNavMarketplace(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXCHANGE_VIEW));
-            Parent view = loader.load();
-            ExchangeController controller = loader.getController();
-            if (controller != null) {
-                controller.selectMarketplaceTab();
-            }
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
-            highlightActiveNavButton(btnNavMarketplace);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showPlaceholder(
-                    "Stock Marketplace & Listings",
-                    "Member 3 - Stock Exchange & Requests",
-                    "Marketplace allowing pharmacies to browse surplus medicine batches from other licensed facilities and publish surplus listings with discounted unit rates.",
-                    "Owned Classes: MarketplaceController, RequestsController, ExchangeListing, ExchangeRequest, StockTransfer, ExchangeService, ExchangeRepository, EventProducer, ExchangeWorker",
-                    "Multithreading Syllabus: Concurrent exchange requests, stock reservation coordination, event production, shared-resource access, and notification queue dispatch."
-            );
-            highlightActiveNavButton(btnNavMarketplace);
-        }
+        loadSubView(AppConfig.MARKETPLACE_VIEW);
+        highlightActiveNavButton(btnNavMarketplace);
     }
 
     @FXML
     private void handleNavRequests(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXCHANGE_VIEW));
-            Parent view = loader.load();
-            ExchangeController controller = loader.getController();
-            if (controller != null) {
-                controller.selectRequestsTab();
-            }
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
-            highlightActiveNavButton(btnNavRequests);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showPlaceholder(
-                    "Exchange Requests & Transfer Tracking",
-                    "Member 3 - Stock Exchange & Requests",
-                    "Track inbound and outbound medicine transfer requests, approve or reject stock reservations, and track secure medicine transfers.",
-                    "Owned Classes: RequestsController, ExchangeRequest, StockTransfer, ExchangeService",
-                    "Multithreading Syllabus: Multi-pharmacy concurrent reservation locks and transactional consistency."
-            );
-            highlightActiveNavButton(btnNavRequests);
-        }
+        loadSubView(AppConfig.REQUESTS_VIEW);
+        highlightActiveNavButton(btnNavRequests);
     }
 
 
@@ -285,21 +256,13 @@ public class DashboardController {
             e.printStackTrace();
             showPlaceholder(
                     "Expiry Monitoring & Notifications",
-                    "Member 4 — Expiry, Notifications & Reports",
+                    "Subsystem: Expiry, Notifications & Reports",
                     "Real-time monitoring of medicine batches nearing expiry with automatic threshold alerts and notifications.",
                     "Owned Classes: ExpiryController, Notification, AppEvent, ExpiryService, NotificationService, CustomEventQueue, EventConsumer, NotificationWorker",
-                    "Multithreading Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
+                    "Architecture Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
             );
             highlightActiveNavButton(btnNavExpiry);
         }
-        showPlaceholder(
-                "Expiry Monitoring & Notifications",
-                "Member 4 — Expiry, Notifications & Reports",
-                "Real-time monitoring of medicine batches nearing expiry with automatic threshold alerts and notifications.",
-                "Owned Classes: ExpiryController, Notification, AppEvent, ExpiryService, NotificationService, CustomEventQueue, EventConsumer, NotificationWorker",
-                "Multithreading Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
-        );
-        highlightActiveNavButton(btnNavExpiry);
     }
 
     @FXML
@@ -314,21 +277,13 @@ public class DashboardController {
             e.printStackTrace();
             showPlaceholder(
                     "Reports & Asynchronous Event Queue Monitor",
-                    "Member 4 — Expiry, Notifications & Reports",
+                    "Subsystem: Expiry, Notifications & Reports",
                     "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
                     "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
-                    "Multithreading Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
+                    "Architecture Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
             );
             highlightActiveNavButton(btnNavReports);
         }
-        showPlaceholder(
-                "Reports & Asynchronous Event Queue Monitor",
-                "Member 4 — Expiry, Notifications & Reports",
-                "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
-                "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
-                "Multithreading Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
-        );
-        highlightActiveNavButton(btnNavReports);
     }
 
     @FXML

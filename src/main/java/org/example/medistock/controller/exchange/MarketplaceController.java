@@ -62,6 +62,7 @@ public class MarketplaceController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        exchangeService.ensureWorkerStarted();
         setupPharmacySelector();
         setupTableColumns();
         loadListings();

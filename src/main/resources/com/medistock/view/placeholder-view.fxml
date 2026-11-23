@@ -15,7 +15,7 @@
         <HBox alignment="CENTER_LEFT" spacing="12.0">
             <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                 <Label fx:id="moduleTitleLabel" text="Module Title" styleClass="placeholder-title"/>
-                <Label fx:id="moduleOwnerLabel" text="Owner: Member X" styleClass="placeholder-owner"/>
+                <Label fx:id="moduleOwnerLabel" text="Subsystem Information" styleClass="placeholder-owner"/>
             </VBox>
             <Label text="TEAM INTEGRATION" styleClass="badge-integration"/>
         </HBox>
@@ -42,7 +42,7 @@
 
         <Separator/>
 
-        <Label text="💡 Note for Evaluation 1: Coordinated integration architecture by Member 1." styleClass="text-muted"/>
+        <Label text="💡 Coordinated architecture and integrated subsystem." styleClass="text-muted"/>
     </VBox>
 
 </VBox>

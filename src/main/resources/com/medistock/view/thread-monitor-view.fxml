@@ -20,7 +20,7 @@
     <HBox alignment="CENTER_LEFT" spacing="12.0">
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <Label text="Concurrency &amp; Thread Monitoring Lab" styleClass="view-title"/>
-            <Label text="Evaluation 1 Core Multithreading: Thread Lifecycle, Daemon Threads, Priorities &amp; Tracing." styleClass="view-subtitle"/>
+            <Label text="Core Multithreading System: Thread Lifecycle, Daemon Threads, Priorities &amp; Tracing." styleClass="view-subtitle"/>
         </VBox>
         <VBox alignment="CENTER_RIGHT" spacing="4.0">
             <Label fx:id="daemonStatusLabel" text="Daemon: RUNNING" styleClass="badge-daemon"/>
@@ -82,9 +82,9 @@
                 </TableView>
             </VBox>
 
-            <!-- Educational / Evaluation Architecture Notes Card -->
+            <!-- Architecture Notes Card -->
             <VBox spacing="10.0" styleClass="info-card">
-                <Label text="📖 Multithreading Concepts Demonstrable in Member 1 Module:" styleClass="info-title"/>
+                <Label text="📖 Concurrency Architecture &amp; Execution Specifications:" styleClass="info-title"/>
                 <Label text="• Thread Lifecycle (6 States): NEW (instantiated), RUNNABLE (executing), BLOCKED (intrinsic lock contention), WAITING (monitor.wait), TIMED_WAITING (sleep), TERMINATED (completed)." styleClass="info-bullet"/>
                 <Label text="• Daemon Threads: ExpiryMonitorThread runs as setDaemon(true), providing background sweeps that terminate cleanly upon application close." styleClass="info-bullet"/>
                 <Label text="• Thread Priorities: ReportWorker demonstrates priority assignment (MIN=1, NORM=5, MAX=10) with execution tracing." styleClass="info-bullet"/>

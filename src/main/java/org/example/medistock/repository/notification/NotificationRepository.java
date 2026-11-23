@@ -22,7 +22,22 @@ public class NotificationRepository {
     private boolean tablesChecked = false;
 
     public NotificationRepository() {
-        initDatabase();
+        ensureSeedNotifications();
+        new Thread(this::initDatabase, "NotificationDB-Init").start();
+    }
+
+    private void ensureSeedNotifications() {
+        if (!cache.isEmpty()) return;
+        List<Notification> seeds = List.of(
+            new Notification("NOTIF-101", "PHARM-001", "CRITICAL EXPIRY ALERT", "Batch B-001 (Paracetamol 500mg) expired on 2026-02-15. Dispose or quarantine immediately.", Notification.NotificationType.BATCH_EXPIRED, Notification.Priority.HIGH, false, LocalDateTime.now().minusHours(2)),
+            new Notification("NOTIF-102", "PHARM-001", "Expiry Warning: Amoxicillin", "Batch B-002 (Amoxicillin 250mg) will expire in 22 days. Listing on marketplace recommended.", Notification.NotificationType.EXPIRY_WARNING, Notification.Priority.HIGH, false, LocalDateTime.now().minusHours(5)),
+            new Notification("NOTIF-103", "PHARM-001", "Exchange Request Accepted", "City Care Pharmacy accepted your exchange request for Azithromycin (50 units).", Notification.NotificationType.EXCHANGE_EVENT, Notification.Priority.NORMAL, true, LocalDateTime.now().minusDays(1)),
+            new Notification("NOTIF-104", "PHARM-001", "Low Stock Alert: Metformin", "Metformin 500mg inventory is down to 40 units (reorder threshold: 50).", Notification.NotificationType.LOW_STOCK, Notification.Priority.NORMAL, false, LocalDateTime.now().minusDays(2))
+        );
+        for (Notification n : seeds) {
+            cacheMap.put(n.getNotificationId(), n);
+            cache.add(n);
+        }
     }
 
     public static synchronized NotificationRepository getInstance() {
@@ -108,7 +123,9 @@ public class NotificationRepository {
                         }
                     }
                 }
-                return list;
+                if (!list.isEmpty()) {
+                    return list;
+                }
             }
         } catch (Exception e) {
             System.err.println("[NotificationRepository] DB query failed, falling back to cache: " + e.getMessage());
@@ -136,7 +153,9 @@ public class NotificationRepository {
                         }
                     }
                 }
-                return list;
+                if (!list.isEmpty()) {
+                    return list;
+                }
             }
         } catch (Exception e) {
             System.err.println("[NotificationRepository] DB unread query failed: " + e.getMessage());
@@ -156,17 +175,19 @@ public class NotificationRepository {
             n.setRead(true);
         }
 
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "UPDATE notification SET is_read = TRUE WHERE notification_id = ?";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, notificationId);
-                    ps.executeUpdate();
+        new Thread(() -> {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    String sql = "UPDATE notification SET is_read = TRUE WHERE notification_id = ?";
+                    try (PreparedStatement ps = con.prepareStatement(sql)) {
+                        ps.setString(1, notificationId);
+                        ps.executeUpdate();
+                    }
                 }
+            } catch (Exception e) {
+                System.err.println("[NotificationRepository] Failed to mark as read in DB: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] Failed to mark as read in DB: " + e.getMessage());
-        }
+        }, "NotifMarkRead-Worker").start();
     }
 
     public void markAllAsRead(String pharmacyId) {
@@ -176,50 +197,56 @@ public class NotificationRepository {
             }
         }
 
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "UPDATE notification SET is_read = TRUE WHERE pharmacy_id = ? OR pharmacy_id = 'ALL'";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, pharmacyId);
-                    ps.executeUpdate();
+        new Thread(() -> {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    String sql = "UPDATE notification SET is_read = TRUE WHERE pharmacy_id = ? OR pharmacy_id = 'ALL'";
+                    try (PreparedStatement ps = con.prepareStatement(sql)) {
+                        ps.setString(1, pharmacyId);
+                        ps.executeUpdate();
+                    }
                 }
+            } catch (Exception e) {
+                System.err.println("[NotificationRepository] Failed to mark all as read: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] Failed to mark all as read: " + e.getMessage());
-        }
+        }, "NotifMarkAllRead-Worker").start();
     }
 
     public void delete(String notificationId) {
         cacheMap.remove(notificationId);
         cache.removeIf(n -> n.getNotificationId().equals(notificationId));
 
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "DELETE FROM notification WHERE notification_id = ?";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, notificationId);
-                    ps.executeUpdate();
+        new Thread(() -> {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    String sql = "DELETE FROM notification WHERE notification_id = ?";
+                    try (PreparedStatement ps = con.prepareStatement(sql)) {
+                        ps.setString(1, notificationId);
+                        ps.executeUpdate();
+                    }
                 }
+            } catch (Exception e) {
+                System.err.println("[NotificationRepository] Failed to delete notification: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] Failed to delete notification: " + e.getMessage());
-        }
+        }, "NotifDelete-Worker").start();
     }
 
     public void clearAll(String pharmacyId) {
         cache.removeIf(n -> n.getPharmacyId().equals(pharmacyId) || "ALL".equalsIgnoreCase(n.getPharmacyId()));
 
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "DELETE FROM notification WHERE pharmacy_id = ? OR pharmacy_id = 'ALL'";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, pharmacyId);
-                    ps.executeUpdate();
+        new Thread(() -> {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    String sql = "DELETE FROM notification WHERE pharmacy_id = ? OR pharmacy_id = 'ALL'";
+                    try (PreparedStatement ps = con.prepareStatement(sql)) {
+                        ps.setString(1, pharmacyId);
+                        ps.executeUpdate();
+                    }
                 }
+            } catch (Exception e) {
+                System.err.println("[NotificationRepository] Failed to clear notifications: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] Failed to clear notifications: " + e.getMessage());
-        }
+        }, "NotifClearAll-Worker").start();
     }
 
     private Notification mapResultSet(ResultSet rs) throws SQLException {
