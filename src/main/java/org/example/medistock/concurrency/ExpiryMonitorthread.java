@@ -31,7 +31,7 @@ public class ExpiryMonitorthread extends Thread {
     private final List<ScanListener> listeners = new CopyOnWriteArrayList<>();
 
     public ExpiryMonitorthread() {
-        this(5000);
+        this(10000);
     }
 
     public ExpiryMonitorthread(long intervalMillis) {
@@ -72,7 +72,8 @@ public class ExpiryMonitorthread extends Thread {
     }
 
     public void addListener(ScanListener listener) {
-        if (listener != null && !listeners.contains(listener)) {
+        if (listener != null) {
+            listeners.removeIf(l -> l.getClass().equals(listener.getClass()));
             listeners.add(listener);
         }
     }

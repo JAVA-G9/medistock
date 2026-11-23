@@ -121,7 +121,9 @@ public class inventoryController {
     Connection con;
     @FXML
     void initialize() {
-        con= DBConnection.connectToMySql();
+        new Thread(() -> {
+            con = DBConnection.connectToMySql();
+        }, "InventoryDB-Init").start();
         getCategory.getItems().addAll(
                 "Pain Relief",
                 "Antibiotic",

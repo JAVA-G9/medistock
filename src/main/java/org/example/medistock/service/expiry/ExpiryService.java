@@ -32,8 +32,8 @@ public class ExpiryService {
 
     public ExpiryService(NotificationService notificationService) {
         this.notificationService = notificationService;
-        initDatabase();
         ensureSeedData();
+        new Thread(this::initDatabase, "ExpiryDB-Init").start();
     }
 
     public static synchronized ExpiryService getInstance() {
@@ -121,34 +121,36 @@ public class ExpiryService {
         // Populate in-memory store first so UI works immediately in evaluation/offline mode
         inMemoryBatches.addAll(seeds);
 
-        // If DB is reachable, sync seeds
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                for (MedicineBatch batch : seeds) {
-                    try {
-                        String sql = """
-                            INSERT INTO medicine_batch (medicine_id, medicine_name, batch_number, manufacturing_date, expiry_date, quantity, unit_price, pharmacy_id, status)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            ON DUPLICATE KEY UPDATE quantity = VALUES(quantity)
-                        """;
-                        try (PreparedStatement ps = con.prepareStatement(sql)) {
-                            ps.setInt(1, batch.getMedicineId());
-                            ps.setString(2, batch.getMedicineName());
-                            ps.setString(3, batch.getBatchNumber());
-                            ps.setDate(4, java.sql.Date.valueOf(batch.getManufacturingDate()));
-                            ps.setDate(5, java.sql.Date.valueOf(batch.getExpiryDate()));
-                            ps.setInt(6, batch.getQuantity());
-                            ps.setDouble(7, batch.getUnitPrice());
-                            ps.setString(8, batch.getPharmacyId());
-                            ps.setString(9, "AVAILABLE");
-                            ps.executeUpdate();
+        // If DB is reachable, sync seeds in background without blocking UI
+        new Thread(() -> {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    for (MedicineBatch batch : seeds) {
+                        try {
+                            String sql = """
+                                INSERT INTO medicine_batch (medicine_id, medicine_name, batch_number, manufacturing_date, expiry_date, quantity, unit_price, pharmacy_id, status)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                ON DUPLICATE KEY UPDATE quantity = VALUES(quantity)
+                            """;
+                            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                                ps.setInt(1, batch.getMedicineId());
+                                ps.setString(2, batch.getMedicineName());
+                                ps.setString(3, batch.getBatchNumber());
+                                ps.setDate(4, java.sql.Date.valueOf(batch.getManufacturingDate()));
+                                ps.setDate(5, java.sql.Date.valueOf(batch.getExpiryDate()));
+                                ps.setInt(6, batch.getQuantity());
+                                ps.setDouble(7, batch.getUnitPrice());
+                                ps.setString(8, batch.getPharmacyId());
+                                ps.setString(9, "AVAILABLE");
+                                ps.executeUpdate();
+                            }
+                        } catch (Exception ignored) {
                         }
-                    } catch (Exception ignored) {
                     }
                 }
+            } catch (Exception ignored) {
             }
-        } catch (Exception ignored) {
-        }
+        }, "ExpirySeed-Sync").start();
     }
 
     public synchronized MedicineBatch saveBatch(MedicineBatch batch) {
@@ -156,38 +158,40 @@ public class ExpiryService {
         inMemoryBatches.removeIf(b -> b.getBatchNumber().equalsIgnoreCase(batch.getBatchNumber()));
         inMemoryBatches.add(batch);
 
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = """
-                    INSERT INTO medicine_batch (medicine_id, medicine_name, batch_number, manufacturing_date, expiry_date, quantity, unit_price, pharmacy_id, status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE
-                        quantity = VALUES(quantity),
-                        unit_price = VALUES(unit_price),
-                        expiry_date = VALUES(expiry_date),
-                        status = VALUES(status)
-                """;
-                try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                    ps.setInt(1, batch.getMedicineId());
-                    ps.setString(2, batch.getMedicineName());
-                    ps.setString(3, batch.getBatchNumber());
-                    ps.setDate(4, java.sql.Date.valueOf(batch.getManufacturingDate()));
-                    ps.setDate(5, java.sql.Date.valueOf(batch.getExpiryDate()));
-                    ps.setInt(6, batch.getQuantity());
-                    ps.setDouble(7, batch.getUnitPrice());
-                    ps.setString(8, batch.getPharmacyId());
-                    ps.setString(9, "AVAILABLE");
-                    ps.executeUpdate();
-                    try (ResultSet rs = ps.getGeneratedKeys()) {
-                        if (rs.next()) {
-                            batch.setBatchId(rs.getInt(1));
+        new Thread(() -> {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    String sql = """
+                        INSERT INTO medicine_batch (medicine_id, medicine_name, batch_number, manufacturing_date, expiry_date, quantity, unit_price, pharmacy_id, status)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE
+                            quantity = VALUES(quantity),
+                            unit_price = VALUES(unit_price),
+                            expiry_date = VALUES(expiry_date),
+                            status = VALUES(status)
+                    """;
+                    try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                        ps.setInt(1, batch.getMedicineId());
+                        ps.setString(2, batch.getMedicineName());
+                        ps.setString(3, batch.getBatchNumber());
+                        ps.setDate(4, java.sql.Date.valueOf(batch.getManufacturingDate()));
+                        ps.setDate(5, java.sql.Date.valueOf(batch.getExpiryDate()));
+                        ps.setInt(6, batch.getQuantity());
+                        ps.setDouble(7, batch.getUnitPrice());
+                        ps.setString(8, batch.getPharmacyId());
+                        ps.setString(9, "AVAILABLE");
+                        ps.executeUpdate();
+                        try (ResultSet rs = ps.getGeneratedKeys()) {
+                            if (rs.next()) {
+                                batch.setBatchId(rs.getInt(1));
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                System.err.println("[ExpiryService] Error saving batch to DB: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[ExpiryService] Error saving batch to DB: " + e.getMessage());
-        }
+        }, "SaveBatch-Worker").start();
         return batch;
     }
 
@@ -312,7 +316,7 @@ public class ExpiryService {
     }
 
     public List<ExpiryRecord> getAllExpiryRecords(String pharmacyId) {
-        List<MedicineBatch> batches = fetchBatchesFromDB(pharmacyId);
+        List<MedicineBatch> batches = new ArrayList<>(inMemoryBatches);
         List<ExpiryRecord> records = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
@@ -370,17 +374,19 @@ public class ExpiryService {
 
     public void disposeBatch(String batchNumber) {
         inMemoryBatches.removeIf(b -> b.getBatchNumber().equalsIgnoreCase(batchNumber));
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "DELETE FROM medicine_batch WHERE batch_number = ?";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, batchNumber);
-                    ps.executeUpdate();
+        new Thread(() -> {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    String sql = "DELETE FROM medicine_batch WHERE batch_number = ?";
+                    try (PreparedStatement ps = con.prepareStatement(sql)) {
+                        ps.setString(1, batchNumber);
+                        ps.executeUpdate();
+                    }
                 }
+            } catch (Exception e) {
+                System.err.println("[ExpiryService] Error disposing batch: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[ExpiryService] Error disposing batch: " + e.getMessage());
-        }
+        }, "DisposeBatch-Worker").start();
     }
 
     public void updateBatchExpiry(String batchNumber, LocalDate newDate) {
@@ -389,17 +395,19 @@ public class ExpiryService {
                 b.setExpiryDate(newDate);
             }
         }
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "UPDATE medicine_batch SET expiry_date = ? WHERE batch_number = ?";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setDate(1, java.sql.Date.valueOf(newDate));
-                    ps.setString(2, batchNumber);
-                    ps.executeUpdate();
+        new Thread(() -> {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    String sql = "UPDATE medicine_batch SET expiry_date = ? WHERE batch_number = ?";
+                    try (PreparedStatement ps = con.prepareStatement(sql)) {
+                        ps.setDate(1, java.sql.Date.valueOf(newDate));
+                        ps.setString(2, batchNumber);
+                        ps.executeUpdate();
+                    }
                 }
+            } catch (Exception e) {
+                System.err.println("[ExpiryService] Error updating batch expiry: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[ExpiryService] Error updating batch expiry: " + e.getMessage());
-        }
+        }, "UpdateExpiry-Worker").start();
     }
 }

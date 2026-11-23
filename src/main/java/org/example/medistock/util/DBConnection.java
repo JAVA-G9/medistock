@@ -1,6 +1,7 @@
 
 package org.example.medistock.util;
 
+import javafx.application.Platform;
 import org.example.medistock.config.DatabaseConfig;
 
 import java.sql.Connection;
@@ -14,6 +15,11 @@ public class DBConnection {
     private static final long RETRY_INTERVAL_MS = 60_000; // Only retry remote DB after 60 seconds if it failed
 
     public static Connection connectToMySql() {
+        // Strict UI responsiveness rule: Never block the JavaFX Application Thread on network I/O
+        if (Platform.isFxApplicationThread()) {
+            return null;
+        }
+
         long now = System.currentTimeMillis();
 
         // Circuit breaker: If remote DB was unreachable, fail fast without hanging the JavaFX UI

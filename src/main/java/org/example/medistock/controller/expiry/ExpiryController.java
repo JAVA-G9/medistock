@@ -225,9 +225,7 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
 
     @Override
     public void onScanCompleted(int cycle, List<ExpiryRecord> atRiskRecords) {
-        Platform.runLater(() -> {
-            loadRecords();
-            updateDaemonUiStatus();
-        });
+        loadRecords();
+        updateDaemonUiStatus();
     }
 }
