@@ -1,83 +1,172 @@
-<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Rectangle?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="539.0" prefWidth="658.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.medistock.controller.inventory.inventoryController">
+<VBox prefWidth="1000.0" prefHeight="750.0"
+      maxWidth="Infinity" maxHeight="Infinity"
+      spacing="18.0"
+      styleClass="dashboard-root"
+      stylesheets="@../../css/main.css"
+      xmlns="http://javafx.com/javafx/26"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.medistock.controller.inventory.inventoryController">
+
    <children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ccfbf1" height="464.0" layoutX="4.0" layoutY="75.0" stroke="#ccfbf1" strokeType="INSIDE" width="647.0" />
-      <Label alignment="CENTER" layoutY="-1.0" prefHeight="74.0" prefWidth="655.0" style="-fx-background-color: #115E59; -fx-font-family: Segoe UI;" text="Medistock" textFill="#fff8f8">
-         <font>
-            <Font size="22.0" />
-         </font>
-      </Label>
-      <Button fx:id="saveBtn" layoutX="126.0" layoutY="392.0" mnemonicParsing="false" onAction="#doSave" prefHeight="37.0" prefWidth="77.0" style="-fx-background-color: #0F172A;" text="Save" textFill="#fffefe">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Button>
-      <Button fx:id="delBtn" layoutX="427.0" layoutY="392.0" mnemonicParsing="false" onAction="#doDelete" prefHeight="37.0" prefWidth="77.0" style="-fx-background-color: #0F172A;" text="Delete" textFill="#fffefe">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Button>
-      <Button fx:id="fetchBtn" layoutX="274.0" layoutY="392.0" mnemonicParsing="false" onAction="#doFetch" prefHeight="37.0" prefWidth="77.0" style="-fx-background-color: #0F172A;" text="Fetch" textFill="#fffefe">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Button>
-      <TextField fx:id="getMedName" layoutX="151.0" layoutY="87.0" prefHeight="26.0" prefWidth="113.0" />
-      <Label alignment="CENTER" layoutX="26.0" layoutY="89.0" prefHeight="22.0" prefWidth="114.0" style="-fx-background-color: #64748B; -fx-background-radius: 5;" text="Medicine Name" textFill="WHITE">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <Label alignment="CENTER" layoutX="313.0" layoutY="89.0" prefHeight="22.0" prefWidth="100.0" style="-fx-background-color: #64748B; -fx-background-radius: 5;" text="Genric Name" textFill="WHITE">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <Label alignment="CENTER" layoutX="26.0" layoutY="129.0" prefHeight="22.0" prefWidth="114.0" style="-fx-background-color: #64748B; -fx-background-radius: 5;" text="Manufacturar" textFill="WHITE">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <TextField fx:id="getGenName" layoutX="430.0" layoutY="87.0" prefHeight="26.0" prefWidth="113.0" />
-      <TextField fx:id="getManName" layoutX="151.0" layoutY="127.0" prefHeight="26.0" prefWidth="113.0" />
-      <ComboBox fx:id="getCategory" editable="true" layoutX="436.0" layoutY="127.0" prefHeight="26.0" prefWidth="114.0" />
-      <Label alignment="CENTER" layoutX="313.0" layoutY="129.0" prefHeight="22.0" prefWidth="114.0" style="-fx-background-color: #64748B; -fx-background-radius: 5;" text="Select Category" textFill="WHITE">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <Label alignment="CENTER" layoutX="26.0" layoutY="177.0" prefHeight="22.0" prefWidth="87.0" style="-fx-background-color: #64748B; -fx-background-radius: 5;" text="Strength" textFill="WHITE">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <TextField fx:id="getStrength" layoutX="151.0" layoutY="175.0" prefHeight="26.0" prefWidth="113.0" />
-      <ComboBox fx:id="getDosage" editable="true" layoutX="436.0" layoutY="175.0" prefHeight="26.0" prefWidth="114.0" />
-      <Label alignment="CENTER" layoutX="313.0" layoutY="177.0" prefHeight="22.0" prefWidth="100.0" style="-fx-background-color: #64748B; -fx-background-radius: 5;" text="Dosage Form" textFill="WHITE">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <Label alignment="CENTER" layoutX="26.0" layoutY="226.0" prefHeight="22.0" prefWidth="100.0" style="-fx-background-color: #64748B; -fx-background-radius: 5;" text="Description" textFill="WHITE">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <TextArea fx:id="getDescription" layoutX="151.0" layoutY="237.0" prefHeight="101.0" prefWidth="200.0" />
-      <Button fx:id="clearBtn" layoutX="562.0" layoutY="487.0" mnemonicParsing="false" onAction="#doClear" prefHeight="26.0" prefWidth="78.0" style="-fx-background-color: #0F172A;" text="clear all" textFill="#fffefe">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Button>
+
+      <!-- Page Heading -->
+      <VBox spacing="5.0" styleClass="view-content-root">
+         <children>
+            <Label text="My Inventory &amp; Batch Management"
+                   styleClass="view-title"/>
+
+            <Label text="Manage your medicine catalog and medicine details."
+                   styleClass="view-subtitle"/>
+         </children>
+      </VBox>
+
+      <!-- Form Card -->
+      <VBox spacing="22.0" styleClass="form-card">
+         <children>
+
+            <Label text="Medicine Information"
+                   styleClass="section-header"/>
+
+            <GridPane hgap="20.0" vgap="22.0">
+               <columnConstraints>
+                  <javafx.scene.layout.ColumnConstraints percentWidth="17"/>
+                  <javafx.scene.layout.ColumnConstraints percentWidth="33"/>
+                  <javafx.scene.layout.ColumnConstraints percentWidth="17"/>
+                  <javafx.scene.layout.ColumnConstraints percentWidth="33"/>
+               </columnConstraints>
+
+               <children>
+
+                  <Label text="Medicine Name"
+                         styleClass="field-label"
+                         GridPane.columnIndex="0"
+                         GridPane.rowIndex="0"/>
+
+                  <TextField fx:id="getMedName"
+                             promptText="Enter medicine name"
+                             styleClass="input-field"
+                             maxWidth="Infinity"
+                             GridPane.columnIndex="1"
+                             GridPane.rowIndex="0"/>
+
+                  <Label text="Generic Name"
+                         styleClass="field-label"
+                         GridPane.columnIndex="2"
+                         GridPane.rowIndex="0"/>
+
+                  <TextField fx:id="getGenName"
+                             promptText="Enter generic name"
+                             styleClass="input-field"
+                             maxWidth="Infinity"
+                             GridPane.columnIndex="3"
+                             GridPane.rowIndex="0"/>
+
+                  <Label text="Manufacturer"
+                         styleClass="field-label"
+                         GridPane.columnIndex="0"
+                         GridPane.rowIndex="1"/>
+
+                  <TextField fx:id="getManName"
+                             promptText="Enter manufacturer"
+                             styleClass="input-field"
+                             maxWidth="Infinity"
+                             GridPane.columnIndex="1"
+                             GridPane.rowIndex="1"/>
+
+                  <Label text="Category"
+                         styleClass="field-label"
+                         GridPane.columnIndex="2"
+                         GridPane.rowIndex="1"/>
+
+                  <ComboBox fx:id="getCategory"
+                            editable="true"
+                            promptText="Select category"
+                            styleClass="input-field"
+                            maxWidth="Infinity"
+                            GridPane.columnIndex="3"
+                            GridPane.rowIndex="1"/>
+
+                  <Label text="Strength"
+                         styleClass="field-label"
+                         GridPane.columnIndex="0"
+                         GridPane.rowIndex="2"/>
+
+                  <TextField fx:id="getStrength"
+                             promptText="e.g. 500 mg"
+                             styleClass="input-field"
+                             maxWidth="Infinity"
+                             GridPane.columnIndex="1"
+                             GridPane.rowIndex="2"/>
+
+                  <Label text="Dosage Form"
+                         styleClass="field-label"
+                         GridPane.columnIndex="2"
+                         GridPane.rowIndex="2"/>
+
+                  <ComboBox fx:id="getDosage"
+                            editable="true"
+                            promptText="Select dosage form"
+                            styleClass="input-field"
+                            maxWidth="Infinity"
+                            GridPane.columnIndex="3"
+                            GridPane.rowIndex="2"/>
+
+                  <Label text="Description"
+                         styleClass="field-label"
+                         GridPane.columnIndex="0"
+                         GridPane.rowIndex="3"/>
+
+                  <TextArea fx:id="getDescription"
+                            promptText="Enter medicine description..."
+                            wrapText="true"
+                            prefHeight="110.0"
+                            maxWidth="Infinity"
+                            styleClass="input-field"
+                            GridPane.columnIndex="1"
+                            GridPane.rowIndex="3"
+                            GridPane.columnSpan="3"/>
+
+               </children>
+            </GridPane>
+
+            <!-- Action Buttons -->
+            <HBox spacing="14.0">
+               <children>
+                  <Button fx:id="saveBtn"
+                          text="Save Medicine"
+                          onAction="#doSave"
+                          styleClass="btn-primary"/>
+
+                  <Button fx:id="fetchBtn"
+                          text="Fetch Medicine"
+                          onAction="#doFetch"
+                          styleClass="btn-secondary"/>
+
+                  <Button fx:id="delBtn"
+                          text="Delete Medicine"
+                          onAction="#doDelete"
+                          styleClass="btn-danger"/>
+
+                  <Button fx:id="clearBtn"
+                          text="Clear All"
+                          onAction="#doClear"
+                          styleClass="btn-secondary"/>
+               </children>
+            </HBox>
+
+         </children>
+      </VBox>
+
    </children>
-</AnchorPane>
+</VBox>

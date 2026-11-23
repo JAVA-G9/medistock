@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.net.URL;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -56,16 +57,79 @@ public class inventoryController {
 
     @FXML
     void doClear(ActionEvent event) {
+        getMedName.clear();
+        getGenName.clear();
+        getManName.clear();
+        getStrength.clear();
+        getDescription.clear();
 
+        getCategory.getSelectionModel().clearSelection();
+        getDosage.getSelectionModel().clearSelection();
     }
 
     @FXML
     void doDelete(ActionEvent event) {
+        try {
+            String medName = getMedName.getText();
+
+            if (medName.isEmpty()) {
+                System.out.println("Enter medicine name first");
+                return;
+            }
+
+            String sql = "DELETE FROM medicine WHERE medicine_name = ?";
+
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, medName);
+
+            int count = pst.executeUpdate();
+
+            if (count > 0) {
+                System.out.println("Medicine Deleted Successfully");
+                doClear(event);
+            } else {
+                System.out.println("Medicine Not Found");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
     @FXML
     void doFetch(ActionEvent event) {
+        try {
+            String medName = getMedName.getText();
+
+            if (medName.isEmpty()) {
+                System.out.println("Enter medicine name first");
+                return;
+            }
+
+            String sql = "SELECT * FROM medicine WHERE medicine_name = ?";
+
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, medName);
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                getGenName.setText(rs.getString("generic_name"));
+                getManName.setText(rs.getString("manufacturer_name"));
+                getCategory.setValue(rs.getString("category"));
+                getStrength.setText(rs.getString("strength"));
+                getDosage.setValue(rs.getString("dosage_form"));
+                getDescription.setText(rs.getString("description"));
+
+                System.out.println("Medicine Found");
+            } else {
+                System.out.println("Medicine Not Found");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
