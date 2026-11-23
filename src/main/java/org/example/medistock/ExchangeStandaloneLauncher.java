@@ -18,9 +18,9 @@ public class ExchangeStandaloneLauncher extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        URL fxml = getClass().getResource("/org/example/medistock/view/exchange/exchange-view.fxml");
+        URL fxml = getClass().getResource("/org/example/medistock/view/exchange/marketplace-view.fxml");
         if (fxml == null) {
-            throw new IOException("Cannot locate exchange-view.fxml");
+            throw new IOException("Cannot locate marketplace-view.fxml");
         }
 
         Parent root = FXMLLoader.load(fxml);
@@ -31,7 +31,7 @@ public class ExchangeStandaloneLauncher extends Application {
             scene.getStylesheets().add(css.toExternalForm());
         }
 
-        stage.setTitle("MediStock — Stock Exchange & Surplus Marketplace (Member 3)");
+        stage.setTitle("MediStock — Stock Exchange & Surplus Marketplace");
         stage.setMinWidth(980);
         stage.setMinHeight(640);
         stage.setScene(scene);
