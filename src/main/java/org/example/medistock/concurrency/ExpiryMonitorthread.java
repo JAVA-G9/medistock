@@ -1,3 +1,4 @@
+
 package org.example.medistock.concurrency;
 
 import javafx.application.Platform;
@@ -10,10 +11,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Background daemon thread for continuous monitoring of medicine batches approaching expiration.
+ * Background daemon thread for continuous monitoring of medicine batches
+ * approaching expiration.
+ *
  * Owned by Member 4 (Expiry, Notifications & Reports).
- * Multithreading syllabus role: Daemon thread, periodic polling, state tracing (RUNNABLE / TIMED_WAITING),
- * safe shutdown using volatile running flag and interrupt().
+ *
+ * Multithreading concepts:
+ * Daemon thread, periodic polling, atomic variables, volatile flag,
+ * interruption, and thread-safe listener management.
  */
 public class ExpiryMonitorthread extends Thread {
 
@@ -22,60 +27,63 @@ public class ExpiryMonitorthread extends Thread {
     }
 
     private static ExpiryMonitorthread instance;
+
     private volatile boolean running = false;
-    private long intervalMillis = 5000; // 5 seconds default
+    private volatile long intervalMillis;
+
     private final AtomicInteger scanCycle = new AtomicInteger(0);
     private final AtomicLong lastScanTime = new AtomicLong(0);
     private final AtomicInteger flaggedCount = new AtomicInteger(0);
 
-    private final List<ScanListener> listeners = new CopyOnWriteArrayList<>();
+    private final List<ScanListener> listeners =
+            new CopyOnWriteArrayList<>();
 
     public ExpiryMonitorthread() {
         this(5000);
-        this(10000);
     }
 
     public ExpiryMonitorthread(long intervalMillis) {
         super("MediStock-ExpiryMonitor-Daemon");
-        this.intervalMillis = intervalMillis;
-        setDaemon(true); // Daemon thread: does not prevent JVM termination
-        setPriority(Thread.NORM_PRIORITY - 1); // Priority 4
+
+        setIntervalMillis(intervalMillis);
+
+        setDaemon(true);
+        setPriority(Thread.NORM_PRIORITY - 1);
     }
 
     public static synchronized ExpiryMonitorthread getInstance() {
-        if (instance == null || !instance.isAlive()) {
+        if (instance == null || instance.getState() == State.TERMINATED) {
             instance = new ExpiryMonitorthread();
         }
+
         return instance;
     }
 
     public synchronized void startMonitoring() {
-        if (running && isAlive()) {
+
+        if (isAlive()) {
             return;
         }
-        running = true;
-        if (!isAlive()) {
-            try {
-                start();
-            } catch (IllegalThreadStateException e) {
-                // If thread already finished or started, create fresh instance
-                instance = new ExpiryMonitorthread(this.intervalMillis);
-                instance.listeners.addAll(this.listeners);
-                instance.running = true;
-                instance.start();
-            }
+
+        if (getState() == State.TERMINATED) {
+            System.err.println(
+                    "[EXPIRY-DAEMON] Thread has already terminated. " +
+                            "Use ExpiryMonitorthread.getInstance() to obtain a new instance."
+            );
+            return;
         }
+
+        running = true;
+        start();
     }
 
     public synchronized void stopMonitoring() {
-        this.running = false;
-        this.interrupt();
+        running = false;
+        interrupt();
     }
 
     public void addListener(ScanListener listener) {
         if (listener != null && !listeners.contains(listener)) {
-        if (listener != null) {
-            listeners.removeIf(l -> l.getClass().equals(listener.getClass()));
             listeners.add(listener);
         }
     }
@@ -86,65 +94,95 @@ public class ExpiryMonitorthread extends Thread {
 
     @Override
     public void run() {
-        System.out.printf("[EXPIRY-DAEMON] [%s] Daemon thread started (Daemon: %b, Priority: %d). Periodic sweeps every %d ms...%n",
-                getName(), isDaemon(), getPriority(), intervalMillis);
+
+        System.out.printf(
+                "[EXPIRY-DAEMON] [%s] Started. Daemon: %b, Priority: %d. Interval: %d ms.%n",
+                getName(), isDaemon(), getPriority(), intervalMillis
+        );
 
         while (running) {
+
             try {
+                System.out.println(
+                        "[EXPIRY-DAEMON] Scanning medicine batches..."
+                );
+
+                // Perform expiry scanning
+                List<ExpiryRecord> records =
+                        ExpiryService.getInstance()
+                                .checkAndProcessExpiries("PHARM-001");
+
+                // Avoid exposing a mutable list to listeners
+                List<ExpiryRecord> urgentRecords =
+                        records == null ? List.of() : List.copyOf(records);
+
+                // Update monitoring statistics after successful scan
+                int cycle = scanCycle.incrementAndGet();
+
                 lastScanTime.set(System.currentTimeMillis());
 
-                // Run sweep through ExpiryService first
-                List<ExpiryRecord> urgentRecords = ExpiryService.getInstance().checkAndProcessExpiries("PHARM-001");
+                flaggedCount.set(urgentRecords.size());
 
-                // Increment ONLY after successful sweep execution
-                int cycle = scanCycle.incrementAndGet();
-                flaggedCount.set(urgentRecords != null ? urgentRecords.size() : 0);
+                System.out.printf(
+                        "[EXPIRY-DAEMON] Cycle #%d completed. Flagged %d batches.%n",
+                        cycle, flaggedCount.get()
+                );
 
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Sweep successfully completed. Flagged %d at-risk/expired batches.%n",
-                int cycle = scanCycle.incrementAndGet();
-                lastScanTime.set(System.currentTimeMillis());
-
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Scanning medicine batches for expiration risks...%n", cycle);
-
-                // Run sweep through ExpiryService
-                List<ExpiryRecord> urgentRecords = ExpiryService.getInstance().checkAndProcessExpiries("PHARM-001");
-                flaggedCount.set(urgentRecords != null ? urgentRecords.size() : 0);
-
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Sweep complete. Flagged %d at-risk/expired batches.%n",
-                        cycle, flaggedCount.get());
-
-                // Notify UI listeners safely
+                // Notify registered listeners
                 for (ScanListener listener : listeners) {
+
                     try {
+                        Platform.runLater(
+                                () -> listener.onScanCompleted(cycle, urgentRecords)
+                        );
+
+                    } catch (IllegalStateException noToolkit) {
+
+                        // Fallback for environments without JavaFX initialized
                         try {
-                            Platform.runLater(() -> listener.onScanCompleted(cycle, urgentRecords));
-                        } catch (IllegalStateException noToolkit) {
-                            // Non-UI testing environment
                             listener.onScanCompleted(cycle, urgentRecords);
+                        } catch (Exception e) {
+                            System.err.println(
+                                    "[EXPIRY-DAEMON] Listener error: " +
+                                            e.getMessage()
+                            );
                         }
-                    } catch (Exception e) {
-                        System.err.println("[EXPIRY-DAEMON] Error notifying listener: " + e.getMessage());
                     }
                 }
 
-                // Enters TIMED_WAITING state
+                // Thread enters TIMED_WAITING state
                 Thread.sleep(intervalMillis);
 
             } catch (InterruptedException e) {
-                System.out.printf("[EXPIRY-DAEMON] [%s] Received interruption signal. Stopping monitor loop.%n", getName());
+
+                System.out.printf(
+                        "[EXPIRY-DAEMON] [%s] Interrupted. Stopping monitor.%n",
+                        getName()
+                );
+
                 break;
+
             } catch (Exception e) {
-                System.err.printf("[EXPIRY-DAEMON] Error during scan cycle: %s%n", e.getMessage());
+
+                System.err.printf(
+                        "[EXPIRY-DAEMON] Error during scan: %s%n",
+                        e.getMessage()
+                );
+
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException ie) {
+                } catch (InterruptedException interrupted) {
                     break;
                 }
             }
         }
 
-        System.out.printf("[EXPIRY-DAEMON] [%s] Daemon thread stopped. Final cycle count: %d%n",
-                getName(), scanCycle.get());
+        running = false;
+
+        System.out.printf(
+                "[EXPIRY-DAEMON] [%s] Stopped. Total successful scans: %d%n",
+                getName(), scanCycle.get()
+        );
     }
 
     public int getScanCycle() {
@@ -168,6 +206,13 @@ public class ExpiryMonitorthread extends Thread {
     }
 
     public void setIntervalMillis(long intervalMillis) {
+
+        if (intervalMillis <= 0) {
+            throw new IllegalArgumentException(
+                    "Scan interval must be greater than zero."
+            );
+        }
+
         this.intervalMillis = intervalMillis;
     }
 }

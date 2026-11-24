@@ -29,6 +29,7 @@ import javafx.util.Duration;
 
 import org.example.medistock.controller.exchange.ExchangeController;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Main application dashboard controller.
@@ -211,14 +212,39 @@ public class DashboardController {
 
     @FXML
     private void handleNavInventory(ActionEvent event) {
-        showPlaceholder(
-                "My Inventory & Batch Management",
-                "Member 2 — Inventory Management",
-                "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
-                "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
-                "Multithreading Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
-        );
-        highlightActiveNavButton(btnNavInventory);
+        String fxmlPath =
+                "/org/example/medistock/view/InventoryV/InventoryView.fxml";
+        try {
+            URL fxmlURL = getClass().getResource(fxmlPath);
+
+            if (fxmlURL == null) {
+                throw new IOException("FXML file not found at: " + fxmlPath);
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlURL);
+            Parent view = loader.load();
+
+            contentArea.getChildren().setAll(view);
+
+            highlightActiveNavButton(btnNavInventory);
+
+            System.out.println("Inventory page loaded successfully!");
+
+        } catch (Exception e) {
+
+            System.err.println("Could not load Inventory page:");
+            e.printStackTrace();
+
+            showPlaceholder(
+                    "My Inventory & Batch Management",
+                    "Member 2 — Inventory Management",
+                    "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
+                    "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
+                    "Multithreading Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
+            );
+
+            highlightActiveNavButton(btnNavInventory);
+        }
     }
 
     @FXML

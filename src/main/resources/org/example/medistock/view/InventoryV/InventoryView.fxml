@@ -18,7 +18,7 @@
             vbarPolicy="AS_NEEDED"
             styleClass="dashboard-root"
             stylesheets="@../../css/main.css"
-            xmlns="http://javafx.com/javafx/26"
+            xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.medistock.controller.inventory.inventoryController">
 
@@ -174,10 +174,15 @@
                                 onAction="#doDelete"
                                 styleClass="btn-danger"/>
 
+                        <Button fx:id="updateBtn"
+                                text="Update Medicine"
+                                onAction="#doUpdate"/>
+
                         <Button fx:id="clearBtn"
                                 text="Clear All"
                                 onAction="#doClear"
                                 styleClass="btn-secondary"/>
+
 
                      </children>
                   </HBox>

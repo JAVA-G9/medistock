@@ -42,6 +42,9 @@ public class inventoryController {
     private Button saveBtn;
 
     @FXML
+    private Button updateBtn;
+
+    @FXML
     private ComboBox<String> getCategory;
 
     @FXML
@@ -118,6 +121,9 @@ public class inventoryController {
 
     Connection con;
 
+    // Stores the ID of the medicine currently being edited
+    private int fetchedMedicineId = -1;
+
 
     // =====================================================
     //                  MEDICINE METHODS
@@ -134,6 +140,8 @@ public class inventoryController {
 
         getCategory.getSelectionModel().clearSelection();
         getDosage.getSelectionModel().clearSelection();
+
+        fetchedMedicineId = -1;
 
         System.out.println("Medicine form cleared");
     }
@@ -162,6 +170,8 @@ public class inventoryController {
                 if (count > 0) {
 
                     System.out.println("Medicine Deleted Successfully");
+
+                    fetchedMedicineId = -1;
                     doClear(event);
 
                     loadBatchMedicines();
@@ -194,6 +204,8 @@ public class inventoryController {
                 return;
             }
 
+            fetchedMedicineId = -1;
+
             String sql = "SELECT * FROM medicine WHERE medicine_name = ?";
 
             try (PreparedStatement pst = con.prepareStatement(sql)) {
@@ -203,6 +215,8 @@ public class inventoryController {
                 try (ResultSet rs = pst.executeQuery()) {
 
                     if (rs.next()) {
+
+                        fetchedMedicineId = rs.getInt("medicine_id");
 
                         getGenName.setText(rs.getString("generic_name"));
                         getManName.setText(rs.getString("manufacturer_name"));
@@ -281,11 +295,79 @@ public class inventoryController {
 
 
     // =====================================================
-    //                BATCH HELPER METHODS
+    //                  UPDATE MEDICINE
     // =====================================================
 
-    // Loads medicines into the batch dropdown.
-    // Each item has the format: medicine_id - medicine_name
+    @FXML
+    void doUpdate(ActionEvent event) {
+
+        if (fetchedMedicineId == -1) {
+            System.out.println("Fetch a medicine first before updating");
+            return;
+        }
+
+        String medName = getMedName.getText().trim();
+        String genName = getGenName.getText().trim();
+        String manName = getManName.getText().trim();
+
+        String category = getCategory.getValue();
+        String strength = getStrength.getText().trim();
+        String dosage = getDosage.getValue();
+        String description = getDescription.getText().trim();
+
+        if (medName.isEmpty() || manName.isEmpty()
+                || category == null || dosage == null) {
+
+            System.out.println("Please fill all required medicine fields");
+            return;
+        }
+
+        String sql = "UPDATE medicine SET "
+                + "medicine_name = ?, "
+                + "generic_name = ?, "
+                + "manufacturer_name = ?, "
+                + "category = ?, "
+                + "strength = ?, "
+                + "dosage_form = ?, "
+                + "description = ? "
+                + "WHERE medicine_id = ?";
+
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setString(1, medName);
+            pst.setString(2, genName);
+            pst.setString(3, manName);
+            pst.setString(4, category);
+            pst.setString(5, strength);
+            pst.setString(6, dosage);
+            pst.setString(7, description);
+            pst.setInt(8, fetchedMedicineId);
+
+            int count = pst.executeUpdate();
+
+            if (count > 0) {
+
+                System.out.println("Medicine Updated Successfully");
+
+                fetchedMedicineId = -1;
+                loadBatchMedicines();
+
+            } else {
+
+                System.out.println("Medicine Not Found");
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println("Could not update medicine");
+            e.printStackTrace();
+        }
+    }
+
+
+    // =====================================================
+    //                BATCH HELPER METHODS
+    // =====================================================
 
     private void loadBatchMedicines() {
 
@@ -315,8 +397,6 @@ public class inventoryController {
     }
 
 
-    // Extracts medicine_id from the selected dropdown item.
-
     private int getSelectedMedicineId() {
 
         String selected = batchMedicine.getValue();
@@ -338,8 +418,6 @@ public class inventoryController {
     }
 
 
-    // Extracts medicine name from the selected dropdown item.
-
     private String getSelectedMedicineName() {
 
         String selected = batchMedicine.getValue();
@@ -351,8 +429,6 @@ public class inventoryController {
         return selected.substring(selected.indexOf(" - ") + 3).trim();
     }
 
-
-    // Checks the common required batch fields.
 
     private boolean validateBatchFields() {
 
@@ -539,7 +615,6 @@ public class inventoryController {
 
                         int medicineId = rs.getInt("medicine_id");
 
-                        // Select the corresponding medicine in the dropdown.
                         for (String item : batchMedicine.getItems()) {
 
                             if (item.startsWith(medicineId + " - ")) {
@@ -773,6 +848,11 @@ public class inventoryController {
 
         con = DBConnection.connectToMySql();
 
+        if (con == null) {
+            System.err.println("Database connection is NULL!");
+            return;
+        }
+
         // Medicine categories
         getCategory.getItems().addAll(
                 "Pain Relief",
@@ -816,11 +896,11 @@ public class inventoryController {
         // Load medicines into batch dropdown
         loadBatchMedicines();
 
-
         // Existing medicine form checks
         assert clearBtn != null;
         assert delBtn != null;
         assert fetchBtn != null;
+        assert updateBtn != null;
         assert getCategory != null;
         assert getDescription != null;
         assert getDosage != null;
@@ -829,6 +909,7 @@ public class inventoryController {
         assert getMedName != null;
         assert getStrength != null;
         assert saveBtn != null;
+
 
     }
 
