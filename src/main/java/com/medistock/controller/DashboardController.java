@@ -29,6 +29,7 @@ import javafx.util.Duration;
 
 import org.example.medistock.controller.exchange.ExchangeController;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Main application dashboard controller.
@@ -211,35 +212,89 @@ public class DashboardController {
 
     @FXML
     private void handleNavInventory(ActionEvent event) {
+        String fxmlPath =
+                "/org/example/medistock/view/InventoryV/InventoryView.fxml";
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.INVENTORY_VIEW));
+            URL fxmlURL = getClass().getResource(fxmlPath);
+
+            if (fxmlURL == null) {
+                throw new IOException("FXML file not found at: " + fxmlPath);
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlURL);
             Parent view = loader.load();
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
+
+            contentArea.getChildren().setAll(view);
+
             highlightActiveNavButton(btnNavInventory);
+
+            System.out.println("Inventory page loaded successfully!");
+
         } catch (Exception e) {
+
+            System.err.println("Could not load Inventory page:");
             e.printStackTrace();
+
             showPlaceholder(
                     "My Inventory & Batch Management",
-                    "Subsystem: Inventory & Batch Management",
+                    "Member 2 — Inventory Management",
                     "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
                     "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
-                    "Architecture Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
+                    "Multithreading Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
             );
+
             highlightActiveNavButton(btnNavInventory);
         }
     }
 
     @FXML
     private void handleNavMarketplace(ActionEvent event) {
-        loadSubView(AppConfig.MARKETPLACE_VIEW);
-        highlightActiveNavButton(btnNavMarketplace);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXCHANGE_VIEW));
+            Parent view = loader.load();
+            ExchangeController controller = loader.getController();
+            if (controller != null) {
+                controller.selectMarketplaceTab();
+            }
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
+            highlightActiveNavButton(btnNavMarketplace);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder(
+                    "Stock Marketplace & Listings",
+                    "Member 3 - Stock Exchange & Requests",
+                    "Marketplace allowing pharmacies to browse surplus medicine batches from other licensed facilities and publish surplus listings with discounted unit rates.",
+                    "Owned Classes: MarketplaceController, RequestsController, ExchangeListing, ExchangeRequest, StockTransfer, ExchangeService, ExchangeRepository, EventProducer, ExchangeWorker",
+                    "Multithreading Syllabus: Concurrent exchange requests, stock reservation coordination, event production, shared-resource access, and notification queue dispatch."
+            );
+            highlightActiveNavButton(btnNavMarketplace);
+        }
     }
 
     @FXML
     private void handleNavRequests(ActionEvent event) {
-        loadSubView(AppConfig.REQUESTS_VIEW);
-        highlightActiveNavButton(btnNavRequests);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXCHANGE_VIEW));
+            Parent view = loader.load();
+            ExchangeController controller = loader.getController();
+            if (controller != null) {
+                controller.selectRequestsTab();
+            }
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
+            highlightActiveNavButton(btnNavRequests);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder(
+                    "Exchange Requests & Transfer Tracking",
+                    "Member 3 - Stock Exchange & Requests",
+                    "Track inbound and outbound medicine transfer requests, approve or reject stock reservations, and track secure medicine transfers.",
+                    "Owned Classes: RequestsController, ExchangeRequest, StockTransfer, ExchangeService",
+                    "Multithreading Syllabus: Multi-pharmacy concurrent reservation locks and transactional consistency."
+            );
+            highlightActiveNavButton(btnNavRequests);
+        }
     }
 
 
@@ -263,6 +318,14 @@ public class DashboardController {
             );
             highlightActiveNavButton(btnNavExpiry);
         }
+        showPlaceholder(
+                "Expiry Monitoring & Notifications",
+                "Member 4 — Expiry, Notifications & Reports",
+                "Real-time monitoring of medicine batches nearing expiry with automatic threshold alerts and notifications.",
+                "Owned Classes: ExpiryController, Notification, AppEvent, ExpiryService, NotificationService, CustomEventQueue, EventConsumer, NotificationWorker",
+                "Multithreading Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
+        );
+        highlightActiveNavButton(btnNavExpiry);
     }
 
     @FXML
@@ -284,6 +347,14 @@ public class DashboardController {
             );
             highlightActiveNavButton(btnNavReports);
         }
+        showPlaceholder(
+                "Reports & Asynchronous Event Queue Monitor",
+                "Member 4 — Expiry, Notifications & Reports",
+                "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
+                "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
+                "Multithreading Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
+        );
+        highlightActiveNavButton(btnNavReports);
     }
 
     @FXML
