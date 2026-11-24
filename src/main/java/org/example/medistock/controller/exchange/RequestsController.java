@@ -71,7 +71,6 @@ public class RequestsController implements Initializable {
     @FXML private TableColumn<StockTransfer, String> colTrfCreated;
 
     @FXML private Label statusLabel;
-    @FXML private TextArea logArea;
 
     private final ExchangeService exchangeService = ExchangeService.getInstance();
     private final PharmacyService pharmacyService = PharmacyService.getInstance();
@@ -347,12 +346,7 @@ public class RequestsController implements Initializable {
     }
 
     private void logMessage(String msg) {
-        String logLine = String.format("[%s] %s%n", java.time.LocalTime.now().withNano(0), msg);
-        if (logArea != null) {
-            logArea.appendText(logLine);
-        } else {
-            System.out.println(logLine);
-        }
+        System.out.printf("[%s] %s%n", java.time.LocalTime.now().withNano(0), msg);
     }
 
     private void showError(String title, String content) {
