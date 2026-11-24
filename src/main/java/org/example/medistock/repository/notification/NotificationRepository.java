@@ -19,6 +19,8 @@ public class NotificationRepository {
     private static NotificationRepository instance;
     private final List<Notification> cache = new CopyOnWriteArrayList<>();
     private final Map<String, Notification> cacheMap = new ConcurrentHashMap<>();
+    private volatile long lastFetchTime = 0;
+    private static final long CACHE_TTL_MS = 10_000;
     private boolean tablesChecked = false;
 
     public NotificationRepository() {
@@ -95,6 +97,21 @@ public class NotificationRepository {
     }
 
     public List<Notification> findByPharmacyId(String pharmacyId) {
+        return findByPharmacyId(pharmacyId, false);
+    }
+
+    public List<Notification> findByPharmacyId(String pharmacyId, boolean forceRefresh) {
+        long now = System.currentTimeMillis();
+        if (!forceRefresh && !cache.isEmpty() && (now - lastFetchTime < CACHE_TTL_MS)) {
+            List<Notification> list = new ArrayList<>();
+            for (Notification n : cache) {
+                if (n.getPharmacyId().equals(pharmacyId) || "ALL".equalsIgnoreCase(n.getPharmacyId())) {
+                    list.add(n);
+                }
+            }
+            return list;
+        }
+
         List<Notification> list = new ArrayList<>();
         try (Connection con = DBConnection.connectToMySql()) {
             if (con != null) {
@@ -110,6 +127,9 @@ public class NotificationRepository {
                     }
                 }
                 if (!list.isEmpty()) {
+                    cache.clear();
+                    cache.addAll(list);
+                    lastFetchTime = System.currentTimeMillis();
                     return list;
                 }
             }
@@ -127,32 +147,14 @@ public class NotificationRepository {
     }
 
     public List<Notification> findUnreadByPharmacyId(String pharmacyId) {
-        List<Notification> list = new ArrayList<>();
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "SELECT * FROM notification WHERE (pharmacy_id = ? OR pharmacy_id = 'ALL') AND is_read = FALSE ORDER BY created_at DESC";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, pharmacyId);
-                    try (ResultSet rs = ps.executeQuery()) {
-                        while (rs.next()) {
-                            list.add(mapResultSet(rs));
-                        }
-                    }
-                }
-                if (!list.isEmpty()) {
-                    return list;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] DB unread query failed: " + e.getMessage());
-        }
-
-        for (Notification n : cache) {
-            if ((n.getPharmacyId().equals(pharmacyId) || "ALL".equalsIgnoreCase(n.getPharmacyId())) && !n.isRead()) {
-                list.add(n);
+        List<Notification> all = findByPharmacyId(pharmacyId, false);
+        List<Notification> unread = new ArrayList<>();
+        for (Notification n : all) {
+            if (!n.isRead()) {
+                unread.add(n);
             }
         }
-        return list;
+        return unread;
     }
 
     public void markAsRead(String notificationId) {
@@ -160,18 +162,13 @@ public class NotificationRepository {
         if (n != null) {
             n.setRead(true);
         }
-
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "UPDATE notification SET is_read = TRUE WHERE notification_id = ?";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, notificationId);
-                    ps.executeUpdate();
-                }
+        for (Notification item : cache) {
+            if (item.getNotificationId().equals(notificationId)) {
+                item.setRead(true);
             }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] Failed to mark as read in DB: " + e.getMessage());
         }
+
+        // Run DB update once asynchronously in background so UI thread never freezes
         new Thread(() -> {
             try (Connection con = DBConnection.connectToMySql()) {
                 if (con != null) {
@@ -194,17 +191,7 @@ public class NotificationRepository {
             }
         }
 
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "UPDATE notification SET is_read = TRUE WHERE pharmacy_id = ? OR pharmacy_id = 'ALL'";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, pharmacyId);
-                    ps.executeUpdate();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] Failed to mark all as read: " + e.getMessage());
-        }
+        // Run DB update once asynchronously in background
         new Thread(() -> {
             try (Connection con = DBConnection.connectToMySql()) {
                 if (con != null) {
@@ -224,17 +211,7 @@ public class NotificationRepository {
         cacheMap.remove(notificationId);
         cache.removeIf(n -> n.getNotificationId().equals(notificationId));
 
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "DELETE FROM notification WHERE notification_id = ?";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, notificationId);
-                    ps.executeUpdate();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] Failed to delete notification: " + e.getMessage());
-        }
+        // Run DB delete once asynchronously in background
         new Thread(() -> {
             try (Connection con = DBConnection.connectToMySql()) {
                 if (con != null) {
@@ -253,17 +230,7 @@ public class NotificationRepository {
     public void clearAll(String pharmacyId) {
         cache.removeIf(n -> n.getPharmacyId().equals(pharmacyId) || "ALL".equalsIgnoreCase(n.getPharmacyId()));
 
-        try (Connection con = DBConnection.connectToMySql()) {
-            if (con != null) {
-                String sql = "DELETE FROM notification WHERE pharmacy_id = ? OR pharmacy_id = 'ALL'";
-                try (PreparedStatement ps = con.prepareStatement(sql)) {
-                    ps.setString(1, pharmacyId);
-                    ps.executeUpdate();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("[NotificationRepository] Failed to clear notifications: " + e.getMessage());
-        }
+        // Run DB clear once asynchronously in background
         new Thread(() -> {
             try (Connection con = DBConnection.connectToMySql()) {
                 if (con != null) {

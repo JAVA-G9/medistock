@@ -25,6 +25,8 @@ public class ExpiryService {
     private final NotificationService notificationService;
     private final List<MedicineBatch> dbCache = new CopyOnWriteArrayList<>();
     private final Set<String> notifiedBatchKeys = ConcurrentHashMap.newKeySet();
+    private volatile long lastFetchTime = 0;
+    private static final long CACHE_TTL_MS = 10_000; // 10-second smart cache to eliminate redundant remote DB round-trips
     private boolean tablesInitialized = false;
 
     public ExpiryService() {
@@ -148,11 +150,25 @@ public class ExpiryService {
         return batch;
     }
 
+    public void invalidateCache() {
+        lastFetchTime = 0;
+    }
+
     /**
      * Fetches all medicine batches directly from TiDB Cloud MySQL in real time,
      * joining with the master 'medicine' table to resolve canonical medicine names.
+     * Uses a short 10s memory cache to prevent redundant remote round-trips.
      */
     public List<MedicineBatch> fetchBatchesFromDB(String pharmacyId) {
+        return fetchBatchesFromDB(pharmacyId, false);
+    }
+
+    public List<MedicineBatch> fetchBatchesFromDB(String pharmacyId, boolean forceRefresh) {
+        long now = System.currentTimeMillis();
+        if (!forceRefresh && !dbCache.isEmpty() && (now - lastFetchTime < CACHE_TTL_MS)) {
+            return new ArrayList<>(dbCache);
+        }
+
         List<MedicineBatch> list = new ArrayList<>();
         try (Connection con = DBConnection.connectToMySql()) {
             if (con != null) {
@@ -233,11 +249,12 @@ public class ExpiryService {
                 }
                 // If this specific pharmacy has no batches in DB, show the network batches so data is visible
                 if (list.isEmpty() && !"PHARM-001".equals(pharmacyId)) {
-                    return fetchBatchesFromDB("PHARM-001");
+                    return fetchBatchesFromDB("PHARM-001", forceRefresh);
                 }
-                // Update local cache with live DB records
+                // Update local cache with live DB records and mark timestamp
                 dbCache.clear();
                 dbCache.addAll(list);
+                lastFetchTime = System.currentTimeMillis();
                 return list;
             }
         } catch (Exception e) {

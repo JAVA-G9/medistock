@@ -223,6 +223,7 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
     @FXML
     private void handleRefresh(ActionEvent event) {
         if (lblTableCount != null) lblTableCount.setText("Refreshing...");
+        expiryService.invalidateCache();
         loadRecordsAsync();
     }
 
@@ -250,17 +251,15 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
                 for (ExpiryRecord rec : expired) {
                     expiryService.disposeBatch(rec.getBatchNumber());
                 }
-                loadRecords();
+                expiryService.invalidateCache();
+                loadRecordsAsync();
             }
         });
     }
 
     @Override
     public void onScanCompleted(int cycle, List<ExpiryRecord> atRiskRecords) {
-        // Daemon sweep done on background thread — just schedule an async UI refresh
-        Platform.runLater(() -> {
-            updateDaemonUiStatus();
-            loadRecordsAsync();
-        });
+        // Daemon sweep completed: update cycle counter & daemon widgets without firing duplicate DB queries
+        Platform.runLater(this::updateDaemonUiStatus);
     }
 }

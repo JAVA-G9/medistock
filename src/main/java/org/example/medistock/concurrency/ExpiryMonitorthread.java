@@ -23,7 +23,7 @@ public class ExpiryMonitorthread extends Thread {
 
     private static ExpiryMonitorthread instance;
     private volatile boolean running = false;
-    private long intervalMillis = 5000; // 5 seconds default
+    private long intervalMillis = 15000; // 15 seconds periodic sweep interval
     private final AtomicInteger scanCycle = new AtomicInteger(0);
     private final AtomicLong lastScanTime = new AtomicLong(0);
     private final AtomicInteger flaggedCount = new AtomicInteger(0);
@@ -31,7 +31,7 @@ public class ExpiryMonitorthread extends Thread {
     private final List<ScanListener> listeners = new CopyOnWriteArrayList<>();
 
     public ExpiryMonitorthread() {
-        this(5000);
+        this(15000);
     }
 
     public ExpiryMonitorthread(long intervalMillis) {
