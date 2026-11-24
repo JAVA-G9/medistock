@@ -348,6 +348,7 @@ public class ReportsController implements Initializable {
 
     @FXML
     private void handleRefresh(ActionEvent event) {
+        expiryService.invalidateCache();
         refreshReportAsync();
     }
 }
