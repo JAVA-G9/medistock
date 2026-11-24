@@ -51,20 +51,28 @@ public class ExpiryService {
             if (con != null) {
                 try (Statement st = con.createStatement()) {
                     String ddl = """
-                        CREATE TABLE IF NOT EXISTS medicine_batch (
-                            batch_id INT AUTO_INCREMENT PRIMARY KEY,
-                            medicine_id INT,
-                            medicine_name VARCHAR(255) NOT NULL,
-                            batch_number VARCHAR(100) NOT NULL UNIQUE,
-                            manufacturing_date DATE NOT NULL,
-                            expiry_date DATE NOT NULL,
-                            quantity INT NOT NULL DEFAULT 0,
-                            unit_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-                            pharmacy_id VARCHAR(50) NOT NULL DEFAULT 'PHARM-001',
-                            status VARCHAR(50) NOT NULL DEFAULT 'AVAILABLE',
-                            INDEX idx_expiry (expiry_date),
-                            INDEX idx_pharmacy (pharmacy_id)
-                        )
+                       CREATE TABLE IF NOT EXISTS medicine_batch (
+                           batch_id INT AUTO_INCREMENT PRIMARY KEY,
+                           medicine_id INT NOT NULL,
+                           medicine_name VARCHAR(255) NOT NULL,
+                           batch_number VARCHAR(100) NOT NULL,
+                           manufacturing_date DATE NOT NULL,
+                           expiry_date DATE NOT NULL,
+                       
+                           quantity_received INT NOT NULL DEFAULT 0,
+                           quantity_available INT NOT NULL DEFAULT 0,
+                       
+                           purchase_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                           selling_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                       
+                           pharmacy_id VARCHAR(50) NOT NULL DEFAULT 'PHARM-001',
+                           status VARCHAR(50) NOT NULL DEFAULT 'AVAILABLE',
+                           received_date DATE NULL,
+                       
+                           INDEX idx_expiry (expiry_date),
+                           INDEX idx_pharmacy (pharmacy_id),
+                           INDEX idx_medicine (medicine_id)
+                       );
                     """;
                     st.executeUpdate(ddl);
                     System.out.println("[ExpiryService] Table 'medicine_batch' verified in TiDB Cloud.");

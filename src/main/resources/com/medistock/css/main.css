@@ -1095,3 +1095,79 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
+
+/* =========================================
+   INVENTORY TABLE DESIGN
+   ========================================= */
+
+.inventory-table-card {
+    -fx-background-radius: 14px;
+    -fx-padding: 24px;
+}
+
+.inventory-table {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10px;
+    -fx-border-color: #dce7e1;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 0;
+}
+
+/* Table header */
+.inventory-table .column-header-background {
+    -fx-background-color: #e8f2ec;
+    -fx-background-radius: 10px 10px 0 0;
+}
+
+.inventory-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 44px;
+    -fx-border-color: transparent transparent #d5e3da transparent;
+}
+
+.inventory-table .column-header .label {
+    -fx-text-fill: #24563c;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Table rows */
+.inventory-table .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-cell-size: 43px;
+    -fx-border-color: transparent transparent #edf1ee transparent;
+}
+
+.inventory-table .table-row-cell:odd {
+    -fx-background-color: #f8fbf9;
+}
+
+.inventory-table .table-row-cell:hover {
+    -fx-background-color: #edf7f0;
+}
+
+.inventory-table .table-row-cell:selected {
+    -fx-background-color: #d7ebdd;
+}
+
+/* Cell text */
+.inventory-table .table-cell {
+    -fx-text-fill: #263b30;
+    -fx-font-size: 12px;
+    -fx-padding: 8px 10px;
+    -fx-border-color: transparent;
+}
+
+/* Empty table message */
+.table-empty-message {
+    -fx-text-fill: #89988f;
+    -fx-font-size: 13px;
+    -fx-padding: 20px;
+}
+
+/* Remove distracting focus border */
+.inventory-table:focused {
+    -fx-background-insets: 0;
+}
