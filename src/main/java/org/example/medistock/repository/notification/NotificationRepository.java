@@ -23,22 +23,7 @@ public class NotificationRepository {
 
     public NotificationRepository() {
         initDatabase();
-        ensureSeedNotifications();
-        new Thread(this::initDatabase, "NotificationDB-Init").start();
-    }
-
-    private void ensureSeedNotifications() {
-        if (!cache.isEmpty()) return;
-        List<Notification> seeds = List.of(
-            new Notification("NOTIF-101", "PHARM-001", "CRITICAL EXPIRY ALERT", "Batch B-001 (Paracetamol 500mg) expired on 2026-02-15. Dispose or quarantine immediately.", Notification.NotificationType.BATCH_EXPIRED, Notification.Priority.HIGH, false, LocalDateTime.now().minusHours(2)),
-            new Notification("NOTIF-102", "PHARM-001", "Expiry Warning: Amoxicillin", "Batch B-002 (Amoxicillin 250mg) will expire in 22 days. Listing on marketplace recommended.", Notification.NotificationType.EXPIRY_WARNING, Notification.Priority.HIGH, false, LocalDateTime.now().minusHours(5)),
-            new Notification("NOTIF-103", "PHARM-001", "Exchange Request Accepted", "City Care Pharmacy accepted your exchange request for Azithromycin (50 units).", Notification.NotificationType.EXCHANGE_EVENT, Notification.Priority.NORMAL, true, LocalDateTime.now().minusDays(1)),
-            new Notification("NOTIF-104", "PHARM-001", "Low Stock Alert: Metformin", "Metformin 500mg inventory is down to 40 units (reorder threshold: 50).", Notification.NotificationType.LOW_STOCK, Notification.Priority.NORMAL, false, LocalDateTime.now().minusDays(2))
-        );
-        for (Notification n : seeds) {
-            cacheMap.put(n.getNotificationId(), n);
-            cache.add(n);
-        }
+        // No seed data - all notifications are fetched live from TiDB Cloud
     }
 
     public static synchronized NotificationRepository getInstance() {

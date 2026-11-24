@@ -1,7 +1,6 @@
 
 package org.example.medistock.util;
 
-import javafx.application.Platform;
 import org.example.medistock.config.DatabaseConfig;
 
 import java.sql.Connection;
@@ -10,32 +9,16 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static volatile Boolean dbReachable = null;
-    private static long lastCheckTime = 0;
-    private static final long RETRY_INTERVAL_MS = 60_000; // Only retry remote DB after 60 seconds if it failed
-
     public static Connection connectToMySql() {
-        // Strict UI responsiveness rule: Never block the JavaFX Application Thread on network I/O
-        if (Platform.isFxApplicationThread()) {
-            return null;
-        }
-
-        long now = System.currentTimeMillis();
-
-        // Circuit breaker: If remote DB was unreachable, fail fast without hanging the JavaFX UI
-        if (Boolean.FALSE.equals(dbReachable) && (now - lastCheckTime < RETRY_INTERVAL_MS)) {
-            return null;
-        }
-
         Connection con = null;
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            DriverManager.setLoginTimeout(2); // 2 second timeout max
+            DriverManager.setLoginTimeout(10); // 10 second timeout
 
             String url = DatabaseConfig.getUrl();
             if (url != null && !url.contains("connectTimeout")) {
-                url += (url.contains("?") ? "&" : "?") + "connectTimeout=2000&socketTimeout=2000";
+                url += (url.contains("?") ? "&" : "?") + "connectTimeout=10000&socketTimeout=10000";
             }
 
             con = DriverManager.getConnection(
@@ -44,25 +27,12 @@ public class DBConnection {
                     DatabaseConfig.getPassword()
             );
 
-            dbReachable = true;
-            lastCheckTime = now;
             System.out.println("[DBConnection] Database Connected Successfully");
         }
         catch (Throwable e) {
-            dbReachable = false;
-            lastCheckTime = now;
-            System.err.println("[DBConnection] Cloud DB unreachable (offline/firewall). Operating in seamless IN-MEMORY mode: " + e.getMessage());
+            System.err.println("[DBConnection] Database connection error: " + e.getMessage());
         }
 
         return con;
-    }
-
-    public static boolean isAvailable() {
-        return Boolean.TRUE.equals(dbReachable);
-    }
-
-    public static void resetConnectionCheck() {
-        dbReachable = null;
-        lastCheckTime = 0;
     }
 }
