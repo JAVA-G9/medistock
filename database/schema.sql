@@ -26,8 +26,13 @@ CREATE TABLE IF NOT EXISTS medicine_batch (
     batch_number VARCHAR(100) NOT NULL UNIQUE,
     manufacturing_date DATE NOT NULL,
     expiry_date DATE NOT NULL,
-    quantity INT NOT NULL DEFAULT 0,
-    unit_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+
+    quantity_received INT NOT NULL DEFAULT 0,
+    quantity_available INT NOT NULL DEFAULT 0,
+    purchase_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    selling_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    received_date DATE,
+
     pharmacy_id VARCHAR(50) NOT NULL DEFAULT 'PHARM-001',
     status VARCHAR(50) NOT NULL DEFAULT 'AVAILABLE',
     INDEX idx_expiry (expiry_date),

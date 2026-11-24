@@ -3,6 +3,13 @@ package org.example.medistock.controller.inventory;
 
 import org.example.medistock.util.DBConnection;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,21 +18,23 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-
 public class inventoryController {
+
+    // ---------------- INVENTORY TABLE ----------------
+
+    @FXML
+    private TableView<showBean> inventoryTable;
+
+    private ObservableList<showBean> inventoryList =
+            FXCollections.observableArrayList();
+
 
     @FXML
     private ResourceBundle resources;
 
     @FXML
     private URL location;
+
 
     // ---------------- MEDICINE FIELDS ----------------
 
@@ -121,8 +130,167 @@ public class inventoryController {
 
     Connection con;
 
-    // Stores the ID of the medicine currently being edited
     private int fetchedMedicineId = -1;
+
+
+    // =====================================================
+    //                  INVENTORY TABLE
+    // =====================================================
+
+    private void setupInventoryTable() {
+
+        TableColumn<showBean, String> medicineNameCol =
+                new TableColumn<>("Medicine");
+
+        medicineNameCol.setCellValueFactory(
+                new PropertyValueFactory<>("medicineName"));
+
+        medicineNameCol.setMinWidth(130);
+
+
+        TableColumn<showBean, String> batchNumberCol =
+                new TableColumn<>("Batch Number");
+
+        batchNumberCol.setCellValueFactory(
+                new PropertyValueFactory<>("batchNumber"));
+
+        batchNumberCol.setMinWidth(110);
+
+
+        TableColumn<showBean, Integer> quantityReceivedCol =
+                new TableColumn<>("Received");
+
+        quantityReceivedCol.setCellValueFactory(
+                new PropertyValueFactory<>("quantityReceived"));
+
+        quantityReceivedCol.setMinWidth(90);
+
+
+        TableColumn<showBean, Integer> quantityAvailableCol =
+                new TableColumn<>("Available");
+
+        quantityAvailableCol.setCellValueFactory(
+                new PropertyValueFactory<>("quantityAvailable"));
+
+        quantityAvailableCol.setMinWidth(90);
+
+
+        TableColumn<showBean, Double> purchasePriceCol =
+                new TableColumn<>("Purchase Price");
+
+        purchasePriceCol.setCellValueFactory(
+                new PropertyValueFactory<>("purchasePrice"));
+
+        purchasePriceCol.setMinWidth(110);
+
+
+        TableColumn<showBean, Double> sellingPriceCol =
+                new TableColumn<>("Selling Price");
+
+        sellingPriceCol.setCellValueFactory(
+                new PropertyValueFactory<>("sellingPrice"));
+
+        sellingPriceCol.setMinWidth(110);
+
+
+        TableColumn<showBean, LocalDate> expiryDateCol =
+                new TableColumn<>("Expiry Date");
+
+        expiryDateCol.setCellValueFactory(
+                new PropertyValueFactory<>("expiryDate"));
+
+        expiryDateCol.setMinWidth(110);
+
+
+        inventoryTable.getColumns().clear();
+
+        inventoryTable.getColumns().addAll(
+                medicineNameCol,
+                batchNumberCol,
+                quantityReceivedCol,
+                quantityAvailableCol,
+                purchasePriceCol,
+                sellingPriceCol,
+                expiryDateCol
+        );
+    }
+
+
+    private ObservableList<showBean> getAllInventoryRecords() {
+
+        ObservableList<showBean> list =
+                FXCollections.observableArrayList();
+
+        String sql = "SELECT m.medicine_name, b.batch_number, "
+                + "b.quantity_received, b.quantity_available, "
+                + "b.purchase_price, b.selling_price, b.expiry_date "
+                + "FROM medicine m "
+                + "INNER JOIN medicine_batch b "
+                + "ON m.medicine_id = b.medicine_id "
+                + "WHERE b.pharmacy_id = ? "
+                + "ORDER BY m.medicine_name";
+
+        try (PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setString(1, pharmacyId.getText().trim());
+
+            try (ResultSet rs = pst.executeQuery()) {
+
+                while (rs.next()) {
+
+                    String medicineName =
+                            rs.getString("medicine_name");
+
+                    String batchNo =
+                            rs.getString("batch_number");
+
+                    int received =
+                            rs.getInt("quantity_received");
+
+                    int available =
+                            rs.getInt("quantity_available");
+
+                    double purchase =
+                            rs.getDouble("purchase_price");
+
+                    double selling =
+                            rs.getDouble("selling_price");
+
+                    LocalDate expiry =
+                            rs.getDate("expiry_date").toLocalDate();
+
+                    showBean obj = new showBean(
+                            medicineName,
+                            batchNo,
+                            received,
+                            available,
+                            purchase,
+                            selling,
+                            expiry
+                    );
+
+                    list.add(obj);
+                }
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println("Error fetching inventory records");
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+
+    private void loadInventoryTable() {
+
+        inventoryTable.setItems(null);
+
+        inventoryList = getAllInventoryRecords();
+
+        inventoryTable.setItems(inventoryList);
+    }
 
 
     // =====================================================
@@ -159,7 +327,8 @@ public class inventoryController {
                 return;
             }
 
-            String sql = "DELETE FROM medicine WHERE medicine_name = ?";
+            String sql =
+                    "DELETE FROM medicine WHERE medicine_name = ?";
 
             try (PreparedStatement pst = con.prepareStatement(sql)) {
 
@@ -175,6 +344,7 @@ public class inventoryController {
                     doClear(event);
 
                     loadBatchMedicines();
+                    loadInventoryTable();
 
                 } else {
 
@@ -206,7 +376,8 @@ public class inventoryController {
 
             fetchedMedicineId = -1;
 
-            String sql = "SELECT * FROM medicine WHERE medicine_name = ?";
+            String sql =
+                    "SELECT * FROM medicine WHERE medicine_name = ?";
 
             try (PreparedStatement pst = con.prepareStatement(sql)) {
 
@@ -216,14 +387,26 @@ public class inventoryController {
 
                     if (rs.next()) {
 
-                        fetchedMedicineId = rs.getInt("medicine_id");
+                        fetchedMedicineId =
+                                rs.getInt("medicine_id");
 
-                        getGenName.setText(rs.getString("generic_name"));
-                        getManName.setText(rs.getString("manufacturer_name"));
-                        getCategory.setValue(rs.getString("category"));
-                        getStrength.setText(rs.getString("strength"));
-                        getDosage.setValue(rs.getString("dosage_form"));
-                        getDescription.setText(rs.getString("description"));
+                        getGenName.setText(
+                                rs.getString("generic_name"));
+
+                        getManName.setText(
+                                rs.getString("manufacturer_name"));
+
+                        getCategory.setValue(
+                                rs.getString("category"));
+
+                        getStrength.setText(
+                                rs.getString("strength"));
+
+                        getDosage.setValue(
+                                rs.getString("dosage_form"));
+
+                        getDescription.setText(
+                                rs.getString("description"));
 
                         System.out.println("Medicine Found");
 
@@ -257,7 +440,9 @@ public class inventoryController {
             if (medName.isEmpty() || manName.isEmpty()
                     || category == null || dosage == null) {
 
-                System.out.println("Please fill all required medicine fields");
+                System.out.println(
+                        "Please fill all required medicine fields");
+
                 return;
             }
 
@@ -294,15 +479,13 @@ public class inventoryController {
     }
 
 
-    // =====================================================
-    //                  UPDATE MEDICINE
-    // =====================================================
-
     @FXML
     void doUpdate(ActionEvent event) {
 
         if (fetchedMedicineId == -1) {
-            System.out.println("Fetch a medicine first before updating");
+            System.out.println(
+                    "Fetch a medicine first before updating");
+
             return;
         }
 
@@ -318,7 +501,9 @@ public class inventoryController {
         if (medName.isEmpty() || manName.isEmpty()
                 || category == null || dosage == null) {
 
-            System.out.println("Please fill all required medicine fields");
+            System.out.println(
+                    "Please fill all required medicine fields");
+
             return;
         }
 
@@ -350,7 +535,9 @@ public class inventoryController {
                 System.out.println("Medicine Updated Successfully");
 
                 fetchedMedicineId = -1;
+
                 loadBatchMedicines();
+                loadInventoryTable();
 
             } else {
 
@@ -408,7 +595,8 @@ public class inventoryController {
         try {
 
             return Integer.parseInt(
-                    selected.substring(0, selected.indexOf(" - ")).trim()
+                    selected.substring(
+                            0, selected.indexOf(" - ")).trim()
             );
 
         } catch (NumberFormatException e) {
@@ -426,7 +614,8 @@ public class inventoryController {
             return null;
         }
 
-        return selected.substring(selected.indexOf(" - ") + 3).trim();
+        return selected.substring(
+                selected.indexOf(" - ") + 3).trim();
     }
 
 
@@ -442,41 +631,57 @@ public class inventoryController {
                 || pharmacyId.getText().trim().isEmpty()
                 || batchStatus.getValue() == null) {
 
-            System.out.println("Please fill all required batch fields");
+            System.out.println(
+                    "Please fill all required batch fields");
+
             return false;
         }
 
-        if (manufacturingDate.getValue().isAfter(expiryDate.getValue())) {
+        if (manufacturingDate.getValue()
+                .isAfter(expiryDate.getValue())) {
 
-            System.out.println("Manufacturing date cannot be after expiry date");
+            System.out.println(
+                    "Manufacturing date cannot be after expiry date");
+
             return false;
         }
 
         if (receivedDate.getValue() != null
-                && manufacturingDate.getValue().isAfter(receivedDate.getValue())) {
+                && manufacturingDate.getValue()
+                .isAfter(receivedDate.getValue())) {
 
-            System.out.println("Received date cannot be before manufacturing date");
+            System.out.println(
+                    "Received date cannot be before manufacturing date");
+
             return false;
         }
 
         try {
 
-            int received = Integer.parseInt(quantityReceived.getText().trim());
+            int received = Integer.parseInt(
+                    quantityReceived.getText().trim());
 
             int available;
 
             if (quantityAvailable.getText().trim().isEmpty()) {
                 available = received;
             } else {
-                available = Integer.parseInt(quantityAvailable.getText().trim());
+                available = Integer.parseInt(
+                        quantityAvailable.getText().trim());
             }
 
-            double purchase = Double.parseDouble(purchasePrice.getText().trim());
-            double selling = Double.parseDouble(sellingPrice.getText().trim());
+            double purchase = Double.parseDouble(
+                    purchasePrice.getText().trim());
 
-            if (received < 0 || available < 0 || available > received) {
+            double selling = Double.parseDouble(
+                    sellingPrice.getText().trim());
 
-                System.out.println("Check received and available quantities");
+            if (received < 0 || available < 0
+                    || available > received) {
+
+                System.out.println(
+                        "Check received and available quantities");
+
                 return false;
             }
 
@@ -488,7 +693,9 @@ public class inventoryController {
 
         } catch (NumberFormatException e) {
 
-            System.out.println("Enter valid numbers for quantities and prices");
+            System.out.println(
+                    "Enter valid numbers for quantities and prices");
+
             return false;
         }
 
@@ -518,18 +725,23 @@ public class inventoryController {
             int medicineId = getSelectedMedicineId();
             String medicineName = getSelectedMedicineName();
 
-            int received = Integer.parseInt(quantityReceived.getText().trim());
+            int received = Integer.parseInt(
+                    quantityReceived.getText().trim());
 
             int available;
 
             if (quantityAvailable.getText().trim().isEmpty()) {
                 available = received;
             } else {
-                available = Integer.parseInt(quantityAvailable.getText().trim());
+                available = Integer.parseInt(
+                        quantityAvailable.getText().trim());
             }
 
-            double purchase = Double.parseDouble(purchasePrice.getText().trim());
-            double selling = Double.parseDouble(sellingPrice.getText().trim());
+            double purchase = Double.parseDouble(
+                    purchasePrice.getText().trim());
+
+            double selling = Double.parseDouble(
+                    sellingPrice.getText().trim());
 
             LocalDate receivedOn = receivedDate.getValue();
 
@@ -548,22 +760,36 @@ public class inventoryController {
 
                 pst.setInt(1, medicineId);
                 pst.setString(2, batchNumber.getText().trim());
-                pst.setDate(3, java.sql.Date.valueOf(manufacturingDate.getValue()));
-                pst.setDate(4, java.sql.Date.valueOf(expiryDate.getValue()));
+
+                pst.setDate(3,
+                        java.sql.Date.valueOf(
+                                manufacturingDate.getValue()));
+
+                pst.setDate(4,
+                        java.sql.Date.valueOf(
+                                expiryDate.getValue()));
+
                 pst.setInt(5, received);
                 pst.setDouble(6, purchase);
                 pst.setString(7, pharmacyId.getText().trim());
                 pst.setString(8, batchStatus.getValue());
                 pst.setInt(9, available);
                 pst.setDouble(10, selling);
-                pst.setDate(11, java.sql.Date.valueOf(receivedOn));
+
+                pst.setDate(11,
+                        java.sql.Date.valueOf(receivedOn));
+
                 pst.setString(12, medicineName);
 
                 int count = pst.executeUpdate();
 
                 if (count > 0) {
 
-                    System.out.println("Medicine Batch Saved Successfully");
+                    System.out.println(
+                            "Medicine Batch Saved Successfully");
+
+                    loadInventoryTable();
+
                     doClearBatch(event);
                 }
             }
@@ -571,13 +797,16 @@ public class inventoryController {
         } catch (SQLException e) {
 
             System.out.println("Could not save batch.");
-            System.out.println("Check whether the batch number already exists for this pharmacy.");
+            System.out.println(
+                    "Check whether the batch number already exists.");
 
             e.printStackTrace();
 
         } catch (Exception e) {
 
-            System.out.println("Something went wrong while saving the batch.");
+            System.out.println(
+                    "Something went wrong while saving the batch.");
+
             e.printStackTrace();
         }
     }
@@ -597,7 +826,9 @@ public class inventoryController {
 
             if (number.isEmpty() || pharmacy.isEmpty()) {
 
-                System.out.println("Enter batch number and pharmacy ID first");
+                System.out.println(
+                        "Enter batch number and pharmacy ID first");
+
                 return;
             }
 
@@ -625,36 +856,37 @@ public class inventoryController {
                         }
 
                         manufacturingDate.setValue(
-                                rs.getDate("manufacturing_date").toLocalDate()
-                        );
+                                rs.getDate("manufacturing_date")
+                                        .toLocalDate());
 
                         expiryDate.setValue(
-                                rs.getDate("expiry_date").toLocalDate()
-                        );
+                                rs.getDate("expiry_date")
+                                        .toLocalDate());
 
                         quantityReceived.setText(
-                                String.valueOf(rs.getInt("quantity_received"))
-                        );
+                                String.valueOf(
+                                        rs.getInt("quantity_received")));
 
                         quantityAvailable.setText(
-                                String.valueOf(rs.getInt("quantity_available"))
-                        );
+                                String.valueOf(
+                                        rs.getInt("quantity_available")));
 
                         purchasePrice.setText(
-                                String.valueOf(rs.getBigDecimal("purchase_price"))
-                        );
+                                String.valueOf(
+                                        rs.getBigDecimal("purchase_price")));
 
                         sellingPrice.setText(
-                                String.valueOf(rs.getBigDecimal("selling_price"))
-                        );
+                                String.valueOf(
+                                        rs.getBigDecimal("selling_price")));
 
-                        batchStatus.setValue(rs.getString("status"));
+                        batchStatus.setValue(
+                                rs.getString("status"));
 
                         if (rs.getDate("received_date") != null) {
 
                             receivedDate.setValue(
-                                    rs.getDate("received_date").toLocalDate()
-                            );
+                                    rs.getDate("received_date")
+                                            .toLocalDate());
 
                         } else {
 
@@ -696,18 +928,23 @@ public class inventoryController {
             int medicineId = getSelectedMedicineId();
             String medicineName = getSelectedMedicineName();
 
-            int received = Integer.parseInt(quantityReceived.getText().trim());
+            int received = Integer.parseInt(
+                    quantityReceived.getText().trim());
 
             int available;
 
             if (quantityAvailable.getText().trim().isEmpty()) {
                 available = received;
             } else {
-                available = Integer.parseInt(quantityAvailable.getText().trim());
+                available = Integer.parseInt(
+                        quantityAvailable.getText().trim());
             }
 
-            double purchase = Double.parseDouble(purchasePrice.getText().trim());
-            double selling = Double.parseDouble(sellingPrice.getText().trim());
+            double purchase = Double.parseDouble(
+                    purchasePrice.getText().trim());
+
+            double selling = Double.parseDouble(
+                    sellingPrice.getText().trim());
 
             LocalDate receivedOn = receivedDate.getValue();
 
@@ -731,14 +968,24 @@ public class inventoryController {
             try (PreparedStatement pst = con.prepareStatement(sql)) {
 
                 pst.setInt(1, medicineId);
-                pst.setDate(2, java.sql.Date.valueOf(manufacturingDate.getValue()));
-                pst.setDate(3, java.sql.Date.valueOf(expiryDate.getValue()));
+
+                pst.setDate(2,
+                        java.sql.Date.valueOf(
+                                manufacturingDate.getValue()));
+
+                pst.setDate(3,
+                        java.sql.Date.valueOf(
+                                expiryDate.getValue()));
+
                 pst.setInt(4, received);
                 pst.setDouble(5, purchase);
                 pst.setString(6, batchStatus.getValue());
                 pst.setInt(7, available);
                 pst.setDouble(8, selling);
-                pst.setDate(9, java.sql.Date.valueOf(receivedOn));
+
+                pst.setDate(9,
+                        java.sql.Date.valueOf(receivedOn));
+
                 pst.setString(10, medicineName);
                 pst.setString(11, number);
                 pst.setString(12, pharmacy);
@@ -748,6 +995,8 @@ public class inventoryController {
                 if (count > 0) {
 
                     System.out.println("Batch Updated Successfully");
+
+                    loadInventoryTable();
 
                 } else {
 
@@ -777,7 +1026,9 @@ public class inventoryController {
 
             if (number.isEmpty() || pharmacy.isEmpty()) {
 
-                System.out.println("Enter batch number and pharmacy ID first");
+                System.out.println(
+                        "Enter batch number and pharmacy ID first");
+
                 return;
             }
 
@@ -794,6 +1045,9 @@ public class inventoryController {
                 if (count > 0) {
 
                     System.out.println("Batch Deleted Successfully");
+
+                    loadInventoryTable();
+
                     doClearBatch(event);
 
                 } else {
@@ -810,7 +1064,7 @@ public class inventoryController {
 
 
     // =====================================================
-    //                 CLEAR BATCH FORM
+    //                 CLEAR MEDICINE BATCH
     // =====================================================
 
     @FXML
@@ -846,9 +1100,13 @@ public class inventoryController {
     @FXML
     void initialize() {
 
+        // Configure the table columns first
+        setupInventoryTable();
+
         con = DBConnection.connectToMySql();
 
         if (con == null) {
+
             System.err.println("Database connection is NULL!");
             return;
         }
@@ -890,13 +1148,18 @@ public class inventoryController {
 
         // Default values
         pharmacyId.setText("PHARM-001");
+
         batchStatus.setValue("AVAILABLE");
+
         receivedDate.setValue(LocalDate.now());
 
-        // Load medicines into batch dropdown
+        // Load medicine dropdown
         loadBatchMedicines();
 
-        // Existing medicine form checks
+        // Load inventory table
+        loadInventoryTable();
+
+
         assert clearBtn != null;
         assert delBtn != null;
         assert fetchBtn != null;
@@ -909,8 +1172,6 @@ public class inventoryController {
         assert getMedName != null;
         assert getStrength != null;
         assert saveBtn != null;
-
-
     }
 
 }
