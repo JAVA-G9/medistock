@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 
@@ -18,6 +19,8 @@ import javafx.scene.control.TextField;
  */
 public class LoginController {
 
+    @FXML
+    private ScrollPane authScrollPane;
     @FXML
     private Label titleLabel;
     @FXML
@@ -66,6 +69,11 @@ public class LoginController {
         }
         if (taglineLabel != null) {
             taglineLabel.setText(AppConfig.APP_TAGLINE);
+        }
+        if (authTabPane != null && authScrollPane != null) {
+            authTabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+                authScrollPane.setVvalue(0.0);
+            });
         }
         hideMessages();
     }
