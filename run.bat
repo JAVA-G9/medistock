@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-title MediStock - Pharmacy Exchange Platform
+title MediStock - Pharmacy Surplus & Exchange Platform
 
 :: Detect JDK
 if exist "C:\Program Files\Java\jdk-25.0.3\bin\java.exe" (
@@ -14,14 +14,8 @@ cd /d "%~dp0"
 
 echo ===================================================================
 echo               MEDISTOCK - PHARMACY SURPLUS PLATFORM
+echo               Integrated Application (All Modules)
 echo ===================================================================
-echo  1. Launch Member 3 Standalone UI (Exchange, Marketplace, Transfers)
-echo  2. Launch Full Integrated Application (Login -^> Dashboard)
-echo  3. Run Member 3 Verification Suite (7/7 Concurrency Tests)
-echo ===================================================================
-set /p choice="Select an option (1, 2, or 3) [Default: 1]: "
-
-if "%choice%"=="" set choice=1
 
 set JAVAFX_PATH=%USERPROFILE%\.m2\repository\org\openjfx
 set MYSQL_JAR=%USERPROFILE%\.m2\repository\com\mysql\mysql-connector-j\8.4.0\mysql-connector-j-8.4.0.jar
@@ -32,17 +26,6 @@ if not exist "target\classes\module-info.class" (
     call .\mvnw.cmd test-compile
 )
 
-if "%choice%"=="1" (
-    echo Starting Member 3 Standalone UI...
-    java --module-path "%MODULE_PATH%" -m org.example.medistock/org.example.medistock.ExchangeStandaloneLauncher
-) else if "%choice%"=="2" (
-    echo Starting MediStock Full Application...
-    java --module-path "%MODULE_PATH%" -m org.example.medistock/com.medistock.MainApp
-) else if "%choice%"=="3" (
-    echo Running Member 3 Verification Suite...
-    java --module-path "%MODULE_PATH%" -m org.example.medistock/org.example.medistock.ExchangeBackendVerification
-    pause
-) else (
-    echo Invalid choice.
-    pause
-)
+echo Starting MediStock Application...
+java --module-path "%MODULE_PATH%" -m org.example.medistock/com.medistock.MainApp
+pause

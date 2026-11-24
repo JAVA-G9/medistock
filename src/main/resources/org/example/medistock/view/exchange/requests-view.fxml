@@ -56,15 +56,15 @@
                 <Label fx:id="statusLabel" text="Ready" styleClass="text-muted" minWidth="-Infinity"/>
             </HBox>
 
-            <!-- TabPane for Requests and Transfers (Calibrated for 5 entries at 32px height + Action Buttons) -->
-            <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="325.0" minHeight="325.0" styleClass="table-card, sub-tab-pane">
+            <!-- TabPane for Requests and Transfers -->
+            <TabPane tabClosingPolicy="UNAVAILABLE" prefHeight="380.0" minHeight="340.0" styleClass="table-card, sub-tab-pane">
                 <!-- Tab 1: Incoming Requests -->
                 <Tab text="📥 Incoming Requests (For My Listings)">
                     <VBox spacing="8.0">
                         <padding>
                             <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                         </padding>
-                        <TableView fx:id="incomingTable" fixedCellSize="32.0" prefHeight="194.0" minHeight="194.0" maxHeight="194.0" styleClass="medistock-table">
+                        <TableView fx:id="incomingTable" fixedCellSize="32.0" prefHeight="245.0" minHeight="200.0" styleClass="medistock-table">
                             <columns>
                                 <TableColumn fx:id="colIncId" prefWidth="75.0" minWidth="65.0" text="Req ID" />
                                 <TableColumn fx:id="colIncListing" prefWidth="75.0" minWidth="65.0" text="List ID" />
@@ -93,7 +93,7 @@
                         <padding>
                             <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                         </padding>
-                        <TableView fx:id="outgoingTable" fixedCellSize="32.0" prefHeight="194.0" minHeight="194.0" maxHeight="194.0" styleClass="medistock-table">
+                        <TableView fx:id="outgoingTable" fixedCellSize="32.0" prefHeight="245.0" minHeight="200.0" styleClass="medistock-table">
                             <columns>
                                 <TableColumn fx:id="colOutId" prefWidth="75.0" minWidth="65.0" text="Req ID" />
                                 <TableColumn fx:id="colOutListing" prefWidth="75.0" minWidth="65.0" text="List ID" />
@@ -121,7 +121,7 @@
                         <padding>
                             <Insets top="8.0" right="4.0" bottom="4.0" left="4.0"/>
                         </padding>
-                        <TableView fx:id="transfersTable" fixedCellSize="32.0" prefHeight="194.0" minHeight="194.0" maxHeight="194.0" styleClass="medistock-table">
+                        <TableView fx:id="transfersTable" fixedCellSize="32.0" prefHeight="245.0" minHeight="200.0" styleClass="medistock-table">
                             <columns>
                                 <TableColumn fx:id="colTrfId" prefWidth="80.0" minWidth="65.0" text="TRF ID" />
                                 <TableColumn fx:id="colTrfMedicine" prefWidth="150.0" minWidth="110.0" text="Medicine" />
@@ -144,12 +144,6 @@
                     </VBox>
                 </Tab>
             </TabPane>
-
-            <!-- Activity & Event Notification Log (Info Card) -->
-            <VBox spacing="4.0" styleClass="info-card">
-                <Label text="⚡ Activity &amp; Event Notification Log" styleClass="info-title" minWidth="-Infinity"/>
-                <TextArea fx:id="logArea" editable="false" prefHeight="44.0" minHeight="38.0" styleClass="console-area" wrapText="true"/>
-            </VBox>
 
         </VBox>
     </ScrollPane>

@@ -52,7 +52,6 @@ public class MarketplaceController implements Initializable {
     @FXML private Label kpiReservedStock;
 
     @FXML private Label statusLabel;
-    @FXML private TextArea logArea;
 
     private final ExchangeService exchangeService = ExchangeService.getInstance();
     private final PharmacyService pharmacyService = PharmacyService.getInstance();
@@ -121,6 +120,7 @@ public class MarketplaceController implements Initializable {
         colSeller.setCellValueFactory(new PropertyValueFactory<>("sellerPharmacyName"));
         colStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().name()));
 
+        listingsTable.setPlaceholder(new Label("No surplus medicine listings found in marketplace."));
         listingsTable.setItems(listingsData);
     }
 
@@ -250,10 +250,11 @@ public class MarketplaceController implements Initializable {
         });
 
         Optional<ExchangeListing> result = dialog.showAndWait();
-        result.ifPresent(listing -> {
+        if (result.isPresent()) {
+            ExchangeListing listing = result.get();
             loadListings();
             logMessage("SUCCESS: Published listing " + listing.getListingId() + " (" + listing.getMedicineName() + ")");
-        });
+        }
     }
 
     @FXML
@@ -284,7 +285,8 @@ public class MarketplaceController implements Initializable {
         dialog.setContentText("Enter quantity to request:");
 
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(qtyStr -> {
+        if (result.isPresent()) {
+            String qtyStr = result.get();
             try {
                 int qty = Integer.parseInt(qtyStr.trim());
                 exchangeService.submitRequest(
@@ -303,7 +305,7 @@ public class MarketplaceController implements Initializable {
                 showError("Reservation Failed", e.getMessage());
                 logMessage("RESERVATION FAILED: " + e.getMessage());
             }
-        });
+        }
     }
 
     @FXML
@@ -359,12 +361,7 @@ public class MarketplaceController implements Initializable {
     }
 
     private void logMessage(String msg) {
-        String logLine = String.format("[%s] %s%n", java.time.LocalTime.now().withNano(0), msg);
-        if (logArea != null) {
-            logArea.appendText(logLine);
-        } else {
-            System.out.println(logLine);
-        }
+        System.out.printf("[%s] %s%n", java.time.LocalTime.now().withNano(0), msg);
     }
 
     private void showError(String title, String content) {
