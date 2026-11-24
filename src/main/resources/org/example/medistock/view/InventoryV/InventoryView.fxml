@@ -1,172 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="1000.0" prefHeight="750.0"
-      maxWidth="Infinity" maxHeight="Infinity"
-      spacing="18.0"
-      styleClass="dashboard-root"
-      stylesheets="@../../css/main.css"
-      xmlns="http://javafx.com/javafx/26"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.medistock.controller.inventory.inventoryController">
+<ScrollPane prefWidth="1000.0"
+            prefHeight="750.0"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            styleClass="dashboard-root"
+            stylesheets="@../../css/main.css"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.medistock.controller.inventory.inventoryController">
 
-   <children>
+   <content>
 
-      <!-- Page Heading -->
-      <VBox spacing="5.0" styleClass="view-content-root">
+      <VBox prefWidth="1000.0"
+            spacing="18.0"
+            styleClass="dashboard-root">
+
          <children>
-            <Label text="My Inventory &amp; Batch Management"
-                   styleClass="view-title"/>
 
-            <Label text="Manage your medicine catalog and medicine details."
-                   styleClass="view-subtitle"/>
+            <!-- PAGE HEADING -->
+            <VBox spacing="5.0" styleClass="view-content-root">
+               <children>
+
+                  <Label text="My Inventory &amp; Batch Management"
+                         styleClass="view-title"/>
+
+                  <Label text="Manage your medicine catalog and stock batches."
+                         styleClass="view-subtitle"/>
+
+               </children>
+            </VBox>
+
+
+            <!-- MEDICINE INFORMATION CARD -->
+            <VBox spacing="22.0" styleClass="form-card">
+               <children>
+
+                  <Label text="Medicine Information"
+                         styleClass="section-header"/>
+
+                  <GridPane hgap="20.0" vgap="22.0">
+
+                     <columnConstraints>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="17"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="33"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="17"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="33"/>
+                     </columnConstraints>
+
+                     <children>
+
+                        <Label text="Medicine Name"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="0"/>
+
+                        <TextField fx:id="getMedName"
+                                   promptText="Enter medicine name"
+                                   styleClass="input-field"
+                                   maxWidth="Infinity"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="0"/>
+
+                        <Label text="Generic Name"
+                               styleClass="field-label"
+                               GridPane.columnIndex="2"
+                               GridPane.rowIndex="0"/>
+
+                        <TextField fx:id="getGenName"
+                                   promptText="Enter generic name"
+                                   styleClass="input-field"
+                                   maxWidth="Infinity"
+                                   GridPane.columnIndex="3"
+                                   GridPane.rowIndex="0"/>
+
+                        <Label text="Manufacturer"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="1"/>
+
+                        <TextField fx:id="getManName"
+                                   promptText="Enter manufacturer"
+                                   styleClass="input-field"
+                                   maxWidth="Infinity"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="1"/>
+
+                        <Label text="Category"
+                               styleClass="field-label"
+                               GridPane.columnIndex="2"
+                               GridPane.rowIndex="1"/>
+
+                        <ComboBox fx:id="getCategory"
+                                  editable="true"
+                                  promptText="Select category"
+                                  styleClass="input-field"
+                                  maxWidth="Infinity"
+                                  GridPane.columnIndex="3"
+                                  GridPane.rowIndex="1"/>
+
+                        <Label text="Strength"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="2"/>
+
+                        <TextField fx:id="getStrength"
+                                   promptText="e.g. 500 mg"
+                                   styleClass="input-field"
+                                   maxWidth="Infinity"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="2"/>
+
+                        <Label text="Dosage Form"
+                               styleClass="field-label"
+                               GridPane.columnIndex="2"
+                               GridPane.rowIndex="2"/>
+
+                        <ComboBox fx:id="getDosage"
+                                  editable="true"
+                                  promptText="Select dosage form"
+                                  styleClass="input-field"
+                                  maxWidth="Infinity"
+                                  GridPane.columnIndex="3"
+                                  GridPane.rowIndex="2"/>
+
+                        <Label text="Description"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="3"/>
+
+                        <TextArea fx:id="getDescription"
+                                  promptText="Enter medicine description..."
+                                  wrapText="true"
+                                  prefHeight="110.0"
+                                  maxWidth="Infinity"
+                                  styleClass="input-field"
+                                  GridPane.columnIndex="1"
+                                  GridPane.rowIndex="3"
+                                  GridPane.columnSpan="3"/>
+
+                     </children>
+                  </GridPane>
+
+
+                  <!-- MEDICINE BUTTONS -->
+                  <HBox spacing="14.0">
+                     <children>
+
+                        <Button fx:id="saveBtn"
+                                text="Save Medicine"
+                                onAction="#doSave"
+                                styleClass="btn-primary"/>
+
+                        <Button fx:id="fetchBtn"
+                                text="Fetch Medicine"
+                                onAction="#doFetch"
+                                styleClass="btn-secondary"/>
+
+                        <Button fx:id="delBtn"
+                                text="Delete Medicine"
+                                onAction="#doDelete"
+                                styleClass="btn-danger"/>
+
+                        <Button fx:id="clearBtn"
+                                text="Clear All"
+                                onAction="#doClear"
+                                styleClass="btn-secondary"/>
+
+                     </children>
+                  </HBox>
+
+               </children>
+            </VBox>
+
+
+            <!-- MEDICINE BATCH INFORMATION CARD -->
+            <VBox spacing="22.0" styleClass="form-card">
+               <children>
+
+                  <Label text="Medicine Batch Management"
+                         styleClass="section-header"/>
+
+                  <Label text="Manage manufacturing batches, expiry dates and available stock."
+                         styleClass="view-subtitle"/>
+
+                  <GridPane hgap="20.0" vgap="20.0">
+
+                     <columnConstraints>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="17"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="33"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="17"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="33"/>
+                     </columnConstraints>
+
+                     <children>
+
+                        <Label text="Select Medicine"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="0"/>
+
+                        <ComboBox fx:id="batchMedicine"
+                                  promptText="Select medicine"
+                                  maxWidth="Infinity"
+                                  styleClass="input-field"
+                                  GridPane.columnIndex="1"
+                                  GridPane.rowIndex="0"/>
+
+                        <Label text="Batch Number"
+                               styleClass="field-label"
+                               GridPane.columnIndex="2"
+                               GridPane.rowIndex="0"/>
+
+                        <TextField fx:id="batchNumber"
+                                   promptText="Enter batch number"
+                                   maxWidth="Infinity"
+                                   styleClass="input-field"
+                                   GridPane.columnIndex="3"
+                                   GridPane.rowIndex="0"/>
+
+
+                        <Label text="Manufacturing Date"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="1"/>
+
+                        <DatePicker fx:id="manufacturingDate"
+                                    promptText="Select manufacturing date"
+                                    maxWidth="Infinity"
+                                    styleClass="input-field"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="1"/>
+
+                        <Label text="Expiry Date"
+                               styleClass="field-label"
+                               GridPane.columnIndex="2"
+                               GridPane.rowIndex="1"/>
+
+                        <DatePicker fx:id="expiryDate"
+                                    promptText="Select expiry date"
+                                    maxWidth="Infinity"
+                                    styleClass="input-field"
+                                    GridPane.columnIndex="3"
+                                    GridPane.rowIndex="1"/>
+
+
+                        <Label text="Quantity Received"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="2"/>
+
+                        <TextField fx:id="quantityReceived"
+                                   promptText="Enter received quantity"
+                                   maxWidth="Infinity"
+                                   styleClass="input-field"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="2"/>
+
+                        <Label text="Quantity Available"
+                               styleClass="field-label"
+                               GridPane.columnIndex="2"
+                               GridPane.rowIndex="2"/>
+
+                        <TextField fx:id="quantityAvailable"
+                                   promptText="Enter available quantity"
+                                   maxWidth="Infinity"
+                                   styleClass="input-field"
+                                   GridPane.columnIndex="3"
+                                   GridPane.rowIndex="2"/>
+
+
+                        <Label text="Purchase Price"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="3"/>
+
+                        <TextField fx:id="purchasePrice"
+                                   promptText="Enter purchase price"
+                                   maxWidth="Infinity"
+                                   styleClass="input-field"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="3"/>
+
+                        <Label text="Selling Price"
+                               styleClass="field-label"
+                               GridPane.columnIndex="2"
+                               GridPane.rowIndex="3"/>
+
+                        <TextField fx:id="sellingPrice"
+                                   promptText="Enter selling price"
+                                   maxWidth="Infinity"
+                                   styleClass="input-field"
+                                   GridPane.columnIndex="3"
+                                   GridPane.rowIndex="3"/>
+
+
+                        <Label text="Pharmacy ID"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="4"/>
+
+                        <TextField fx:id="pharmacyId"
+                                   text="PHARM-001"
+                                   maxWidth="Infinity"
+                                   styleClass="input-field"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="4"/>
+
+                        <Label text="Batch Status"
+                               styleClass="field-label"
+                               GridPane.columnIndex="2"
+                               GridPane.rowIndex="4"/>
+
+                        <ComboBox fx:id="batchStatus"
+                                  promptText="Select status"
+                                  maxWidth="Infinity"
+                                  styleClass="input-field"
+                                  GridPane.columnIndex="3"
+                                  GridPane.rowIndex="4"/>
+
+
+                        <Label text="Received Date"
+                               styleClass="field-label"
+                               GridPane.columnIndex="0"
+                               GridPane.rowIndex="5"/>
+
+                        <DatePicker fx:id="receivedDate"
+                                    promptText="Select received date"
+                                    maxWidth="Infinity"
+                                    styleClass="input-field"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="5"/>
+
+                     </children>
+                  </GridPane>
+
+
+                  <!-- BATCH BUTTONS -->
+                  <HBox spacing="12.0">
+                     <children>
+
+                        <Button fx:id="saveBatchBtn"
+                                text="Save Batch"
+                                onAction="#doSaveBatch"
+                                styleClass="btn-primary"/>
+
+                        <Button fx:id="fetchBatchBtn"
+                                text="Fetch Batch"
+                                onAction="#doFetchBatch"
+                                styleClass="btn-secondary"/>
+
+                        <Button fx:id="updateBatchBtn"
+                                text="Update Batch"
+                                onAction="#doUpdateBatch"
+                                styleClass="btn-secondary"/>
+
+                        <Button fx:id="deleteBatchBtn"
+                                text="Delete Batch"
+                                onAction="#doDeleteBatch"
+                                styleClass="btn-danger"/>
+
+                        <Button fx:id="clearBatchBtn"
+                                text="Clear"
+                                onAction="#doClearBatch"
+                                styleClass="btn-secondary"/>
+
+                     </children>
+                  </HBox>
+
+               </children>
+            </VBox>
+
          </children>
       </VBox>
 
-      <!-- Form Card -->
-      <VBox spacing="22.0" styleClass="form-card">
-         <children>
-
-            <Label text="Medicine Information"
-                   styleClass="section-header"/>
-
-            <GridPane hgap="20.0" vgap="22.0">
-               <columnConstraints>
-                  <javafx.scene.layout.ColumnConstraints percentWidth="17"/>
-                  <javafx.scene.layout.ColumnConstraints percentWidth="33"/>
-                  <javafx.scene.layout.ColumnConstraints percentWidth="17"/>
-                  <javafx.scene.layout.ColumnConstraints percentWidth="33"/>
-               </columnConstraints>
-
-               <children>
-
-                  <Label text="Medicine Name"
-                         styleClass="field-label"
-                         GridPane.columnIndex="0"
-                         GridPane.rowIndex="0"/>
-
-                  <TextField fx:id="getMedName"
-                             promptText="Enter medicine name"
-                             styleClass="input-field"
-                             maxWidth="Infinity"
-                             GridPane.columnIndex="1"
-                             GridPane.rowIndex="0"/>
-
-                  <Label text="Generic Name"
-                         styleClass="field-label"
-                         GridPane.columnIndex="2"
-                         GridPane.rowIndex="0"/>
-
-                  <TextField fx:id="getGenName"
-                             promptText="Enter generic name"
-                             styleClass="input-field"
-                             maxWidth="Infinity"
-                             GridPane.columnIndex="3"
-                             GridPane.rowIndex="0"/>
-
-                  <Label text="Manufacturer"
-                         styleClass="field-label"
-                         GridPane.columnIndex="0"
-                         GridPane.rowIndex="1"/>
-
-                  <TextField fx:id="getManName"
-                             promptText="Enter manufacturer"
-                             styleClass="input-field"
-                             maxWidth="Infinity"
-                             GridPane.columnIndex="1"
-                             GridPane.rowIndex="1"/>
-
-                  <Label text="Category"
-                         styleClass="field-label"
-                         GridPane.columnIndex="2"
-                         GridPane.rowIndex="1"/>
-
-                  <ComboBox fx:id="getCategory"
-                            editable="true"
-                            promptText="Select category"
-                            styleClass="input-field"
-                            maxWidth="Infinity"
-                            GridPane.columnIndex="3"
-                            GridPane.rowIndex="1"/>
-
-                  <Label text="Strength"
-                         styleClass="field-label"
-                         GridPane.columnIndex="0"
-                         GridPane.rowIndex="2"/>
-
-                  <TextField fx:id="getStrength"
-                             promptText="e.g. 500 mg"
-                             styleClass="input-field"
-                             maxWidth="Infinity"
-                             GridPane.columnIndex="1"
-                             GridPane.rowIndex="2"/>
-
-                  <Label text="Dosage Form"
-                         styleClass="field-label"
-                         GridPane.columnIndex="2"
-                         GridPane.rowIndex="2"/>
-
-                  <ComboBox fx:id="getDosage"
-                            editable="true"
-                            promptText="Select dosage form"
-                            styleClass="input-field"
-                            maxWidth="Infinity"
-                            GridPane.columnIndex="3"
-                            GridPane.rowIndex="2"/>
-
-                  <Label text="Description"
-                         styleClass="field-label"
-                         GridPane.columnIndex="0"
-                         GridPane.rowIndex="3"/>
-
-                  <TextArea fx:id="getDescription"
-                            promptText="Enter medicine description..."
-                            wrapText="true"
-                            prefHeight="110.0"
-                            maxWidth="Infinity"
-                            styleClass="input-field"
-                            GridPane.columnIndex="1"
-                            GridPane.rowIndex="3"
-                            GridPane.columnSpan="3"/>
-
-               </children>
-            </GridPane>
-
-            <!-- Action Buttons -->
-            <HBox spacing="14.0">
-               <children>
-                  <Button fx:id="saveBtn"
-                          text="Save Medicine"
-                          onAction="#doSave"
-                          styleClass="btn-primary"/>
-
-                  <Button fx:id="fetchBtn"
-                          text="Fetch Medicine"
-                          onAction="#doFetch"
-                          styleClass="btn-secondary"/>
-
-                  <Button fx:id="delBtn"
-                          text="Delete Medicine"
-                          onAction="#doDelete"
-                          styleClass="btn-danger"/>
-
-                  <Button fx:id="clearBtn"
-                          text="Clear All"
-                          onAction="#doClear"
-                          styleClass="btn-secondary"/>
-               </children>
-            </HBox>
-
-         </children>
-      </VBox>
-
-   </children>
-</VBox>
+   </content>
+</ScrollPane>
