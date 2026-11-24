@@ -142,6 +142,7 @@ public class RequestsController implements Initializable {
         colIncStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().name()));
         colIncDate.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toString().substring(0, 16)));
 
+        incomingTable.setPlaceholder(new Label("No incoming requests pending for this facility's listings."));
         incomingTable.setItems(incomingData);
     }
 
@@ -156,6 +157,7 @@ public class RequestsController implements Initializable {
         colOutStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().name()));
         colOutDate.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toString().substring(0, 16)));
 
+        outgoingTable.setPlaceholder(new Label("No outgoing requests placed by this facility."));
         outgoingTable.setItems(outgoingData);
     }
 
@@ -169,6 +171,7 @@ public class RequestsController implements Initializable {
         colTrfStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().name()));
         colTrfCreated.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toString().substring(0, 16)));
 
+        transfersTable.setPlaceholder(new Label("No stock transfers recorded for this facility yet."));
         transfersTable.setItems(transfersData);
     }
 

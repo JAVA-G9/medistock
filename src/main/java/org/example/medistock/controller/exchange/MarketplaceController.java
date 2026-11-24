@@ -120,6 +120,7 @@ public class MarketplaceController implements Initializable {
         colSeller.setCellValueFactory(new PropertyValueFactory<>("sellerPharmacyName"));
         colStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().name()));
 
+        listingsTable.setPlaceholder(new Label("No surplus medicine listings found in marketplace."));
         listingsTable.setItems(listingsData);
     }
 

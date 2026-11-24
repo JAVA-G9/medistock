@@ -138,6 +138,18 @@ public class ExchangeService {
                     50, 28.0, "Seasonal restocking for Green Valley dispensary");
             StockTransfer trf1 = approveRequest(req3.getRequestId(), PHARM2_ID);
             updateTransferStatus(trf1.getTransferId(), StockTransfer.TransferStatus.DISPATCHED);
+
+            // 4. City Health requested 20 units of Amoxicillin from Apex Care, which was Approved & Dispatched
+            ExchangeRequest req4 = submitRequest(l1.getListingId(), PHARM2_ID, PHARM2_NAME,
+                    20, 85.0, "Urgent pediatric ward antibiotic requirement");
+            StockTransfer trf2 = approveRequest(req4.getRequestId(), PHARM1_ID);
+            updateTransferStatus(trf2.getTransferId(), StockTransfer.TransferStatus.DISPATCHED);
+
+            // 5. Green Valley requested 30 units of Metformin from Apex Care, which was Approved & Delivered
+            ExchangeRequest req5 = submitRequest(l8.getListingId(), PHARM3_ID, PHARM3_NAME,
+                    30, 42.0, "Routine restocking for diabetes clinic");
+            StockTransfer trf3 = approveRequest(req5.getRequestId(), PHARM1_ID);
+            updateTransferStatus(trf3.getTransferId(), StockTransfer.TransferStatus.DELIVERED);
         } catch (Exception ignored) {
         }
     }
