@@ -250,10 +250,11 @@ public class MarketplaceController implements Initializable {
         });
 
         Optional<ExchangeListing> result = dialog.showAndWait();
-        result.ifPresent(listing -> {
+        if (result.isPresent()) {
+            ExchangeListing listing = result.get();
             loadListings();
             logMessage("SUCCESS: Published listing " + listing.getListingId() + " (" + listing.getMedicineName() + ")");
-        });
+        }
     }
 
     @FXML
@@ -284,7 +285,8 @@ public class MarketplaceController implements Initializable {
         dialog.setContentText("Enter quantity to request:");
 
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(qtyStr -> {
+        if (result.isPresent()) {
+            String qtyStr = result.get();
             try {
                 int qty = Integer.parseInt(qtyStr.trim());
                 exchangeService.submitRequest(
@@ -303,7 +305,7 @@ public class MarketplaceController implements Initializable {
                 showError("Reservation Failed", e.getMessage());
                 logMessage("RESERVATION FAILED: " + e.getMessage());
             }
-        });
+        }
     }
 
     @FXML

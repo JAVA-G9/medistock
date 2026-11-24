@@ -183,17 +183,16 @@ public class ExchangeService {
         return exchangeRepository.searchListings(query);
     }
 
-    public Optional<ExchangeListing> getListingById(String listingId) {
+    public ExchangeListing getListingById(String listingId) {
         return exchangeRepository.findListingById(listingId);
     }
 
     public boolean cancelListing(String listingId, String sellerPharmacyId) {
-        Optional<ExchangeListing> opt = exchangeRepository.findListingById(listingId);
-        if (opt.isEmpty()) {
+        ExchangeListing listing = exchangeRepository.findListingById(listingId);
+        if (listing == null) {
             return false;
         }
 
-        ExchangeListing listing = opt.get();
         synchronized (listing) {
             if (!listing.getSellerPharmacyId().equalsIgnoreCase(sellerPharmacyId)) {
                 throw new IllegalStateException("Only the seller pharmacy can cancel this listing.");
@@ -224,8 +223,10 @@ public class ExchangeService {
             throw new IllegalArgumentException("Requested quantity must be positive.");
         }
 
-        ExchangeListing listing = exchangeRepository.findListingById(listingId)
-                .orElseThrow(() -> new IllegalArgumentException("Listing not found: " + listingId));
+        ExchangeListing listing = exchangeRepository.findListingById(listingId);
+        if (listing == null) {
+            throw new IllegalArgumentException("Listing not found: " + listingId);
+        }
 
         if (listing.getSellerPharmacyId().equalsIgnoreCase(requesterPharmacyId)) {
             throw new IllegalArgumentException("A pharmacy cannot request stock from its own listing.");
@@ -273,8 +274,10 @@ public class ExchangeService {
      * Approves a pending request, committing reservation and generating a StockTransfer.
      */
     public StockTransfer approveRequest(String requestId, String sellerPharmacyId) {
-        ExchangeRequest request = exchangeRepository.findRequestById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
+        ExchangeRequest request = exchangeRepository.findRequestById(requestId);
+        if (request == null) {
+            throw new IllegalArgumentException("Request not found: " + requestId);
+        }
 
         if (!request.getSellerPharmacyId().equalsIgnoreCase(sellerPharmacyId)) {
             throw new IllegalStateException("Only the seller pharmacy can approve this request.");
@@ -284,8 +287,10 @@ public class ExchangeService {
             throw new IllegalStateException("Only PENDING requests can be approved. Current status: " + request.getStatus());
         }
 
-        ExchangeListing listing = exchangeRepository.findListingById(request.getListingId())
-                .orElseThrow(() -> new IllegalStateException("Associated listing not found: " + request.getListingId()));
+        ExchangeListing listing = exchangeRepository.findListingById(request.getListingId());
+        if (listing == null) {
+            throw new IllegalStateException("Associated listing not found: " + request.getListingId());
+        }
 
         synchronized (listing) {
             request.setStatus(ExchangeRequest.RequestStatus.APPROVED);
@@ -315,8 +320,10 @@ public class ExchangeService {
      * Rejects a pending request and atomically releases the reserved quantity back to the listing.
      */
     public void rejectRequest(String requestId, String sellerPharmacyId, String reason) {
-        ExchangeRequest request = exchangeRepository.findRequestById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
+        ExchangeRequest request = exchangeRepository.findRequestById(requestId);
+        if (request == null) {
+            throw new IllegalArgumentException("Request not found: " + requestId);
+        }
 
         if (!request.getSellerPharmacyId().equalsIgnoreCase(sellerPharmacyId)) {
             throw new IllegalStateException("Only the seller pharmacy can reject this request.");
@@ -326,8 +333,10 @@ public class ExchangeService {
             throw new IllegalStateException("Only PENDING requests can be rejected.");
         }
 
-        ExchangeListing listing = exchangeRepository.findListingById(request.getListingId())
-                .orElseThrow(() -> new IllegalStateException("Associated listing not found: " + request.getListingId()));
+        ExchangeListing listing = exchangeRepository.findListingById(request.getListingId());
+        if (listing == null) {
+            throw new IllegalStateException("Associated listing not found: " + request.getListingId());
+        }
 
         synchronized (listing) {
             listing.releaseReservation(request.getRequestedQuantity());
@@ -349,8 +358,10 @@ public class ExchangeService {
      * Cancels an outgoing pending request and releases reserved stock.
      */
     public void cancelRequest(String requestId, String requesterPharmacyId) {
-        ExchangeRequest request = exchangeRepository.findRequestById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
+        ExchangeRequest request = exchangeRepository.findRequestById(requestId);
+        if (request == null) {
+            throw new IllegalArgumentException("Request not found: " + requestId);
+        }
 
         if (!request.getRequesterPharmacyId().equalsIgnoreCase(requesterPharmacyId)) {
             throw new IllegalStateException("Only the requester pharmacy can cancel this request.");
@@ -360,8 +371,10 @@ public class ExchangeService {
             throw new IllegalStateException("Only PENDING requests can be cancelled.");
         }
 
-        ExchangeListing listing = exchangeRepository.findListingById(request.getListingId())
-                .orElseThrow(() -> new IllegalStateException("Associated listing not found: " + request.getListingId()));
+        ExchangeListing listing = exchangeRepository.findListingById(request.getListingId());
+        if (listing == null) {
+            throw new IllegalStateException("Associated listing not found: " + request.getListingId());
+        }
 
         synchronized (listing) {
             listing.releaseReservation(request.getRequestedQuantity());
@@ -392,20 +405,23 @@ public class ExchangeService {
     // ==========================================
 
     public void updateTransferStatus(String transferId, StockTransfer.TransferStatus newStatus) {
-        StockTransfer transfer = exchangeRepository.findTransferById(transferId)
-                .orElseThrow(() -> new IllegalArgumentException("Transfer not found: " + transferId));
+        StockTransfer transfer = exchangeRepository.findTransferById(transferId);
+        if (transfer == null) {
+            throw new IllegalArgumentException("Transfer not found: " + transferId);
+        }
 
         transfer.setStatus(newStatus);
         exchangeRepository.updateTransfer(transfer);
 
         if (newStatus == StockTransfer.TransferStatus.VERIFIED) {
             // Finalize permanent stock deduction
-            exchangeRepository.findListingById(transfer.getListingId()).ifPresent(listing -> {
+            ExchangeListing listing = exchangeRepository.findListingById(transfer.getListingId());
+            if (listing != null) {
                 synchronized (listing) {
                     listing.completeTransfer(transfer.getQuantity());
                     exchangeRepository.updateListing(listing);
                 }
-            });
+            }
             eventProducer.publishTransferCompleted(transfer);
         } else if (newStatus == StockTransfer.TransferStatus.DISPATCHED) {
             eventProducer.publishTransferDispatched(transfer);
@@ -429,8 +445,10 @@ public class ExchangeService {
      * Demonstrates that synchronized stock reservation prevents overselling and guarantees atomicity.
      */
     public String runConcurrentReservationTest(String listingId, int threadCount, int quantityPerThread) throws InterruptedException {
-        ExchangeListing listing = exchangeRepository.findListingById(listingId)
-                .orElseThrow(() -> new IllegalArgumentException("Listing not found: " + listingId));
+        ExchangeListing listing = exchangeRepository.findListingById(listingId);
+        if (listing == null) {
+            throw new IllegalArgumentException("Listing not found: " + listingId);
+        }
 
         int initialAvailable = listing.getAvailableQuantity();
         System.out.printf("%n=== STARTING CONCURRENT RESERVATION TEST ===%n");
@@ -443,7 +461,7 @@ public class ExchangeService {
 
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
-        List<String> logs = new CopyOnWriteArrayList<>();
+        List<String> logs = Collections.synchronizedList(new ArrayList<>());
 
         for (int i = 1; i <= threadCount; i++) {
             final int pharmacyIndex = i;

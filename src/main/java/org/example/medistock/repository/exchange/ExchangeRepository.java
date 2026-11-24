@@ -5,7 +5,6 @@ import org.example.medistock.model.ExchangeRequest;
 import org.example.medistock.model.StockTransfer;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Repository interface for Stock Exchange operations.
@@ -19,7 +18,7 @@ public interface ExchangeRepository {
     // Listing CRUD & Queries
     void saveListing(ExchangeListing listing);
     void updateListing(ExchangeListing listing);
-    Optional<ExchangeListing> findListingById(String listingId);
+    ExchangeListing findListingById(String listingId);
     List<ExchangeListing> findAllListings();
     List<ExchangeListing> findActiveListings();
     List<ExchangeListing> findListingsByPharmacy(String pharmacyId);
@@ -28,7 +27,7 @@ public interface ExchangeRepository {
     // Request CRUD & Queries
     void saveRequest(ExchangeRequest request);
     void updateRequest(ExchangeRequest request);
-    Optional<ExchangeRequest> findRequestById(String requestId);
+    ExchangeRequest findRequestById(String requestId);
     List<ExchangeRequest> findAllRequests();
     List<ExchangeRequest> findRequestsByRequester(String requesterPharmacyId);
     List<ExchangeRequest> findRequestsForSeller(String sellerPharmacyId);
@@ -37,7 +36,7 @@ public interface ExchangeRepository {
     // Transfer CRUD & Queries
     void saveTransfer(StockTransfer transfer);
     void updateTransfer(StockTransfer transfer);
-    Optional<StockTransfer> findTransferById(String transferId);
+    StockTransfer findTransferById(String transferId);
     List<StockTransfer> findAllTransfers();
     List<StockTransfer> findTransfersByPharmacy(String pharmacyId);
 }

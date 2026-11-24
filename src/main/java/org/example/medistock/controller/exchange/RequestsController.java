@@ -254,7 +254,8 @@ public class RequestsController implements Initializable {
         dialog.setContentText("Enter rejection reason:");
 
         Optional<String> reasonOpt = dialog.showAndWait();
-        reasonOpt.ifPresent(reason -> {
+        if (reasonOpt.isPresent()) {
+            String reason = reasonOpt.get();
             try {
                 Pharmacy currentPharmacy = getActivePharmacy();
                 exchangeService.rejectRequest(selected.getRequestId(), currentPharmacy.getId(), reason);
@@ -265,7 +266,7 @@ public class RequestsController implements Initializable {
                 showError("Rejection Error", e.getMessage());
                 logMessage("REJECT ERROR: " + e.getMessage());
             }
-        });
+        }
     }
 
     @FXML
