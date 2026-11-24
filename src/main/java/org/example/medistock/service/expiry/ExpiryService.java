@@ -17,13 +17,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Service for medicine batch expiration tracking, automated risk classification,
  * threshold notifications, and batch status lifecycle.
  * Owned by Member 4 (Expiry, Notifications & Reports).
+ * Data is fetched and managed in real time directly from the TiDB Cloud MySQL database.
  */
 public class ExpiryService {
 
     private static ExpiryService instance;
     private final NotificationService notificationService;
-    private final List<MedicineBatch> inMemoryBatches = new CopyOnWriteArrayList<>();
+    private final List<MedicineBatch> dbCache = new CopyOnWriteArrayList<>();
     private final Set<String> notifiedBatchKeys = ConcurrentHashMap.newKeySet();
+    private volatile long lastFetchTime = 0;
+    private static final long CACHE_TTL_MS = 10_000; // 10-second smart cache to eliminate redundant remote DB round-trips
     private boolean tablesInitialized = false;
 
     public ExpiryService() {
@@ -32,8 +35,7 @@ public class ExpiryService {
 
     public ExpiryService(NotificationService notificationService) {
         this.notificationService = notificationService;
-        ensureSeedData();
-        new Thread(this::initDatabase, "ExpiryDB-Init").start();
+        initDatabase();
     }
 
     public static synchronized ExpiryService getInstance() {
@@ -65,7 +67,7 @@ public class ExpiryService {
                         )
                     """;
                     st.executeUpdate(ddl);
-                    System.out.println("[ExpiryService] Table 'medicine_batch' verified/initialized.");
+                    System.out.println("[ExpiryService] Table 'medicine_batch' verified in TiDB Cloud.");
                     tablesInitialized = true;
                 }
             }
@@ -74,94 +76,43 @@ public class ExpiryService {
         }
     }
 
-    private synchronized void ensureSeedData() {
-        if (!inMemoryBatches.isEmpty()) return;
-
-        LocalDate today = LocalDate.now();
-
-        List<MedicineBatch> seeds = List.of(
-                // Critical near expiry (within 10-14 days)
-                new MedicineBatch(1, 1, "Paracetamol 650mg", "BAT-PCM-091",
-                        today.minusMonths(11), today.plusDays(10), 120, 18.50, "PHARM-001"),
-
-                // Expiring soon (within 24 days)
-                new MedicineBatch(2, 2, "Amoxicillin 500mg", "BAT-AMX-204",
-                        today.minusMonths(18), today.plusDays(24), 85, 42.00, "PHARM-001"),
-
-                // Expired (expired 5 days ago)
-                new MedicineBatch(3, 3, "Azithromycin 500mg", "BAT-AZI-118",
-                        today.minusMonths(24), today.minusDays(5), 40, 65.00, "PHARM-001"),
-
-                // Critical (within 14 days)
-                new MedicineBatch(4, 4, "Ciprofloxacin 500mg", "BAT-CIP-302",
-                        today.minusMonths(15), today.plusDays(14), 60, 38.00, "PHARM-001"),
-
-                // Attention (within 45 days)
-                new MedicineBatch(5, 5, "Pantoprazole 40mg", "BAT-PAN-841",
-                        today.minusMonths(10), today.plusDays(45), 200, 28.00, "PHARM-001"),
-
-                // Attention (within 55 days)
-                new MedicineBatch(6, 6, "Metformin 500mg SR", "BAT-MET-554",
-                        today.minusMonths(12), today.plusDays(55), 150, 15.00, "PHARM-001"),
-
-                // Safe batches (6+ months)
-                new MedicineBatch(7, 7, "Atorvastatin 10mg", "BAT-ATO-712",
-                        today.minusMonths(6), today.plusMonths(8), 180, 52.00, "PHARM-001"),
-
-                new MedicineBatch(8, 8, "Cetirizine 10mg", "BAT-CET-409",
-                        today.minusMonths(4), today.plusMonths(12), 300, 8.50, "PHARM-001"),
-
-                new MedicineBatch(9, 9, "Ibuprofen 400mg", "BAT-IBU-619",
-                        today.minusMonths(5), today.plusMonths(10), 220, 12.00, "PHARM-001"),
-
-                new MedicineBatch(10, 10, "Budesonide Inhaler", "BAT-BUD-103",
-                        today.minusMonths(8), today.plusMonths(14), 45, 110.00, "PHARM-001")
-        );
-
-        // Populate in-memory store first so UI works immediately in evaluation/offline mode
-        inMemoryBatches.addAll(seeds);
-
-        // If DB is reachable, sync seeds in background without blocking UI
-        new Thread(() -> {
-            try (Connection con = DBConnection.connectToMySql()) {
-                if (con != null) {
-                    for (MedicineBatch batch : seeds) {
-                        try {
-                            String sql = """
-                                INSERT INTO medicine_batch (medicine_id, medicine_name, batch_number, manufacturing_date, expiry_date, quantity, unit_price, pharmacy_id, status)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ON DUPLICATE KEY UPDATE quantity = VALUES(quantity)
-                            """;
-                            try (PreparedStatement ps = con.prepareStatement(sql)) {
-                                ps.setInt(1, batch.getMedicineId());
-                                ps.setString(2, batch.getMedicineName());
-                                ps.setString(3, batch.getBatchNumber());
-                                ps.setDate(4, java.sql.Date.valueOf(batch.getManufacturingDate()));
-                                ps.setDate(5, java.sql.Date.valueOf(batch.getExpiryDate()));
-                                ps.setInt(6, batch.getQuantity());
-                                ps.setDouble(7, batch.getUnitPrice());
-                                ps.setString(8, batch.getPharmacyId());
-                                ps.setString(9, "AVAILABLE");
-                                ps.executeUpdate();
-                            }
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-        }, "ExpirySeed-Sync").start();
-    }
-
+    /**
+     * Saves or updates a medicine batch directly in TiDB Cloud MySQL.
+     */
     public synchronized MedicineBatch saveBatch(MedicineBatch batch) {
         if (batch == null) return null;
-        inMemoryBatches.removeIf(b -> b.getBatchNumber().equalsIgnoreCase(batch.getBatchNumber()));
-        inMemoryBatches.add(batch);
 
-        new Thread(() -> {
-            try (Connection con = DBConnection.connectToMySql()) {
-                if (con != null) {
-                    String sql = """
+        try (Connection con = DBConnection.connectToMySql()) {
+            if (con != null) {
+                // Insert using TiDB Cloud schema (quantity_available, selling_price)
+                String sql = """
+                    INSERT INTO medicine_batch (medicine_id, medicine_name, batch_number, manufacturing_date, expiry_date, quantity_available, selling_price, pharmacy_id, status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                        quantity_available = VALUES(quantity_available),
+                        selling_price = VALUES(selling_price),
+                        expiry_date = VALUES(expiry_date),
+                        status = VALUES(status)
+                """;
+                try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setInt(1, batch.getMedicineId());
+                    ps.setString(2, batch.getMedicineName());
+                    ps.setString(3, batch.getBatchNumber());
+                    ps.setDate(4, java.sql.Date.valueOf(batch.getManufacturingDate()));
+                    ps.setDate(5, java.sql.Date.valueOf(batch.getExpiryDate()));
+                    ps.setInt(6, batch.getQuantity());
+                    ps.setDouble(7, batch.getUnitPrice());
+                    ps.setString(8, batch.getPharmacyId());
+                    ps.setString(9, "AVAILABLE");
+                    ps.executeUpdate();
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                        if (rs.next()) {
+                            batch.setBatchId(rs.getInt(1));
+                        }
+                    }
+                } catch (SQLException ex) {
+                    // Fallback for tables with quantity/unit_price columns
+                    String fallbackSql = """
                         INSERT INTO medicine_batch (medicine_id, medicine_name, batch_number, manufacturing_date, expiry_date, quantity, unit_price, pharmacy_id, status)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                         ON DUPLICATE KEY UPDATE
@@ -170,69 +121,152 @@ public class ExpiryService {
                             expiry_date = VALUES(expiry_date),
                             status = VALUES(status)
                     """;
-                    try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                        ps.setInt(1, batch.getMedicineId());
-                        ps.setString(2, batch.getMedicineName());
-                        ps.setString(3, batch.getBatchNumber());
-                        ps.setDate(4, java.sql.Date.valueOf(batch.getManufacturingDate()));
-                        ps.setDate(5, java.sql.Date.valueOf(batch.getExpiryDate()));
-                        ps.setInt(6, batch.getQuantity());
-                        ps.setDouble(7, batch.getUnitPrice());
-                        ps.setString(8, batch.getPharmacyId());
-                        ps.setString(9, "AVAILABLE");
-                        ps.executeUpdate();
-                        try (ResultSet rs = ps.getGeneratedKeys()) {
+                    try (PreparedStatement ps2 = con.prepareStatement(fallbackSql, Statement.RETURN_GENERATED_KEYS)) {
+                        ps2.setInt(1, batch.getMedicineId());
+                        ps2.setString(2, batch.getMedicineName());
+                        ps2.setString(3, batch.getBatchNumber());
+                        ps2.setDate(4, java.sql.Date.valueOf(batch.getManufacturingDate()));
+                        ps2.setDate(5, java.sql.Date.valueOf(batch.getExpiryDate()));
+                        ps2.setInt(6, batch.getQuantity());
+                        ps2.setDouble(7, batch.getUnitPrice());
+                        ps2.setString(8, batch.getPharmacyId());
+                        ps2.setString(9, "AVAILABLE");
+                        ps2.executeUpdate();
+                        try (ResultSet rs = ps2.getGeneratedKeys()) {
                             if (rs.next()) {
                                 batch.setBatchId(rs.getInt(1));
                             }
                         }
                     }
                 }
-            } catch (Exception e) {
-                System.err.println("[ExpiryService] Error saving batch to DB: " + e.getMessage());
             }
-        }, "SaveBatch-Worker").start();
+        } catch (Exception e) {
+            System.err.println("[ExpiryService] Error saving batch to TiDB Cloud: " + e.getMessage());
+        }
+
+        // Keep local cache in sync
+        dbCache.removeIf(b -> b.getBatchNumber().equalsIgnoreCase(batch.getBatchNumber()));
+        dbCache.add(batch);
         return batch;
     }
 
+    public void invalidateCache() {
+        lastFetchTime = 0;
+    }
+
+    /**
+     * Fetches all medicine batches directly from TiDB Cloud MySQL in real time,
+     * joining with the master 'medicine' table to resolve canonical medicine names.
+     * Uses a short 10s memory cache to prevent redundant remote round-trips.
+     */
     public List<MedicineBatch> fetchBatchesFromDB(String pharmacyId) {
+        return fetchBatchesFromDB(pharmacyId, false);
+    }
+
+    public List<MedicineBatch> fetchBatchesFromDB(String pharmacyId, boolean forceRefresh) {
+        long now = System.currentTimeMillis();
+        if (!forceRefresh && !dbCache.isEmpty() && (now - lastFetchTime < CACHE_TTL_MS)) {
+            return new ArrayList<>(dbCache);
+        }
+
         List<MedicineBatch> list = new ArrayList<>();
         try (Connection con = DBConnection.connectToMySql()) {
             if (con != null) {
-                String sql = "SELECT * FROM medicine_batch WHERE pharmacy_id = ? OR pharmacy_id = 'ALL' ORDER BY expiry_date ASC";
+                String sql = """
+                    SELECT mb.*, m.medicine_name AS parent_med_name, m.generic_name, m.category, m.strength, m.dosage_form
+                    FROM medicine_batch mb
+                    LEFT JOIN medicine m ON mb.medicine_id = m.medicine_id
+                    WHERE mb.pharmacy_id = ? OR mb.pharmacy_id = 'ALL'
+                    ORDER BY mb.expiry_date ASC
+                """;
                 try (PreparedStatement ps = con.prepareStatement(sql)) {
                     ps.setString(1, pharmacyId);
                     try (ResultSet rs = ps.executeQuery()) {
                         while (rs.next()) {
+                            int qty = 0;
+                            try {
+                                qty = rs.getInt("quantity_available");
+                            } catch (SQLException e1) {
+                                try {
+                                    qty = rs.getInt("quantity");
+                                } catch (SQLException e2) {
+                                    try { qty = rs.getInt("quantity_received"); } catch (SQLException ignored) {}
+                                }
+                            }
+
+                            double price = 0.0;
+                            try {
+                                price = rs.getDouble("selling_price");
+                            } catch (SQLException e1) {
+                                try {
+                                    price = rs.getDouble("unit_price");
+                                } catch (SQLException e2) {
+                                    try { price = rs.getDouble("purchase_price"); } catch (SQLException ignored) {}
+                                }
+                            }
+
+                            LocalDate mfgDate = null;
+                            try {
+                                java.sql.Date d = rs.getDate("manufacturing_date");
+                                if (d != null) mfgDate = d.toLocalDate();
+                            } catch (Exception ignored) {}
+                            if (mfgDate == null) mfgDate = LocalDate.now().minusMonths(6);
+
+                            LocalDate expDate = null;
+                            try {
+                                java.sql.Date d = rs.getDate("expiry_date");
+                                if (d != null) expDate = d.toLocalDate();
+                            } catch (Exception ignored) {}
+                            if (expDate == null) expDate = LocalDate.now().plusMonths(6);
+
+                            String medName = "";
+                            try {
+                                medName = rs.getString("parent_med_name");
+                            } catch (Exception ignored) {}
+                            if (medName == null || medName.isBlank()) {
+                                try {
+                                    medName = rs.getString("medicine_name");
+                                } catch (Exception ignored) {}
+                            }
+                            if (medName == null || medName.isBlank()) {
+                                medName = "Medicine-" + rs.getInt("medicine_id");
+                            }
+
                             MedicineBatch b = new MedicineBatch(
                                     rs.getInt("batch_id"),
                                     rs.getInt("medicine_id"),
-                                    rs.getString("medicine_name"),
+                                    medName,
                                     rs.getString("batch_number"),
-                                    rs.getDate("manufacturing_date").toLocalDate(),
-                                    rs.getDate("expiry_date").toLocalDate(),
-                                    rs.getInt("quantity"),
-                                    rs.getDouble("unit_price"),
+                                    mfgDate,
+                                    expDate,
+                                    qty,
+                                    price,
                                     rs.getString("pharmacy_id")
                             );
                             list.add(b);
                         }
                     }
                 }
-                if (!list.isEmpty()) {
-                    return list;
+                // If this specific pharmacy has no batches in DB, show the network batches so data is visible
+                if (list.isEmpty() && !"PHARM-001".equals(pharmacyId)) {
+                    return fetchBatchesFromDB("PHARM-001", forceRefresh);
                 }
+                // Update local cache with live DB records and mark timestamp
+                dbCache.clear();
+                dbCache.addAll(list);
+                lastFetchTime = System.currentTimeMillis();
+                return list;
             }
         } catch (Exception e) {
-            System.err.println("[ExpiryService] DB fetch failed, using memory cache: " + e.getMessage());
+            System.err.println("[ExpiryService] TiDB fetch failed, using cached data: " + e.getMessage());
         }
 
-        // Fallback to in-memory batches
-        return new ArrayList<>(inMemoryBatches);
+        // Return cache only if DB connection failed
+        return new ArrayList<>(dbCache);
     }
 
     /**
-     * Checks all medicine batches for expiration status, calculates remaining days,
+     * Checks all medicine batches for expiration status, calculates remaining days dynamically,
      * updates records, and triggers notifications for critical/expired items.
      * Called periodically by ExpiryMonitorthread.
      */
@@ -316,7 +350,7 @@ public class ExpiryService {
     }
 
     public List<ExpiryRecord> getAllExpiryRecords(String pharmacyId) {
-        List<MedicineBatch> batches = new ArrayList<>(inMemoryBatches);
+        List<MedicineBatch> batches = fetchBatchesFromDB(pharmacyId);
         List<ExpiryRecord> records = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
@@ -372,42 +406,46 @@ public class ExpiryService {
         }).toList();
     }
 
+    /**
+     * Quarantines and deletes an expired medicine batch directly from TiDB Cloud MySQL.
+     */
     public void disposeBatch(String batchNumber) {
-        inMemoryBatches.removeIf(b -> b.getBatchNumber().equalsIgnoreCase(batchNumber));
-        new Thread(() -> {
-            try (Connection con = DBConnection.connectToMySql()) {
-                if (con != null) {
-                    String sql = "DELETE FROM medicine_batch WHERE batch_number = ?";
-                    try (PreparedStatement ps = con.prepareStatement(sql)) {
-                        ps.setString(1, batchNumber);
-                        ps.executeUpdate();
-                    }
+        dbCache.removeIf(b -> b.getBatchNumber().equalsIgnoreCase(batchNumber));
+        try (Connection con = DBConnection.connectToMySql()) {
+            if (con != null) {
+                String sql = "DELETE FROM medicine_batch WHERE batch_number = ?";
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setString(1, batchNumber);
+                    ps.executeUpdate();
+                    System.out.println("[ExpiryService] Batch '" + batchNumber + "' deleted from TiDB Cloud.");
                 }
-            } catch (Exception e) {
-                System.err.println("[ExpiryService] Error disposing batch: " + e.getMessage());
             }
-        }, "DisposeBatch-Worker").start();
+        } catch (Exception e) {
+            System.err.println("[ExpiryService] Error disposing batch in TiDB Cloud: " + e.getMessage());
+        }
     }
 
+    /**
+     * Updates a batch expiry date directly in TiDB Cloud MySQL.
+     */
     public void updateBatchExpiry(String batchNumber, LocalDate newDate) {
-        for (MedicineBatch b : inMemoryBatches) {
+        for (MedicineBatch b : dbCache) {
             if (b.getBatchNumber().equalsIgnoreCase(batchNumber)) {
                 b.setExpiryDate(newDate);
             }
         }
-        new Thread(() -> {
-            try (Connection con = DBConnection.connectToMySql()) {
-                if (con != null) {
-                    String sql = "UPDATE medicine_batch SET expiry_date = ? WHERE batch_number = ?";
-                    try (PreparedStatement ps = con.prepareStatement(sql)) {
-                        ps.setDate(1, java.sql.Date.valueOf(newDate));
-                        ps.setString(2, batchNumber);
-                        ps.executeUpdate();
-                    }
+        try (Connection con = DBConnection.connectToMySql()) {
+            if (con != null) {
+                String sql = "UPDATE medicine_batch SET expiry_date = ? WHERE batch_number = ?";
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setDate(1, java.sql.Date.valueOf(newDate));
+                    ps.setString(2, batchNumber);
+                    ps.executeUpdate();
+                    System.out.println("[ExpiryService] Batch '" + batchNumber + "' expiry updated in TiDB Cloud.");
                 }
-            } catch (Exception e) {
-                System.err.println("[ExpiryService] Error updating batch expiry: " + e.getMessage());
             }
-        }, "UpdateExpiry-Worker").start();
+        } catch (Exception e) {
+            System.err.println("[ExpiryService] Error updating batch expiry in TiDB Cloud: " + e.getMessage());
+        }
     }
 }

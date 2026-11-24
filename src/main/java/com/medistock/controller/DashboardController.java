@@ -28,6 +28,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Main application dashboard controller.
@@ -210,21 +211,37 @@ public class DashboardController {
 
     @FXML
     private void handleNavInventory(ActionEvent event) {
+        String fxmlPath =
+                "/org/example/medistock/view/InventoryV/InventoryView.fxml";
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.INVENTORY_VIEW));
+            URL fxmlURL = getClass().getResource(fxmlPath);
+
+            if (fxmlURL == null) {
+                throw new IOException("FXML file not found at: " + fxmlPath);
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlURL);
             Parent view = loader.load();
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
+
+            contentArea.getChildren().setAll(view);
+
             highlightActiveNavButton(btnNavInventory);
+
+            System.out.println("Inventory page loaded successfully!");
+
         } catch (Exception e) {
+
+            System.err.println("Could not load Inventory page:");
             e.printStackTrace();
+
             showPlaceholder(
                     "My Inventory & Batch Management",
-                    "Subsystem: Inventory & Batch Management",
+                    "Member 2 — Inventory Management",
                     "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
                     "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
-                    "Architecture Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
+                    "Multithreading Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
             );
+
             highlightActiveNavButton(btnNavInventory);
         }
     }
@@ -241,8 +258,6 @@ public class DashboardController {
         highlightActiveNavButton(btnNavRequests);
     }
 
-
-
     @FXML
     private void handleNavExpiry(ActionEvent event) {
         try {
@@ -255,10 +270,10 @@ public class DashboardController {
             e.printStackTrace();
             showPlaceholder(
                     "Expiry Monitoring & Notifications",
-                    "Subsystem: Expiry, Notifications & Reports",
+                    "Member 4 — Expiry, Notifications & Reports",
                     "Real-time monitoring of medicine batches nearing expiry with automatic threshold alerts and notifications.",
                     "Owned Classes: ExpiryController, Notification, AppEvent, ExpiryService, NotificationService, CustomEventQueue, EventConsumer, NotificationWorker",
-                    "Architecture Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
+                    "Multithreading Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
             );
             highlightActiveNavButton(btnNavExpiry);
         }
@@ -276,10 +291,10 @@ public class DashboardController {
             e.printStackTrace();
             showPlaceholder(
                     "Reports & Asynchronous Event Queue Monitor",
-                    "Subsystem: Expiry, Notifications & Reports",
+                    "Member 4 — Expiry, Notifications & Reports",
                     "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
                     "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
-                    "Architecture Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
+                    "Multithreading Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
             );
             highlightActiveNavButton(btnNavReports);
         }

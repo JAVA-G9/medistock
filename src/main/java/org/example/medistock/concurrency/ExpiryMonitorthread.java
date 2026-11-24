@@ -23,7 +23,7 @@ public class ExpiryMonitorthread extends Thread {
 
     private static ExpiryMonitorthread instance;
     private volatile boolean running = false;
-    private long intervalMillis = 5000; // 5 seconds default
+    private long intervalMillis = 15000; // 15 seconds periodic sweep interval
     private final AtomicInteger scanCycle = new AtomicInteger(0);
     private final AtomicLong lastScanTime = new AtomicLong(0);
     private final AtomicInteger flaggedCount = new AtomicInteger(0);
@@ -31,7 +31,7 @@ public class ExpiryMonitorthread extends Thread {
     private final List<ScanListener> listeners = new CopyOnWriteArrayList<>();
 
     public ExpiryMonitorthread() {
-        this(10000);
+        this(15000);
     }
 
     public ExpiryMonitorthread(long intervalMillis) {
@@ -89,16 +89,16 @@ public class ExpiryMonitorthread extends Thread {
 
         while (running) {
             try {
-                int cycle = scanCycle.incrementAndGet();
                 lastScanTime.set(System.currentTimeMillis());
 
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Scanning medicine batches for expiration risks...%n", cycle);
-
-                // Run sweep through ExpiryService
+                // Run sweep through ExpiryService first
                 List<ExpiryRecord> urgentRecords = ExpiryService.getInstance().checkAndProcessExpiries("PHARM-001");
+
+                // Increment ONLY after successful sweep execution
+                int cycle = scanCycle.incrementAndGet();
                 flaggedCount.set(urgentRecords != null ? urgentRecords.size() : 0);
 
-                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Sweep complete. Flagged %d at-risk/expired batches.%n",
+                System.out.printf("[EXPIRY-DAEMON] Cycle #%d: Sweep successfully completed. Flagged %d at-risk/expired batches.%n",
                         cycle, flaggedCount.get());
 
                 // Notify UI listeners safely

@@ -67,7 +67,8 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupFilters();
-        loadRecords();
+        // Show spinner/placeholder until data loads
+        if (lblTableCount != null) lblTableCount.setText("Loading batches from TiDB Cloud...");
 
         // Register controller as listener for background daemon sweeps
         monitorThread.addListener(this);
@@ -77,6 +78,9 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
             monitorThread.startMonitoring();
         }
         updateDaemonUiStatus();
+
+        // Load records off the UI thread so navigation is instant
+        loadRecordsAsync();
     }
 
     private void setupTable() {
@@ -123,6 +127,33 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
         applyFilters();
         updateKpis();
         updateDaemonUiStatus();
+    }
+
+    /**
+     * Loads records on a background thread so the UI remains responsive.
+     * Uses Platform.runLater to push results back to the JavaFX thread.
+     */
+    public void loadRecordsAsync() {
+        Thread worker = new Thread(() -> {
+            String query = txtSearch.getText();
+            String filter = cmbStatusFilter.getValue();
+            List<ExpiryRecord> filtered = expiryService.filterRecords(currentPharmacyId, query, filter);
+            List<ExpiryRecord> all = expiryService.getAllExpiryRecords(currentPharmacyId);
+            ReportsService.InventoryHealthReport report = reportsService.generateReport(currentPharmacyId);
+
+            Platform.runLater(() -> {
+                recordsList.setAll(filtered);
+                if (lblTableCount != null)
+                    lblTableCount.setText(String.format("Showing %d of %d batches", filtered.size(), all.size()));
+                if (lblKpiNearExpiry != null) lblKpiNearExpiry.setText(String.valueOf(report.nearExpiryCount));
+                if (lblKpiCritical != null) lblKpiCritical.setText(String.valueOf(report.criticalCount));
+                if (lblKpiExpired != null) lblKpiExpired.setText(String.valueOf(report.expiredCount));
+                if (lblKpiAtRiskValue != null) lblKpiAtRiskValue.setText(String.format("$%.2f", report.atRiskValue));
+                updateDaemonUiStatus();
+            });
+        }, "ExpiryController-LoadAsync");
+        worker.setDaemon(true);
+        worker.start();
     }
 
     private void applyFilters() {
@@ -191,7 +222,9 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
 
     @FXML
     private void handleRefresh(ActionEvent event) {
-        loadRecords();
+        if (lblTableCount != null) lblTableCount.setText("Refreshing...");
+        expiryService.invalidateCache();
+        loadRecordsAsync();
     }
 
     @FXML
@@ -218,14 +251,15 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
                 for (ExpiryRecord rec : expired) {
                     expiryService.disposeBatch(rec.getBatchNumber());
                 }
-                loadRecords();
+                expiryService.invalidateCache();
+                loadRecordsAsync();
             }
         });
     }
 
     @Override
     public void onScanCompleted(int cycle, List<ExpiryRecord> atRiskRecords) {
-        loadRecords();
-        updateDaemonUiStatus();
+        // Daemon sweep completed: update cycle counter & daemon widgets without firing duplicate DB queries
+        Platform.runLater(this::updateDaemonUiStatus);
     }
 }

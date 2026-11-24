@@ -7,7 +7,7 @@ public final class AppConfig {
 
     public static final String APP_NAME = "MediStock";
     public static final String APP_TAGLINE = "Pharmacy-to-Pharmacy Surplus Stock & Expiry Exchange";
-    public static final String VERSION = "1.0.0-SNAPSHOT";
+    public static final String VERSION = "1.0.0-SNAPSHOT (Evaluation 1)";
 
     public static final double WINDOW_WIDTH = 1180;
     public static final double WINDOW_HEIGHT = 740;
