@@ -1,5 +1,6 @@
 package org.example.medistock.controller.reports;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -114,7 +115,9 @@ public class ReportsController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTables();
-        refreshReport();
+        populateThreadTable(); // thread table is fast (no DB needed)
+        // Load DB-dependent data off the UI thread to prevent navigation freeze
+        refreshReportAsync();
     }
 
     private void setupTables() {
@@ -163,6 +166,69 @@ public class ReportsController implements Initializable {
 
         populateRiskTable();
         populateThreadTable();
+    }
+
+    /**
+     * Runs the DB-heavy report generation on a background thread,
+     * then pushes UI updates to the JavaFX thread via Platform.runLater.
+     * Prevents UI freeze when navigating to this view.
+     */
+    public void refreshReportAsync() {
+        Thread worker = new Thread(() -> {
+            ReportsService.InventoryHealthReport report = reportsService.generateReport(currentPharmacyId);
+            List<ExpiryRecord> records = expiryService.getAllExpiryRecords(currentPharmacyId);
+
+            // Compute risk table data off-thread
+            int expBatches = 0, expUnits = 0; double expVal = 0;
+            int critBatches = 0, critUnits = 0; double critVal = 0;
+            int nearBatches = 0, nearUnits = 0; double nearVal = 0;
+            int attBatches = 0, attUnits = 0; double attVal = 0;
+            int safeBatches = 0, safeUnits = 0; double safeVal = 0;
+            for (ExpiryRecord r : records) {
+                switch (r.getStatus()) {
+                    case EXPIRED -> { expBatches++; expUnits += r.getQuantity(); expVal += r.getTotalValue(); }
+                    case CRITICAL -> { critBatches++; critUnits += r.getQuantity(); critVal += r.getTotalValue(); }
+                    case EXPIRING_SOON -> { nearBatches++; nearUnits += r.getQuantity(); nearVal += r.getTotalValue(); }
+                    case ATTENTION -> { attBatches++; attUnits += r.getQuantity(); attVal += r.getTotalValue(); }
+                    case SAFE -> { safeBatches++; safeUnits += r.getQuantity(); safeVal += r.getTotalValue(); }
+                }
+            }
+            final List<RiskRow> computedRisk = List.of(
+                new RiskRow("EXPIRED (Past Date)", expBatches, expUnits, expVal, "Quarantine immediately; prohibit dispensing; initiate safe disposal"),
+                new RiskRow("CRITICAL (<= 15 Days)", critBatches, critUnits, critVal, "Urgent surplus listing on marketplace with maximum discount; prioritize dispensing"),
+                new RiskRow("NEAR-EXPIRY (<= 30 Days)", nearBatches, nearUnits, nearVal, "Publish to inter-pharmacy exchange; rotate stock to front shelves"),
+                new RiskRow("ATTENTION (<= 60 Days)", attBatches, attUnits, attVal, "Monitor consumption rate; evaluate upcoming bulk prescription demands"),
+                new RiskRow("SAFE (> 60 Days)", safeBatches, safeUnits, safeVal, "Optimal condition; normal standard storage & routine monitoring")
+            );
+
+            Platform.runLater(() -> {
+                // KPIs
+                if (lblHealthScore != null) lblHealthScore.setText(String.format("%.1f%%", report.healthScorePercent));
+                if (lblTotalBatches != null) lblTotalBatches.setText(String.valueOf(report.totalBatches));
+                if (lblTotalUnits != null) lblTotalUnits.setText(String.format("%d total stock units", report.totalUnits));
+                if (lblAtRiskValue != null) lblAtRiskValue.setText(String.format("$%.2f", report.atRiskValue));
+                if (lblAtRiskBatches != null) {
+                    int atRiskCount = report.expiredCount + report.criticalCount + report.nearExpiryCount;
+                    lblAtRiskBatches.setText(String.format("%d batches requiring action", atRiskCount));
+                }
+                // Event queue (fast, no DB)
+                int size = eventQueue.size();
+                int capacity = eventQueue.getCapacity();
+                double ratio = capacity > 0 ? (double) size / capacity : 0.0;
+                if (lblQueueLoad != null) lblQueueLoad.setText(String.format("%d / %d", size, capacity));
+                if (queueProgressBar != null) queueProgressBar.setProgress(ratio);
+                if (lblQueuePercent != null) lblQueuePercent.setText(String.format("%.1f%% buffer load", ratio * 100));
+                if (lblEventsProcessed != null) lblEventsProcessed.setText("Total Events Consumed: " + eventConsumer.getProcessedCount());
+                if (btnToggleDaemon != null) {
+                    btnToggleDaemon.setText(expiryMonitor.isMonitoring() ? "⏸ Pause Daemon" : "▶ Resume Daemon");
+                }
+                // Tables
+                riskList.setAll(computedRisk);
+                populateThreadTable();
+            });
+        }, "ReportsController-LoadAsync");
+        worker.setDaemon(true);
+        worker.start();
     }
 
     private void populateRiskTable() {
@@ -277,11 +343,11 @@ public class ReportsController implements Initializable {
         } else {
             expiryMonitor.startMonitoring();
         }
-        refreshReport();
+        refreshReportAsync();
     }
 
     @FXML
     private void handleRefresh(ActionEvent event) {
-        refreshReport();
+        refreshReportAsync();
     }
 }
