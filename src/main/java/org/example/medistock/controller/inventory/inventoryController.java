@@ -482,32 +482,22 @@ public class inventoryController {
 
     @FXML
     void doUpdate(ActionEvent event) {
-
         if (fetchedMedicineId == -1) {
-            System.out.println(
-                    "Fetch a medicine first before updating");
-
+            System.out.println("Fetch a medicine first before updating");
             return;
         }
-
         String medName = getMedName.getText().trim();
         String genName = getGenName.getText().trim();
         String manName = getManName.getText().trim();
-
         String category = getCategory.getValue();
         String strength = getStrength.getText().trim();
         String dosage = getDosage.getValue();
         String description = getDescription.getText().trim();
-
-        if (medName.isEmpty() || manName.isEmpty()
-                || category == null || dosage == null) {
-
+        if (medName.isEmpty() || manName.isEmpty() || category == null || dosage == null) {
             System.out.println(
                     "Please fill all required medicine fields");
-
             return;
         }
-
         String sql = "UPDATE medicine SET "
                 + "medicine_name = ?, "
                 + "generic_name = ?, "
@@ -819,34 +809,20 @@ public class inventoryController {
 
     @FXML
     void doFetchBatch(ActionEvent event) {
-
         try {
-
             String number = batchNumber.getText().trim();
             String pharmacy = pharmacyId.getText().trim();
-
             if (number.isEmpty() || pharmacy.isEmpty()) {
-
-                System.out.println(
-                        "Enter batch number and pharmacy ID first");
-
+                System.out.println("Enter batch number and pharmacy ID first");
                 return;
             }
-
-            String sql = "SELECT * FROM medicine_batch "
-                    + "WHERE batch_number = ? AND pharmacy_id = ?";
-
+            String sql = "SELECT * FROM medicine_batch WHERE batch_number = ? AND pharmacy_id = ?";
             try (PreparedStatement pst = con.prepareStatement(sql)) {
-
                 pst.setString(1, number);
                 pst.setString(2, pharmacy);
-
                 try (ResultSet rs = pst.executeQuery()) {
-
                     if (rs.next()) {
-
                         int medicineId = rs.getInt("medicine_id");
-
                         for (String item : batchMedicine.getItems()) {
 
                             if (item.startsWith(medicineId + " - ")) {
@@ -855,7 +831,6 @@ public class inventoryController {
                                 break;
                             }
                         }
-
                         manufacturingDate.setValue(
                                 rs.getDate("manufacturing_date")
                                         .toLocalDate());
@@ -908,24 +883,17 @@ public class inventoryController {
             e.printStackTrace();
         }
     }
-
-
     // =====================================================
     //                 UPDATE MEDICINE BATCH
     // =====================================================
-
     @FXML
     void doUpdateBatch(ActionEvent event) {
-
         try {
-
             if (!validateBatchFields()) {
                 return;
             }
-
             String number = batchNumber.getText().trim();
             String pharmacy = pharmacyId.getText().trim();
-
             int medicineId = getSelectedMedicineId();
             String medicineName = getSelectedMedicineName();
 
@@ -940,10 +908,8 @@ public class inventoryController {
                 available = Integer.parseInt(
                         quantityAvailable.getText().trim());
             }
-
             double purchase = Double.parseDouble(
                     purchasePrice.getText().trim());
-
             double selling = Double.parseDouble(
                     sellingPrice.getText().trim());
 
@@ -1000,99 +966,63 @@ public class inventoryController {
                     loadInventoryTable();
 
                 } else {
-
                     System.out.println("Batch Not Found");
                 }
             }
-
         } catch (Exception e) {
-
             System.out.println("Could not update batch");
             e.printStackTrace();
         }
     }
-
-
     // =====================================================
     //                 DELETE MEDICINE BATCH
     // =====================================================
 
     @FXML
     void doDeleteBatch(ActionEvent event) {
-
         try {
-
             String number = batchNumber.getText().trim();
             String pharmacy = pharmacyId.getText().trim();
-
             if (number.isEmpty() || pharmacy.isEmpty()) {
-
-                System.out.println(
-                        "Enter batch number and pharmacy ID first");
-
+                System.out.println("Enter batch number and pharmacy ID first");
                 return;
             }
-
-            String sql = "DELETE FROM medicine_batch "
-                    + "WHERE batch_number = ? AND pharmacy_id = ?";
-
+            String sql = "DELETE FROM medicine_batch WHERE batch_number = ? AND pharmacy_id = ?";
             try (PreparedStatement pst = con.prepareStatement(sql)) {
-
                 pst.setString(1, number);
                 pst.setString(2, pharmacy);
-
                 int count = pst.executeUpdate();
-
                 if (count > 0) {
-
                     System.out.println("Batch Deleted Successfully");
-
                     loadInventoryTable();
-
                     doClearBatch(event);
-
                 } else {
-
                     System.out.println("Batch Not Found");
                 }
             }
-
         } catch (Exception e) {
-
             e.printStackTrace();
         }
     }
-
-
     // =====================================================
     //                 CLEAR MEDICINE BATCH
     // =====================================================
-
     @FXML
     void doClearBatch(ActionEvent event) {
-
         batchMedicine.getSelectionModel().clearSelection();
-
         batchNumber.clear();
-
         manufacturingDate.setValue(null);
         expiryDate.setValue(null);
-
         quantityReceived.clear();
         quantityAvailable.clear();
-
         purchasePrice.clear();
         sellingPrice.clear();
-
         pharmacyId.setText("PHARM-001");
-
         batchStatus.setValue("AVAILABLE");
-
         receivedDate.setValue(LocalDate.now());
 
         System.out.println("Batch form cleared");
     }
-
     // =====================================================
 //          INVENTORY CONCURRENCY TEST
 // =====================================================
