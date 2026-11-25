@@ -45,10 +45,8 @@
                 </VBox>
             </HBox>
 
-            <!-- Responsive Active Pharmacy Switcher Toolbar -->
+            <!-- Action Strip Toolbar -->
             <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="action-strip">
-                <Label text="Active Pharmacy:" styleClass="field-label" minWidth="-Infinity"/>
-                <ComboBox fx:id="pharmacyComboBox" prefWidth="240.0" minWidth="150.0" styleClass="input-field"/>
                 <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
 
                 <Region HBox.hgrow="ALWAYS"/>

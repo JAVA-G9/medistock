@@ -21,7 +21,7 @@
     <ScrollPane fitToWidth="true" styleClass="view-scroll" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
         <VBox spacing="10.0" styleClass="view-scroll-content">
 
-            <!-- 4 KPI Metric Stat Cards (Enhanced Font Sizing) -->
+            <!-- 3 KPI Metric Stat Cards (Enhanced Font Sizing) -->
             <HBox spacing="10.0">
                 <!-- Teal KPI: Total Available Listings -->
                 <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-teal" minWidth="150.0">
@@ -43,28 +43,17 @@
                     <Label fx:id="kpiReservedStock" text="40 units" styleClass="kpi-value"/>
                     <Label text="Locked in pending requests" styleClass="kpi-subtext" minWidth="-Infinity"/>
                 </VBox>
-
-                <!-- Purple KPI: Concurrency Engine -->
-                <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-purple" minWidth="150.0">
-                    <Label text="CONCURRENCY ENGINE" styleClass="kpi-label" minWidth="-Infinity"/>
-                    <Label text="ACTIVE" styleClass="kpi-value"/>
-                    <Label text="Intrinsic lock • Zero overselling" styleClass="kpi-subtext" minWidth="-Infinity"/>
-                </VBox>
             </HBox>
 
             <!-- Responsive Filter & Search Toolbar Card -->
             <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="action-strip">
-                <HBox spacing="8.0" alignment="CENTER_LEFT">
-                    <Label text="Active Pharmacy:" styleClass="field-label" minWidth="-Infinity"/>
-                    <ComboBox fx:id="pharmacyComboBox" prefWidth="220.0" minWidth="150.0" styleClass="input-field"/>
-                    <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
-                </HBox>
+                <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <HBox spacing="8.0" alignment="CENTER_LEFT">
                     <Label text="Search Medicine:" styleClass="field-label" minWidth="-Infinity"/>
-                    <TextField fx:id="searchField" prefWidth="180.0" minWidth="110.0" promptText="Filter listings..." styleClass="input-field"/>
+                    <TextField fx:id="searchField" prefWidth="220.0" minWidth="150.0" promptText="Filter listings..." styleClass="input-field"/>
                 </HBox>
             </HBox>
 
@@ -98,7 +87,6 @@
                 <HBox spacing="8.0" alignment="CENTER_LEFT">
                     <Button text="➕ Publish Surplus" onAction="#handlePublishListing" styleClass="btn-action-primary" minWidth="-Infinity"/>
                     <Button text="📥 Request Stock" onAction="#handleRequestStock" styleClass="btn-action-primary" minWidth="-Infinity"/>
-                    <Button text="⚡ Concurrency Test" onAction="#handleRunConcurrencyTest" styleClass="btn-lab-primary" minWidth="-Infinity"/>
                     <Button text="❌ Cancel Listing" onAction="#handleCancelListing" styleClass="btn-secondary" minWidth="-Infinity"/>
 
                     <Region HBox.hgrow="ALWAYS"/>
