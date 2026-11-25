@@ -284,12 +284,15 @@ public class inventoryController {
 
 
     private void loadInventoryTable() {
-
-        inventoryTable.setItems(null);
-
-        inventoryList = getAllInventoryRecords();
-
-        inventoryTable.setItems(inventoryList);
+        new Thread(() -> {
+            if (con == null) con = DBConnection.connectToMySql();
+            if (con == null) return;
+            ObservableList<showBean> list = getAllInventoryRecords();
+            javafx.application.Platform.runLater(() -> {
+                inventoryList = list;
+                inventoryTable.setItems(inventoryList);
+            });
+        }, "Inventory-TableLoader").start();
     }
 
 
@@ -557,30 +560,28 @@ public class inventoryController {
     // =====================================================
 
     private void loadBatchMedicines() {
+        new Thread(() -> {
+            if (con == null) con = DBConnection.connectToMySql();
+            if (con == null) return;
 
-        batchMedicine.getItems().clear();
+            java.util.List<String> items = new java.util.ArrayList<>();
+            String sql = "SELECT medicine_id, medicine_name FROM medicine ORDER BY medicine_name";
 
-        String sql = "SELECT medicine_id, medicine_name "
-                + "FROM medicine ORDER BY medicine_name";
+            try (PreparedStatement pst = con.prepareStatement(sql);
+                 ResultSet rs = pst.executeQuery()) {
 
-        try (PreparedStatement pst = con.prepareStatement(sql);
-             ResultSet rs = pst.executeQuery()) {
-
-            while (rs.next()) {
-
-                int id = rs.getInt("medicine_id");
-                String name = rs.getString("medicine_name");
-
-                batchMedicine.getItems().add(id + " - " + name);
+                while (rs.next()) {
+                    int id = rs.getInt("medicine_id");
+                    String name = rs.getString("medicine_name");
+                    items.add(id + " - " + name);
+                }
+                System.out.println("Medicine dropdown loaded");
+            } catch (SQLException e) {
+                System.out.println("Error loading medicines: " + e.getMessage());
             }
 
-            System.out.println("Medicine dropdown loaded");
-
-        } catch (SQLException e) {
-
-            System.out.println("Error loading medicines");
-            e.printStackTrace();
-        }
+            javafx.application.Platform.runLater(() -> batchMedicine.getItems().setAll(items));
+        }, "Inventory-BatchMedicineLoader").start();
     }
 
 
@@ -1148,16 +1149,15 @@ public class inventoryController {
 
         // Default values
         pharmacyId.setText("PHARM-001");
-
         batchStatus.setValue("AVAILABLE");
-
         receivedDate.setValue(LocalDate.now());
 
-        // Load medicine dropdown
-        loadBatchMedicines();
-
-        // Load inventory table
-        loadInventoryTable();
+        // Connect and load database records asynchronously so tab opens with 0ms lag
+        new Thread(() -> {
+            con = DBConnection.connectToMySql();
+            loadBatchMedicines();
+            loadInventoryTable();
+        }, "Inventory-DataLoader").start();
 
 
         assert clearBtn != null;
