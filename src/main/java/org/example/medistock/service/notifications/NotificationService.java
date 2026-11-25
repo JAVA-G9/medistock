@@ -118,6 +118,14 @@ public class NotificationService {
         return repository.findByPharmacyId(pharmacyId);
     }
 
+    public List<Notification> getCachedNotifications(String pharmacyId) {
+        return repository.getCachedNotifications(pharmacyId);
+    }
+
+    public int getCachedUnreadCount(String pharmacyId) {
+        return repository.getCachedUnreadCount(pharmacyId);
+    }
+
     public List<Notification> getUnreadNotifications(String pharmacyId) {
         return repository.findUnreadByPharmacyId(pharmacyId);
     }

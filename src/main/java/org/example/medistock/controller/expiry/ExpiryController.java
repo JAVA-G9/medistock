@@ -67,8 +67,10 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupFilters();
-        // Show spinner/placeholder until data loads
-        if (lblTableCount != null) lblTableCount.setText("Loading batches from TiDB Cloud...");
+
+        // 1. Immediately render cached records (0ms instant display - no blank table wait!)
+        applyFilters();
+        updateKpis();
 
         // Register controller as listener for background daemon sweeps
         monitorThread.addListener(this);
@@ -79,7 +81,7 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
         }
         updateDaemonUiStatus();
 
-        // Load records off the UI thread so navigation is instant
+        // 2. Fetch fresh updates asynchronously in the background
         loadRecordsAsync();
     }
 
@@ -159,15 +161,15 @@ public class ExpiryController implements Initializable, ExpiryMonitorthread.Scan
     private void applyFilters() {
         String query = txtSearch.getText();
         String filter = cmbStatusFilter.getValue();
-        List<ExpiryRecord> filtered = expiryService.filterRecords(currentPharmacyId, query, filter);
+        List<ExpiryRecord> filtered = expiryService.filterCachedRecords(currentPharmacyId, query, filter);
         recordsList.setAll(filtered);
         if (lblTableCount != null) {
-            lblTableCount.setText(String.format("Showing %d of %d batches", filtered.size(), expiryService.getAllExpiryRecords(currentPharmacyId).size()));
+            lblTableCount.setText(String.format("Showing %d of %d batches", filtered.size(), expiryService.getCachedExpiryRecordsOnly(currentPharmacyId).size()));
         }
     }
 
     private void updateKpis() {
-        ReportsService.InventoryHealthReport report = reportsService.generateReport(currentPharmacyId);
+        ReportsService.InventoryHealthReport report = reportsService.generateCachedReport(currentPharmacyId);
         if (lblKpiNearExpiry != null) lblKpiNearExpiry.setText(String.valueOf(report.nearExpiryCount));
         if (lblKpiCritical != null) lblKpiCritical.setText(String.valueOf(report.criticalCount));
         if (lblKpiExpired != null) lblKpiExpired.setText(String.valueOf(report.expiredCount));

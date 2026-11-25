@@ -1,5 +1,6 @@
 package org.example.medistock.controller.notifications;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -64,21 +65,35 @@ public class NotificationsController implements Initializable {
         setupTable();
         setupFilters();
 
-        // Start consumer worker if not running
+        // 1. Immediately render cached notifications (0ms instant display!)
+        applyFilters();
+        updateKpis();
+
+        // Ensure EventConsumer is active to process inbound exchange request events from Member 3
         if (!eventConsumer.isRunning()) {
             eventConsumer.start();
         }
 
-        refreshData();
+        // 2. Fetch fresh updates asynchronously in the background
+        refreshDataAsync();
     }
 
     private void setupTable() {
-        colTimestamp.setCellValueFactory(new PropertyValueFactory<>("formattedTimestamp"));
-        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
-        colMessage.setCellValueFactory(new PropertyValueFactory<>("message"));
+        colTimestamp.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue() != null ? cellData.getValue().getFormattedTimestamp() : ""
+        ));
+        colTitle.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue() != null ? cellData.getValue().getTitle() : ""
+        ));
+        colMessage.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue() != null ? cellData.getValue().getMessage() : ""
+        ));
 
         // Priority Badge Cell Factory
-        colPriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
+        colPriority.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue() != null && cellData.getValue().getPriority() != null
+                        ? cellData.getValue().getPriority().name() : "NORMAL"
+        ));
         colPriority.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -87,9 +102,12 @@ public class NotificationsController implements Initializable {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    Notification n = getTableView().getItems().get(getIndex());
                     Label pill = new Label(item);
-                    pill.setStyle(n.getPriorityBadgeStyle());
+                    if ("HIGH".equalsIgnoreCase(item) || "CRITICAL".equalsIgnoreCase(item)) {
+                        pill.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-font-weight: bold; -fx-padding: 3 8; -fx-background-radius: 10;");
+                    } else {
+                        pill.setStyle("-fx-background-color: #e0f2fe; -fx-text-fill: #0369a1; -fx-padding: 3 8; -fx-background-radius: 10;");
+                    }
                     setGraphic(pill);
                     setText(null);
                 }
@@ -97,7 +115,10 @@ public class NotificationsController implements Initializable {
         });
 
         // Type Badge Cell Factory
-        colType.setCellValueFactory(new PropertyValueFactory<>("type"));
+        colType.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue() != null && cellData.getValue().getType() != null
+                        ? cellData.getValue().getType().name().replace('_', ' ') : "ALERT"
+        ));
         colType.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -106,9 +127,8 @@ public class NotificationsController implements Initializable {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    Notification n = getTableView().getItems().get(getIndex());
-                    Label pill = new Label(n.getType().name().replace('_', ' '));
-                    pill.setStyle(n.getTypeBadgeStyle());
+                    Label pill = new Label(item);
+                    pill.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-padding: 3 8; -fx-background-radius: 10;");
                     setGraphic(pill);
                     setText(null);
                 }
@@ -117,7 +137,7 @@ public class NotificationsController implements Initializable {
 
         // Status Column
         colStatus.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
-                cellData.getValue().isRead() ? "Read" : "Unread"
+                cellData.getValue() != null && cellData.getValue().isRead() ? "Read" : "Unread"
         ));
         colStatus.setCellFactory(col -> new TableCell<>() {
             @Override
@@ -129,9 +149,9 @@ public class NotificationsController implements Initializable {
                 } else {
                     Label pill = new Label(item);
                     if ("Unread".equalsIgnoreCase(item)) {
-                        pill.setStyle("-fx-background-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-weight: bold; -fx-padding: 2 6; -fx-background-radius: 10;");
+                        pill.setStyle("-fx-background-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-weight: bold; -fx-padding: 3 8; -fx-background-radius: 10;");
                     } else {
-                        pill.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #64748b; -fx-padding: 2 6; -fx-background-radius: 10;");
+                        pill.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #64748b; -fx-padding: 3 8; -fx-background-radius: 10;");
                     }
                     setGraphic(pill);
                     setText(null);
@@ -173,11 +193,26 @@ public class NotificationsController implements Initializable {
         updateConsumerUi();
     }
 
+    public void refreshDataAsync() {
+        new Thread(() -> {
+            List<Notification> all = notificationService.getNotifications(currentPharmacyId);
+            long unreadCount = all.stream().filter(n -> !n.isRead()).count();
+            long highPriorityCount = all.stream().filter(n -> n.getPriority() == Notification.Priority.HIGH).count();
+
+            Platform.runLater(() -> {
+                applyFilters();
+                if (lblKpiUnread != null) lblKpiUnread.setText(String.valueOf(unreadCount));
+                if (lblKpiHighPriority != null) lblKpiHighPriority.setText(String.valueOf(highPriorityCount));
+                if (lblKpiTotal != null) lblKpiTotal.setText(String.valueOf(all.size()));
+            });
+        }, "NotifController-LoadAsync").start();
+    }
+
     private void applyFilters() {
         String query = txtSearch != null ? txtSearch.getText().trim().toLowerCase() : "";
         String typeFilter = cmbTypeFilter != null ? cmbTypeFilter.getValue() : "ALL";
 
-        List<Notification> all = notificationService.getNotifications(currentPharmacyId);
+        List<Notification> all = notificationService.getCachedNotifications(currentPharmacyId);
         List<Notification> filtered = all.stream().filter(n -> {
             boolean matchesQuery = query.isEmpty()
                     || n.getTitle().toLowerCase().contains(query)
@@ -196,17 +231,13 @@ public class NotificationsController implements Initializable {
     }
 
     private void updateKpis() {
-        ReportsService.InventoryHealthReport report = reportsService.generateReport(currentPharmacyId);
-        List<Notification> all = notificationService.getNotifications(currentPharmacyId);
+        List<Notification> all = notificationService.getCachedNotifications(currentPharmacyId);
+        long unreadCount = all.stream().filter(n -> !n.isRead()).count();
+        long highPriorityCount = all.stream().filter(n -> n.getPriority() == Notification.Priority.HIGH).count();
 
-        long highPriorityCount = all.stream()
-                .filter(n -> n.getPriority() == Notification.Priority.HIGH)
-                .count();
-
-        if (lblKpiUnread != null) lblKpiUnread.setText(String.valueOf(report.unreadNotifications));
+        if (lblKpiUnread != null) lblKpiUnread.setText(String.valueOf(unreadCount));
         if (lblKpiHighPriority != null) lblKpiHighPriority.setText(String.valueOf(highPriorityCount));
         if (lblKpiTotal != null) lblKpiTotal.setText(String.valueOf(all.size()));
-        if (lblKpiQueueLoad != null) lblKpiQueueLoad.setText(String.format("%d / %d", report.queueSize, report.queueCapacity));
     }
 
     private void updateConsumerUi() {
