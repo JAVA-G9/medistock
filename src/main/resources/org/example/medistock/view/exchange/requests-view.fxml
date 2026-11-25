@@ -45,12 +45,9 @@
                 </VBox>
             </HBox>
 
-            <!-- Action Strip Toolbar -->
+            <!-- Pipeline Status Summary Strip -->
             <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="action-strip">
-                <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
-
-                <Region HBox.hgrow="ALWAYS"/>
-
+                <Label text="📊 Pipeline Status:" styleClass="field-label" minWidth="-Infinity"/>
                 <Label fx:id="statusLabel" text="Ready" styleClass="text-muted" minWidth="-Infinity"/>
             </HBox>
 

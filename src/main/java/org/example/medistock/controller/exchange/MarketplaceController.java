@@ -128,12 +128,6 @@ public class MarketplaceController implements Initializable {
     }
 
     @FXML
-    public void handleRefresh() {
-        loadListings();
-        logMessage("Marketplace listings refreshed.");
-    }
-
-    @FXML
     public void handlePublishListing() {
         Pharmacy currentPharmacy = getActivePharmacy();
 

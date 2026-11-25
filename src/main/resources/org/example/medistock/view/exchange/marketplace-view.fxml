@@ -45,16 +45,12 @@
                 </VBox>
             </HBox>
 
-            <!-- Responsive Filter & Search Toolbar Card -->
+            <!-- Search Toolbar Card -->
             <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="action-strip">
-                <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-action-secondary" minWidth="-Infinity"/>
-
+                <Label text="🔍 Search Medicine:" styleClass="field-label" minWidth="-Infinity"/>
+                <TextField fx:id="searchField" prefWidth="260.0" minWidth="180.0" promptText="Filter listings by name or batch..." styleClass="input-field"/>
                 <Region HBox.hgrow="ALWAYS"/>
-
-                <HBox spacing="8.0" alignment="CENTER_LEFT">
-                    <Label text="Search Medicine:" styleClass="field-label" minWidth="-Infinity"/>
-                    <TextField fx:id="searchField" prefWidth="220.0" minWidth="150.0" promptText="Filter listings..." styleClass="input-field"/>
-                </HBox>
+                <Label text="Real-time catalog filter" styleClass="text-muted" minWidth="-Infinity"/>
             </HBox>
 
             <!-- Table Card Container (Calibrated for 8 entries at 32px height + Action Buttons) -->

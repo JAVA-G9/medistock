@@ -171,12 +171,6 @@ public class RequestsController implements Initializable {
     }
 
     @FXML
-    public void handleRefresh() {
-        refreshAllData();
-        logMessage("Data refreshed.");
-    }
-
-    @FXML
     public void handleApproveRequest() {
         ExchangeRequest selected = incomingTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
