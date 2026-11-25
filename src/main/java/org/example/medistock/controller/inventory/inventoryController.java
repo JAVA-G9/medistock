@@ -1093,7 +1093,6 @@ public class inventoryController {
         System.out.println("Batch form cleared");
     }
 
-
     // =====================================================
 //          INVENTORY CONCURRENCY TEST
 // =====================================================
@@ -1101,26 +1100,19 @@ public class inventoryController {
     @FXML
     void runInventoryConcurrencyTest(ActionEvent event) {
 
-        System.out.println("\n========== UNSAFE TEST ==========");
+        StringBuffer output = new StringBuffer();
 
-        StockTest unsafeStock = new StockTest(10);
+        output.append("========== UNSAFE TEST ==========\n");
 
-        CountDownLatch bothReadStock = new CountDownLatch(2);
-        CountDownLatch allowUpdate = new CountDownLatch(1);
+        StockTest unsafeStock = new StockTest(10, output);
 
-        Thread t1 = new Thread(() ->
-                unsafeStock.unsafeIssue(7, bothReadStock, allowUpdate));
-
-        Thread t2 = new Thread(() ->
-                unsafeStock.unsafeIssue(7, bothReadStock, allowUpdate));
+        Thread t1 = new Thread(() -> unsafeStock.unsafeIssue(7));
+        Thread t2 = new Thread(() -> unsafeStock.unsafeIssue(7));
 
         t1.start();
         t2.start();
 
         try {
-
-            bothReadStock.await();
-            allowUpdate.countDown();
 
             t1.join();
             t2.join();
@@ -1130,19 +1122,17 @@ public class inventoryController {
             Thread.currentThread().interrupt();
         }
 
-        System.out.println("Final unsafe stock: "
-                + unsafeStock.getStock());
+        output.append("Final unsafe stock: ")
+                .append(unsafeStock.getStock())
+                .append("\n\n");
 
 
-        System.out.println("\n========== SAFE TEST ==========");
+        output.append("========== SAFE TEST ==========\n");
 
-        StockTest safeStock = new StockTest(10);
+        StockTest safeStock = new StockTest(10, output);
 
-        Thread t3 = new Thread(() ->
-                safeStock.safeIssue(7));
-
-        Thread t4 = new Thread(() ->
-                safeStock.safeIssue(7));
+        Thread t3 = new Thread(() -> safeStock.safeIssue(7));
+        Thread t4 = new Thread(() -> safeStock.safeIssue(7));
 
         t3.start();
         t4.start();
@@ -1157,10 +1147,22 @@ public class inventoryController {
             Thread.currentThread().interrupt();
         }
 
-        System.out.println("Final safe stock: "
-                + safeStock.getStock());
+        output.append("Final safe stock: ")
+                .append(safeStock.getStock())
+                .append("\n");
 
-        System.out.println("========== TEST COMPLETE ==========");
+        output.append("========== TEST COMPLETE ==========");
+
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+        alert.setTitle("Inventory Concurrency Test");
+        alert.setHeaderText("Unsafe vs Safe Stock Handling");
+        alert.setContentText(output.toString());
+
+        alert.getDialogPane().setPrefWidth(450);
+
+        alert.showAndWait();
     }
 
 
@@ -1171,28 +1173,28 @@ public class inventoryController {
     private static class StockTest {
 
         private int stock;
+        private StringBuffer output;
 
-        StockTest(int stock) {
+        StockTest(int stock, StringBuffer output) {
             this.stock = stock;
+            this.output = output;
         }
 
 
         // Unsafe stock issue
 
-        void unsafeIssue(int amount,
-                         CountDownLatch bothReadStock,
-                         CountDownLatch allowUpdate) {
+        void unsafeIssue(int amount) {
 
             int currentStock = stock;
 
-            System.out.println(Thread.currentThread().getName()
-                    + " read stock: " + currentStock);
-
-            bothReadStock.countDown();
+            output.append(Thread.currentThread().getName())
+                    .append(" read stock: ")
+                    .append(currentStock)
+                    .append("\n");
 
             try {
 
-                allowUpdate.await();
+                Thread.sleep(100);
 
             } catch (InterruptedException e) {
 
@@ -1204,13 +1206,15 @@ public class inventoryController {
 
                 stock = currentStock - amount;
 
-                System.out.println(Thread.currentThread().getName()
-                        + " issued " + amount + " units");
+                output.append(Thread.currentThread().getName())
+                        .append(" issued ")
+                        .append(amount)
+                        .append(" units\n");
 
             } else {
 
-                System.out.println(Thread.currentThread().getName()
-                        + " failed: insufficient stock");
+                output.append(Thread.currentThread().getName())
+                        .append(" failed: insufficient stock\n");
             }
         }
 
@@ -1223,13 +1227,15 @@ public class inventoryController {
 
                 stock = stock - amount;
 
-                System.out.println(Thread.currentThread().getName()
-                        + " issued " + amount + " units");
+                output.append(Thread.currentThread().getName())
+                        .append(" issued ")
+                        .append(amount)
+                        .append(" units\n");
 
             } else {
 
-                System.out.println(Thread.currentThread().getName()
-                        + " failed: insufficient stock");
+                output.append(Thread.currentThread().getName())
+                        .append(" failed: insufficient stock\n");
             }
         }
 
@@ -1238,7 +1244,6 @@ public class inventoryController {
             return stock;
         }
     }
-
     // =====================================================
     //                    INITIALIZE
     // =====================================================
