@@ -199,6 +199,7 @@ public class DashboardController {
     private void refreshKpiMetrics() {
         Pharmacy p = SessionContext.getCurrentPharmacy();
         if (p != null) {
+            pharmacyService.refreshPharmacyMetrics(p);
             metricTotalStock.setText(String.valueOf(p.getTotalInventoryItems()));
             metricNearExpiry.setText(String.valueOf(p.getNearExpiryCount()));
             metricPendingRequests.setText(String.valueOf(p.getActiveListingCount()));
