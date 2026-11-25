@@ -26,7 +26,7 @@ public class ExpiryService {
     private final List<MedicineBatch> dbCache = new CopyOnWriteArrayList<>();
     private final Set<String> notifiedBatchKeys = ConcurrentHashMap.newKeySet();
     private volatile long lastFetchTime = 0;
-    private static final long CACHE_TTL_MS = 10_000; // 10-second smart cache to eliminate redundant remote DB round-trips
+    private static final long CACHE_TTL_MS = 300_000; // 5-minute memory cache for 0ms instant tab switching (refreshed on explicit Refresh)
     private boolean tablesInitialized = false;
 
     public ExpiryService() {
@@ -387,6 +387,69 @@ public class ExpiryService {
         // Sort by days remaining ascending (expired and most urgent first)
         records.sort(Comparator.comparingLong(ExpiryRecord::getDaysRemaining));
         return records;
+    }
+
+    public boolean hasCachedBatches() {
+        return !dbCache.isEmpty();
+    }
+
+    /**
+     * Instantaneous memory-only read without touching network or DB.
+     */
+    public List<ExpiryRecord> getCachedExpiryRecordsOnly(String pharmacyId) {
+        List<MedicineBatch> batches = new ArrayList<>(dbCache);
+        List<ExpiryRecord> records = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (MedicineBatch b : batches) {
+            long days = ChronoUnit.DAYS.between(today, b.getExpiryDate());
+            ExpiryRecord.ExpiryStatus status;
+
+            if (days < 0) {
+                status = ExpiryRecord.ExpiryStatus.EXPIRED;
+            } else if (days <= 15) {
+                status = ExpiryRecord.ExpiryStatus.CRITICAL;
+            } else if (days <= 30) {
+                status = ExpiryRecord.ExpiryStatus.EXPIRING_SOON;
+            } else if (days <= 60) {
+                status = ExpiryRecord.ExpiryStatus.ATTENTION;
+            } else {
+                status = ExpiryRecord.ExpiryStatus.SAFE;
+            }
+
+            records.add(new ExpiryRecord(
+                    "EXP-" + b.getBatchNumber(),
+                    b.getBatchId(),
+                    b.getMedicineName(),
+                    b.getBatchNumber(),
+                    b.getExpiryDate(),
+                    days,
+                    b.getQuantity(),
+                    b.getUnitPrice(),
+                    b.getPharmacyId(),
+                    status
+            ));
+        }
+
+        records.sort(Comparator.comparingLong(ExpiryRecord::getDaysRemaining));
+        return records;
+    }
+
+    public List<ExpiryRecord> filterCachedRecords(String pharmacyId, String query, String statusFilter) {
+        List<ExpiryRecord> all = getCachedExpiryRecordsOnly(pharmacyId);
+        String q = query != null ? query.trim().toLowerCase() : "";
+
+        return all.stream().filter(r -> {
+            boolean matchesQuery = q.isEmpty()
+                    || r.getMedicineName().toLowerCase().contains(q)
+                    || r.getBatchNumber().toLowerCase().contains(q);
+
+            boolean matchesStatus = statusFilter == null
+                    || "ALL".equalsIgnoreCase(statusFilter)
+                    || r.getStatus().name().equalsIgnoreCase(statusFilter);
+
+            return matchesQuery && matchesStatus;
+        }).toList();
     }
 
     public List<ExpiryRecord> filterRecords(String pharmacyId, String query, String statusFilter) {

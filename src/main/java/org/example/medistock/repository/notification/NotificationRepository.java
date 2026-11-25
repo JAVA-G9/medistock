@@ -20,7 +20,7 @@ public class NotificationRepository {
     private final List<Notification> cache = new CopyOnWriteArrayList<>();
     private final Map<String, Notification> cacheMap = new ConcurrentHashMap<>();
     private volatile long lastFetchTime = 0;
-    private static final long CACHE_TTL_MS = 10_000;
+    private static final long CACHE_TTL_MS = 300_000; // 5-minute memory cache for 0ms instant tab switching
     private boolean tablesChecked = false;
 
     public NotificationRepository() {
@@ -98,6 +98,29 @@ public class NotificationRepository {
 
     public List<Notification> findByPharmacyId(String pharmacyId) {
         return findByPharmacyId(pharmacyId, false);
+    }
+
+    /**
+     * Instantaneous memory-only read without touching network or DB.
+     */
+    public List<Notification> getCachedNotifications(String pharmacyId) {
+        List<Notification> list = new ArrayList<>();
+        for (Notification n : cache) {
+            if (n.getPharmacyId().equals(pharmacyId) || "ALL".equalsIgnoreCase(n.getPharmacyId())) {
+                list.add(n);
+            }
+        }
+        return list;
+    }
+
+    public int getCachedUnreadCount(String pharmacyId) {
+        int count = 0;
+        for (Notification n : cache) {
+            if ((n.getPharmacyId().equals(pharmacyId) || "ALL".equalsIgnoreCase(n.getPharmacyId())) && !n.isRead()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public List<Notification> findByPharmacyId(String pharmacyId, boolean forceRefresh) {

@@ -53,26 +53,6 @@
                     <Label fx:id="lblKpiTotal" text="0" styleClass="kpi-value"/>
                     <Label text="Historical audit entries" styleClass="kpi-subtext"/>
                 </VBox>
-
-                <!-- Blue KPI: Queue Buffer Load -->
-                <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card, kpi-blue">
-                    <Label text="EVENT QUEUE LOAD" styleClass="kpi-label"/>
-                    <Label fx:id="lblKpiQueueLoad" text="0 / 50" styleClass="kpi-value"/>
-                    <Label text="Bounded queue buffer state" styleClass="kpi-subtext"/>
-                </VBox>
-            </HBox>
-
-            <!-- Concurrency Consumer Worker Card -->
-            <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="info-card">
-                <VBox spacing="2.0" HBox.hgrow="ALWAYS">
-                    <HBox spacing="8.0" alignment="CENTER_LEFT">
-                        <Label text="⚡ Asynchronous Event Consumer (Producer-Consumer Coordination)" style="-fx-font-weight: bold; -fx-text-fill: #1e3a8a; -fx-font-size: 13px;"/>
-                        <Label fx:id="lblConsumerState" text="State: RUNNABLE" styleClass="badge-active-threads"/>
-                    </HBox>
-                    <Label fx:id="lblConsumerDetails" text="Thread: EventConsumer-Thread | Guarded block wait() on CustomEventQueue | Processed: 0 events" styleClass="text-muted"/>
-                </VBox>
-                <Button text="+ Produce Test Event" onAction="#handleProduceTestEvent" styleClass="btn-action-primary"/>
-                <Button text="🔔 Trigger Expiry Alert" onAction="#handleTriggerTestAlert" styleClass="btn-lab-primary"/>
             </HBox>
 
             <!-- Action Strip / Toolbar -->

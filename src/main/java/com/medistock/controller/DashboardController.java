@@ -28,6 +28,10 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import org.example.medistock.controller.exchange.ExchangeController;
+import org.example.medistock.controller.expiry.ExpiryController;
+import org.example.medistock.controller.notifications.NotificationsController;
+import org.example.medistock.service.expiry.ExpiryService;
+import org.example.medistock.repository.notification.NotificationRepository;
 import java.io.IOException;
 import java.net.URL;
 
@@ -62,6 +66,8 @@ public class DashboardController {
     private Button btnNavRequests;
     @FXML
     private Button btnNavExpiry;
+    @FXML
+    private Button btnNavNotifications;
     @FXML
     private Button btnNavReports;
 
@@ -117,12 +123,28 @@ public class DashboardController {
     private final ThreadManager threadManager = ThreadManager.getInstance();
     private Timeline liveUpdateTimeline;
 
+    // View caching for instant Member 4 navigation
+    private Parent cachedExpiryView;
+    private ExpiryController cachedExpiryController;
+    private Parent cachedNotificationsView;
+    private NotificationsController cachedNotificationsController;
+
     @FXML
     private void initialize() {
         populateUserSession();
         setupPartnerTable();
         setupLiveLogTable();
         refreshKpiMetrics();
+
+        // Asynchronously prewarm caches for Expiry & Notifications so clicks are 0ms instant
+        new Thread(() -> {
+            try {
+                ExpiryService.getInstance().fetchBatchesFromDB("PHARM-001");
+                NotificationRepository.getInstance().findByPharmacyId("PHARM-001");
+            } catch (Exception e) {
+                System.err.println("[DashboardController] Cache prewarm error: " + e.getMessage());
+            }
+        }, "Member4-CachePrewarm").start();
 
         // Ensure default daemon thread is running for background observation
         if (!threadManager.isDaemonExpiryMonitorRunning()) {
@@ -250,12 +272,8 @@ public class DashboardController {
     @FXML
     private void handleNavMarketplace(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXCHANGE_VIEW));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.MARKETPLACE_VIEW));
             Parent view = loader.load();
-            ExchangeController controller = loader.getController();
-            if (controller != null) {
-                controller.selectMarketplaceTab();
-            }
             contentArea.getChildren().clear();
             contentArea.getChildren().add(view);
             highlightActiveNavButton(btnNavMarketplace);
@@ -275,12 +293,8 @@ public class DashboardController {
     @FXML
     private void handleNavRequests(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXCHANGE_VIEW));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.REQUESTS_VIEW));
             Parent view = loader.load();
-            ExchangeController controller = loader.getController();
-            if (controller != null) {
-                controller.selectRequestsTab();
-            }
             contentArea.getChildren().clear();
             contentArea.getChildren().add(view);
             highlightActiveNavButton(btnNavRequests);
@@ -302,11 +316,18 @@ public class DashboardController {
     @FXML
     private void handleNavExpiry(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXPIRY_VIEW));
-            Parent view = loader.load();
+            if (cachedExpiryView == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXPIRY_VIEW));
+                cachedExpiryView = loader.load();
+                cachedExpiryController = loader.getController();
+            }
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
+            contentArea.getChildren().add(cachedExpiryView);
             highlightActiveNavButton(btnNavExpiry);
+            if (cachedExpiryController != null) {
+                cachedExpiryController.loadRecords();
+                cachedExpiryController.loadRecordsAsync();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             showPlaceholder(
@@ -318,14 +339,34 @@ public class DashboardController {
             );
             highlightActiveNavButton(btnNavExpiry);
         }
-        showPlaceholder(
-                "Expiry Monitoring & Notifications",
-                "Member 4 — Expiry, Notifications & Reports",
-                "Real-time monitoring of medicine batches nearing expiry with automatic threshold alerts and notifications.",
-                "Owned Classes: ExpiryController, Notification, AppEvent, ExpiryService, NotificationService, CustomEventQueue, EventConsumer, NotificationWorker",
-                "Multithreading Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
-        );
-        highlightActiveNavButton(btnNavExpiry);
+    }
+
+    @FXML
+    private void handleNavNotifications(ActionEvent event) {
+        try {
+            if (cachedNotificationsView == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.NOTIFICATIONS_VIEW));
+                cachedNotificationsView = loader.load();
+                cachedNotificationsController = loader.getController();
+            }
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(cachedNotificationsView);
+            highlightActiveNavButton(btnNavNotifications);
+            if (cachedNotificationsController != null) {
+                cachedNotificationsController.refreshData();
+                cachedNotificationsController.refreshDataAsync();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showPlaceholder(
+                    "Centralized Notifications Feed",
+                    "Member 4 — Expiry, Notifications & Reports",
+                    "Real-time alerts, system notifications, and asynchronous batch expiry status updates.",
+                    "Owned Classes: NotificationsController, NotificationService, NotificationRepository, NotificationWorker",
+                    "Multithreading Syllabus: Asynchronous background worker threads and thread-safe notification persistence."
+            );
+            highlightActiveNavButton(btnNavNotifications);
+        }
     }
 
     @FXML
@@ -347,14 +388,6 @@ public class DashboardController {
             );
             highlightActiveNavButton(btnNavReports);
         }
-        showPlaceholder(
-                "Reports & Asynchronous Event Queue Monitor",
-                "Member 4 — Expiry, Notifications & Reports",
-                "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
-                "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
-                "Multithreading Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
-        );
-        highlightActiveNavButton(btnNavReports);
     }
 
     @FXML
@@ -417,7 +450,7 @@ public class DashboardController {
         Button[] buttons = {
                 btnNavDashboard, btnNavProfile, btnNavThreadMonitor,
                 btnNavInventory, btnNavMarketplace, btnNavRequests,
-                btnNavExpiry, btnNavReports
+                btnNavExpiry, btnNavNotifications
         };
         for (Button b : buttons) {
             if (b != null) {
