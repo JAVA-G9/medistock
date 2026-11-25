@@ -257,27 +257,32 @@ public class DashboardController {
 
     @FXML
     private void handleNavInventory(ActionEvent event) {
-        showCachedView(AppConfig.INVENTORY_VIEW, btnNavInventory);
+        loadSubView(AppConfig.INVENTORY_VIEW);
+        highlightActiveNavButton(btnNavInventory);
     }
 
     @FXML
     private void handleNavMarketplace(ActionEvent event) {
-        showCachedView(AppConfig.MARKETPLACE_VIEW, btnNavMarketplace);
+        loadSubView(AppConfig.MARKETPLACE_VIEW);
+        highlightActiveNavButton(btnNavMarketplace);
     }
 
     @FXML
     private void handleNavRequests(ActionEvent event) {
-        showCachedView(AppConfig.REQUESTS_VIEW, btnNavRequests);
+        loadSubView(AppConfig.REQUESTS_VIEW);
+        highlightActiveNavButton(btnNavRequests);
     }
 
     @FXML
     private void handleNavExpiry(ActionEvent event) {
-        showCachedView(AppConfig.EXPIRY_VIEW, btnNavExpiry);
+        loadSubView(AppConfig.EXPIRY_VIEW);
+        highlightActiveNavButton(btnNavExpiry);
     }
 
     @FXML
     private void handleNavNotifications(ActionEvent event) {
-        showCachedView(AppConfig.NOTIFICATIONS_VIEW, btnNavNotifications);
+        loadSubView(AppConfig.NOTIFICATIONS_VIEW);
+        highlightActiveNavButton(btnNavNotifications);
     }
 
     @FXML
@@ -286,6 +291,15 @@ public class DashboardController {
     }
 
     private void showCachedView(String fxmlPath, Button navButton) {
+        // Dynamic transactional and alert views must always be freshly loaded to show live data
+        if (AppConfig.MARKETPLACE_VIEW.equals(fxmlPath) || AppConfig.REQUESTS_VIEW.equals(fxmlPath)
+                || AppConfig.INVENTORY_VIEW.equals(fxmlPath) || AppConfig.NOTIFICATIONS_VIEW.equals(fxmlPath)
+                || AppConfig.EXPIRY_VIEW.equals(fxmlPath)) {
+            loadSubView(fxmlPath);
+            highlightActiveNavButton(navButton);
+            return;
+        }
+
         Parent view = viewCache.get(fxmlPath);
         if (view == null) {
             try {
@@ -344,8 +358,7 @@ public class DashboardController {
     private void loadSubView(String fxmlPath) {
         try {
             Parent view = NavigationManager.loadView(fxmlPath);
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
+            contentArea.getChildren().setAll(view);
         } catch (IOException e) {
             e.printStackTrace();
         }

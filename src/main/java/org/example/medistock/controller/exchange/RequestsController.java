@@ -27,8 +27,6 @@ import java.util.ResourceBundle;
  */
 public class RequestsController implements Initializable {
 
-    @FXML private ComboBox<Pharmacy> pharmacyComboBox;
-
     // Header Badges & KPI Stat Labels
     @FXML private Label badgeFacilityReq;
     @FXML private Label kpiIncomingPending;
@@ -73,18 +71,14 @@ public class RequestsController implements Initializable {
     @FXML private Label statusLabel;
 
     private final ExchangeService exchangeService = ExchangeService.getInstance();
-    private final PharmacyService pharmacyService = PharmacyService.getInstance();
 
     private final ObservableList<ExchangeRequest> incomingData = FXCollections.observableArrayList();
     private final ObservableList<ExchangeRequest> outgoingData = FXCollections.observableArrayList();
     private final ObservableList<StockTransfer> transfersData = FXCollections.observableArrayList();
 
-    private Pharmacy activePharmacy;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         exchangeService.ensureWorkerStarted();
-        setupPharmacySelector();
         setupIncomingTable();
         setupOutgoingTable();
         setupTransfersTable();
@@ -93,37 +87,7 @@ public class RequestsController implements Initializable {
         logMessage("Requests & Transfer Controller ready.");
     }
 
-    private void setupPharmacySelector() {
-        List<Pharmacy> pharmacies = pharmacyService.getAllPharmacies();
-        pharmacyComboBox.setItems(FXCollections.observableArrayList(pharmacies));
-
-        Pharmacy sessionPharmacy = SessionContext.getCurrentPharmacy();
-        if (sessionPharmacy != null) {
-            pharmacyComboBox.setValue(sessionPharmacy);
-            this.activePharmacy = sessionPharmacy;
-        } else if (!pharmacies.isEmpty()) {
-            Pharmacy preferred = pharmacies.stream()
-                    .filter(p -> p.getId().equalsIgnoreCase("PHARM-003"))
-                    .findFirst()
-                    .orElse(pharmacies.get(0));
-            pharmacyComboBox.setValue(preferred);
-            this.activePharmacy = preferred;
-        }
-
-        pharmacyComboBox.setOnAction(event -> {
-            Pharmacy selected = pharmacyComboBox.getValue();
-            if (selected != null) {
-                this.activePharmacy = selected;
-                logMessage("Switched active pharmacy to: " + selected.getName());
-                refreshAllData();
-            }
-        });
-    }
-
     private Pharmacy getActivePharmacy() {
-        if (activePharmacy != null) {
-            return activePharmacy;
-        }
         Pharmacy session = SessionContext.getCurrentPharmacy();
         if (session != null) {
             return session;
@@ -179,12 +143,21 @@ public class RequestsController implements Initializable {
         Pharmacy cur = getActivePharmacy();
         List<ExchangeRequest> incoming = exchangeService.getRequestsForSeller(cur.getId());
         incomingData.setAll(incoming);
+        if (incomingTable != null) {
+            incomingTable.refresh();
+        }
 
         List<ExchangeRequest> outgoing = exchangeService.getRequestsByRequester(cur.getId());
         outgoingData.setAll(outgoing);
+        if (outgoingTable != null) {
+            outgoingTable.refresh();
+        }
 
         List<StockTransfer> transfers = exchangeService.getTransfersForPharmacy(cur.getId());
         transfersData.setAll(transfers);
+        if (transfersTable != null) {
+            transfersTable.refresh();
+        }
 
         long pendingIncoming = incoming.stream().filter(r -> r.getStatus() == ExchangeRequest.RequestStatus.PENDING).count();
 
@@ -204,12 +177,6 @@ public class RequestsController implements Initializable {
             statusLabel.setText(String.format("Incoming: %d | Outgoing: %d | Transfers: %d",
                     incoming.size(), outgoing.size(), transfers.size()));
         }
-    }
-
-    @FXML
-    public void handleRefresh() {
-        refreshAllData();
-        logMessage("Data refreshed.");
     }
 
     @FXML

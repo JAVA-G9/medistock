@@ -31,7 +31,6 @@ import java.util.ResourceBundle;
  */
 public class MarketplaceController implements Initializable {
 
-    @FXML private ComboBox<Pharmacy> pharmacyComboBox;
     @FXML private TextField searchField;
     @FXML private TableView<ExchangeListing> listingsTable;
     @FXML private TableColumn<ExchangeListing, String> colListingId;
@@ -54,15 +53,11 @@ public class MarketplaceController implements Initializable {
     @FXML private Label statusLabel;
 
     private final ExchangeService exchangeService = ExchangeService.getInstance();
-    private final PharmacyService pharmacyService = PharmacyService.getInstance();
     private final ObservableList<ExchangeListing> listingsData = FXCollections.observableArrayList();
-
-    private Pharmacy activePharmacy;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         exchangeService.ensureWorkerStarted();
-        setupPharmacySelector();
         setupTableColumns();
         loadListings();
 
@@ -70,37 +65,7 @@ public class MarketplaceController implements Initializable {
         logMessage("Marketplace initialized. Active Pharmacy: " + getActivePharmacy().getName());
     }
 
-    private void setupPharmacySelector() {
-        List<Pharmacy> pharmacies = pharmacyService.getAllPharmacies();
-        pharmacyComboBox.setItems(FXCollections.observableArrayList(pharmacies));
-
-        Pharmacy sessionPharmacy = SessionContext.getCurrentPharmacy();
-        if (sessionPharmacy != null) {
-            pharmacyComboBox.setValue(sessionPharmacy);
-            this.activePharmacy = sessionPharmacy;
-        } else if (!pharmacies.isEmpty()) {
-            Pharmacy preferred = pharmacies.stream()
-                    .filter(p -> p.getId().equalsIgnoreCase("PHARM-003"))
-                    .findFirst()
-                    .orElse(pharmacies.get(0));
-            pharmacyComboBox.setValue(preferred);
-            this.activePharmacy = preferred;
-        }
-
-        pharmacyComboBox.setOnAction(event -> {
-            Pharmacy selected = pharmacyComboBox.getValue();
-            if (selected != null) {
-                this.activePharmacy = selected;
-                logMessage("Switched active pharmacy to: " + selected.getName());
-                loadListings();
-            }
-        });
-    }
-
     private Pharmacy getActivePharmacy() {
-        if (activePharmacy != null) {
-            return activePharmacy;
-        }
         Pharmacy session = SessionContext.getCurrentPharmacy();
         if (session != null) {
             return session;
@@ -127,6 +92,9 @@ public class MarketplaceController implements Initializable {
     public void loadListings() {
         List<ExchangeListing> listings = exchangeService.getAllListings();
         listingsData.setAll(listings);
+        if (listingsTable != null) {
+            listingsTable.refresh();
+        }
 
         Pharmacy cur = getActivePharmacy();
         long activeCount = listings.stream().filter(l -> l.getStatus() == ExchangeListing.ListingStatus.AVAILABLE).count();
@@ -156,16 +124,13 @@ public class MarketplaceController implements Initializable {
         } else {
             List<ExchangeListing> filtered = exchangeService.searchListings(query);
             listingsData.setAll(filtered);
+            if (listingsTable != null) {
+                listingsTable.refresh();
+            }
             if (statusLabel != null) {
                 statusLabel.setText("Found " + filtered.size() + " matching listings.");
             }
         }
-    }
-
-    @FXML
-    public void handleRefresh() {
-        loadListings();
-        logMessage("Marketplace listings refreshed.");
     }
 
     @FXML
@@ -329,35 +294,6 @@ public class MarketplaceController implements Initializable {
             showError("Cancellation Denied", e.getMessage());
             logMessage("CANCEL ERROR: " + e.getMessage());
         }
-    }
-
-    @FXML
-    public void handleRunConcurrencyTest() {
-        ExchangeListing selected = listingsTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showError("Select Listing", "Please select a listing to run the concurrent reservation test on.");
-            return;
-        }
-
-        logMessage(String.format("Launching Concurrency Stress Test on %s (%d units available)...",
-                selected.getMedicineName(), selected.getAvailableQuantity()));
-
-        new Thread(() -> {
-            try {
-                // 6 concurrent threads requesting 20 units each
-                String report = exchangeService.runConcurrentReservationTest(selected.getListingId(), 6, 20);
-                Platform.runLater(() -> {
-                    logMessage(report);
-                    loadListings();
-                    showInfo("Concurrency Test Completed", report);
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    showError("Concurrency Test Error", e.getMessage());
-                    logMessage("CONCURRENCY ERROR: " + e.getMessage());
-                });
-            }
-        }, "ConcurrencyTest-Runner").start();
     }
 
     private void logMessage(String msg) {
