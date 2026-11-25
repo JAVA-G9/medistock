@@ -104,6 +104,27 @@
 
                   </TableView>
 
+                  <!-- CONCURRENCY TEST -->
+                  <VBox spacing="12.0"
+                        styleClass="form-card">
+
+                     <children>
+
+                        <Label styleClass="section-header"
+                               text="Stock Concurrency Test"/>
+
+                        <Label styleClass="view-subtitle"
+                               text="Test concurrent stock requests and synchronized access."/>
+
+                        <Button fx:id="concurrencyTestBtn"
+                                onAction="#runInventoryConcurrencyTest"
+                                styleClass="btn-primary"
+                                prefWidth="220.0"
+                                text="Run Concurrency Test"/>
+
+                     </children>
+                  </VBox>
+
                </children>
             </VBox>
 

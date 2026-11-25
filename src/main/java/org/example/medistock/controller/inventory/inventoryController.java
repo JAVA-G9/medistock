@@ -2,6 +2,7 @@
 package org.example.medistock.controller.inventory;
 
 import org.example.medistock.util.DBConnection;
+import java.util.concurrent.CountDownLatch;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -1092,6 +1093,151 @@ public class inventoryController {
         System.out.println("Batch form cleared");
     }
 
+
+    // =====================================================
+//          INVENTORY CONCURRENCY TEST
+// =====================================================
+
+    @FXML
+    void runInventoryConcurrencyTest(ActionEvent event) {
+
+        System.out.println("\n========== UNSAFE TEST ==========");
+
+        StockTest unsafeStock = new StockTest(10);
+
+        CountDownLatch bothReadStock = new CountDownLatch(2);
+        CountDownLatch allowUpdate = new CountDownLatch(1);
+
+        Thread t1 = new Thread(() ->
+                unsafeStock.unsafeIssue(7, bothReadStock, allowUpdate));
+
+        Thread t2 = new Thread(() ->
+                unsafeStock.unsafeIssue(7, bothReadStock, allowUpdate));
+
+        t1.start();
+        t2.start();
+
+        try {
+
+            bothReadStock.await();
+            allowUpdate.countDown();
+
+            t1.join();
+            t2.join();
+
+        } catch (InterruptedException e) {
+
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Final unsafe stock: "
+                + unsafeStock.getStock());
+
+
+        System.out.println("\n========== SAFE TEST ==========");
+
+        StockTest safeStock = new StockTest(10);
+
+        Thread t3 = new Thread(() ->
+                safeStock.safeIssue(7));
+
+        Thread t4 = new Thread(() ->
+                safeStock.safeIssue(7));
+
+        t3.start();
+        t4.start();
+
+        try {
+
+            t3.join();
+            t4.join();
+
+        } catch (InterruptedException e) {
+
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Final safe stock: "
+                + safeStock.getStock());
+
+        System.out.println("========== TEST COMPLETE ==========");
+    }
+
+
+// =====================================================
+//              SHARED STOCK TEST CLASS
+// =====================================================
+
+    private static class StockTest {
+
+        private int stock;
+
+        StockTest(int stock) {
+            this.stock = stock;
+        }
+
+
+        // Unsafe stock issue
+
+        void unsafeIssue(int amount,
+                         CountDownLatch bothReadStock,
+                         CountDownLatch allowUpdate) {
+
+            int currentStock = stock;
+
+            System.out.println(Thread.currentThread().getName()
+                    + " read stock: " + currentStock);
+
+            bothReadStock.countDown();
+
+            try {
+
+                allowUpdate.await();
+
+            } catch (InterruptedException e) {
+
+                Thread.currentThread().interrupt();
+                return;
+            }
+
+            if (currentStock >= amount) {
+
+                stock = currentStock - amount;
+
+                System.out.println(Thread.currentThread().getName()
+                        + " issued " + amount + " units");
+
+            } else {
+
+                System.out.println(Thread.currentThread().getName()
+                        + " failed: insufficient stock");
+            }
+        }
+
+
+        // Safe stock issue
+
+        synchronized void safeIssue(int amount) {
+
+            if (stock >= amount) {
+
+                stock = stock - amount;
+
+                System.out.println(Thread.currentThread().getName()
+                        + " issued " + amount + " units");
+
+            } else {
+
+                System.out.println(Thread.currentThread().getName()
+                        + " failed: insufficient stock");
+            }
+        }
+
+
+        int getStock() {
+            return stock;
+        }
+    }
 
     // =====================================================
     //                    INITIALIZE
