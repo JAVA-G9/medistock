@@ -1,378 +1,576 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
 <ScrollPane fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
-            style="-fx-background: #f1f5f9; -fx-background-color: #f1f5f9;"
+            styleClass="dashboard-root"
             stylesheets="@../../css/main.css"
-            xmlns="http://javafx.com/javafx/21"
+            xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.medistock.controller.inventory.inventoryController">
 
    <content>
-      <VBox spacing="22"
+      <VBox spacing="18.0"
             fillWidth="true"
-            style="-fx-background-color: #f1f5f9; -fx-padding: 25;">
+            styleClass="dashboard-root">
 
          <children>
 
-            <!-- HEADER -->
-            <HBox alignment="CENTER_LEFT"
-                  style="-fx-background-color: #0f766e; -fx-background-radius: 14; -fx-padding: 25; -fx-font-family: 'Segoe UI';">
-
+            <!-- PAGE HEADING -->
+            <VBox spacing="5.0" styleClass="view-content-root">
                <children>
-                  <VBox spacing="7" HBox.hgrow="ALWAYS">
-                     <children>
-                        <Label text="Inventory Workspace"
-                               style="-fx-font-family: 'Segoe UI'; -fx-font-size: 25px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                  <Label styleClass="view-title"
+                         text="My Inventory &amp; Batch Management"/>
 
-                        <Label text="Manage medicines, monitor stock and maintain batch records."
-                               style="-fx-font-family: 'Segoe UI'; -fx-font-size: 13px; -fx-text-fill: #ccfbf1;"/>
-                     </children>
-                  </VBox>
-
-                  <Label text="MEDISTOCK"
-                         style="-fx-font-family: 'Segoe UI'; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #ccfbf1;"/>
-               </children>
-            </HBox>
-
-
-            <!-- STOCK TABLE -->
-            <VBox spacing="14"
-                  style="-fx-background-color: white; -fx-background-radius: 13; -fx-padding: 20; -fx-border-color: #e2e8f0; -fx-border-radius: 13;">
-
-               <children>
-                  <HBox alignment="CENTER_LEFT">
-                     <children>
-                        <VBox spacing="4" HBox.hgrow="ALWAYS">
-                           <children>
-                              <Label text="Stock Overview"
-                                     style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #172b4d;"/>
-
-                              <Label text="All medicine batches and their current availability"
-                                     style="-fx-font-size: 12px; -fx-text-fill: #8492a6;"/>
-                           </children>
-                        </VBox>
-
-                        <Label text="INVENTORY RECORDS"
-                               style="-fx-background-color: #e6f7f4; -fx-background-radius: 20; -fx-padding: 7 12; -fx-text-fill: #087f70; -fx-font-size: 10px; -fx-font-weight: bold;"/>
-                     </children>
-                  </HBox>
-
-                  <TableView fx:id="inventoryTable"
-                             prefHeight="280"
-                             minHeight="240"
-                             styleClass="inventory-table">
-
-                     <columns>
-                        <TableColumn fx:id="medicineNameCol" text="Medicine" minWidth="130" prefWidth="180"/>
-                        <TableColumn fx:id="batchNumberCol" text="Batch Number" minWidth="110" prefWidth="130"/>
-                        <TableColumn fx:id="quantityReceivedCol" text="Received" minWidth="75" prefWidth="90"/>
-                        <TableColumn fx:id="quantityAvailableCol" text="Available" minWidth="75" prefWidth="95"/>
-                        <TableColumn fx:id="purchasePriceCol" text="Purchase Price" minWidth="100" prefWidth="115"/>
-                        <TableColumn fx:id="sellingPriceCol" text="Selling Price" minWidth="100" prefWidth="110"/>
-                        <TableColumn fx:id="expiryDateCol" text="Expiry Date" minWidth="100" prefWidth="115"/>
-                     </columns>
-
-                     <placeholder>
-                        <Label text="No inventory records found."
-                               style="-fx-text-fill: #94a3b8; -fx-font-size: 13px;"/>
-                     </placeholder>
-                  </TableView>
+                  <Label styleClass="view-subtitle"
+                         text="Manage your medicine catalog and stock batches."/>
                </children>
             </VBox>
 
-            <!-- TWO SIDE-BY-SIDE FORMS -->
-            <HBox spacing="18" alignment="TOP_CENTER">
+            <!-- INVENTORY STOCK TABLE -->
+            <VBox spacing="16.0"
+                  styleClass="form-card inventory-table-card">
 
-               <!-- MEDICINE FORM -->
-               <VBox spacing="17"
-                     minWidth="0"
-                     HBox.hgrow="ALWAYS"
-                     style="-fx-background-color: white; -fx-background-radius: 13; -fx-padding: 20; -fx-border-color: #e2e8f0; -fx-border-radius: 13;">
+               <children>
 
-                  <children>
-                     <VBox spacing="5">
-                        <children>
-                           <Label text="Medicine Details"
-                                  style="-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #172b4d;"/>
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label styleClass="section-header"
+                               text="Inventory Stock"/>
 
-                           <Label text="Add or modify medicine information."
-                                  style="-fx-font-size: 12px; -fx-text-fill: #8492a6;"/>
-                        </children>
-                     </VBox>
+                        <Label styleClass="view-subtitle"
+                               text="View medicine batches, available quantities, prices and expiry dates."/>
+                     </children>
+                  </VBox>
 
-                     <GridPane hgap="13" vgap="13">
-                        <columnConstraints>
-                           <ColumnConstraints percentWidth="50"/>
-                           <ColumnConstraints percentWidth="50"/>
-                        </columnConstraints>
+                  <TableView fx:id="inventoryTable"
+                             minHeight="280.0"
+                             prefHeight="340.0"
+                             styleClass="inventory-table">
 
-                        <children>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                     </columnResizePolicy>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                              <children>
-                                 <Label text="Medicine Name" styleClass="field-label"/>
-                                 <TextField fx:id="getMedName" promptText="Medicine name" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                     <columns>
+                        <TableColumn fx:id="medicineNameCol"
+                                     minWidth="140.0"
+                                     text="Medicine"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                              <children>
-                                 <Label text="Generic Name" styleClass="field-label"/>
-                                 <TextField fx:id="getGenName" promptText="Generic name" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                        <TableColumn fx:id="batchNumberCol"
+                                     minWidth="115.0"
+                                     text="Batch Number"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                              <children>
-                                 <Label text="Manufacturer" styleClass="field-label"/>
-                                 <TextField fx:id="getManName" promptText="Manufacturer" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                        <TableColumn fx:id="quantityReceivedCol"
+                                     minWidth="85.0"
+                                     text="Received"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                              <children>
-                                 <Label text="Category" styleClass="field-label"/>
-                                 <ComboBox fx:id="getCategory" editable="true" promptText="Select category" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                        <TableColumn fx:id="quantityAvailableCol"
+                                     minWidth="85.0"
+                                     text="Available"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                              <children>
-                                 <Label text="Strength" styleClass="field-label"/>
-                                 <TextField fx:id="getStrength" promptText="e.g. 500 mg" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                        <TableColumn fx:id="purchasePriceCol"
+                                     minWidth="105.0"
+                                     text="Purchase Price"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                              <children>
-                                 <Label text="Dosage Form" styleClass="field-label"/>
-                                 <ComboBox fx:id="getDosage" editable="true" promptText="Select form" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                        <TableColumn fx:id="sellingPriceCol"
+                                     minWidth="100.0"
+                                     text="Selling Price"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2">
-                              <children>
-                                 <Label text="Description" styleClass="field-label"/>
-                                 <TextArea fx:id="getDescription"
-                                           promptText="Enter medicine description..."
-                                           wrapText="true"
-                                           prefHeight="75"
-                                           maxWidth="Infinity"
-                                           styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                        <TableColumn fx:id="expiryDateCol"
+                                     minWidth="105.0"
+                                     text="Expiry Date"/>
+                     </columns>
 
-                        </children>
-                     </GridPane>
+                     <placeholder>
+                        <Label styleClass="table-empty-message"
+                               text="No inventory records found."/>
+                     </placeholder>
 
-                     <VBox spacing="9">
-                        <children>
-                           <HBox spacing="9">
-                              <children>
-                                 <Button fx:id="saveBtn"
-                                         text="Save Medicine"
-                                         onAction="#doSave"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #0d9488; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
+                  </TableView>
 
-                                 <Button fx:id="updateBtn"
-                                         text="Update"
-                                         onAction="#doUpdate"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
-                              </children>
-                           </HBox>
+               </children>
+            </VBox>
 
-                           <HBox spacing="9">
-                              <children>
-                                 <Button fx:id="fetchBtn"
-                                         text="Fetch Medicine"
-                                         onAction="#doFetch"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #e8eef6; -fx-text-fill: #263d59; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
+            <!-- FORM CARDS -->
+            <HBox spacing="18.0" alignment="TOP_LEFT">
 
-                                 <Button fx:id="delBtn"
-                                         text="Delete"
-                                         onAction="#doDelete"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
+               <children>
 
-                                 <Button fx:id="clearBtn"
-                                         text="Clear"
-                                         onAction="#doClear"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
-                              </children>
-                           </HBox>
-                        </children>
-                     </VBox>
-                  </children>
-               </VBox>
+                  <!-- MEDICINE INFORMATION -->
+                  <VBox spacing="18.0"
+                        prefWidth="0.0"
+                        maxWidth="Infinity"
+                        HBox.hgrow="ALWAYS"
+                        styleClass="form-card">
 
-               <!-- BATCH FORM -->
-               <VBox spacing="17"
-                     minWidth="0"
-                     HBox.hgrow="ALWAYS"
-                     style="-fx-background-color: white; -fx-background-radius: 13; -fx-padding: 20; -fx-border-color: #e2e8f0; -fx-border-radius: 13;">
+                     <children>
 
-                  <children>
-                     <VBox spacing="5">
-                        <children>
-                           <Label text="Batch Management"
-                                  style="-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #172b4d;"/>
+                        <Label styleClass="section-header"
+                               text="Medicine Information"/>
 
-                           <Label text="Maintain batch quantities, pricing and expiry."
-                                  style="-fx-font-size: 12px; -fx-text-fill: #8492a6;"/>
-                        </children>
-                     </VBox>
+                        <GridPane hgap="14.0" vgap="16.0">
 
-                     <GridPane hgap="13" vgap="12">
-                        <columnConstraints>
-                           <ColumnConstraints percentWidth="50"/>
-                           <ColumnConstraints percentWidth="50"/>
-                        </columnConstraints>
+                           <columnConstraints>
+                              <ColumnConstraints percentWidth="50.0"/>
+                              <ColumnConstraints percentWidth="50.0"/>
+                           </columnConstraints>
 
-                        <children>
+                           <children>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                              <children>
-                                 <Label text="Select Medicine" styleClass="field-label"/>
-                                 <ComboBox fx:id="batchMedicine" promptText="Select medicine" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                              <!-- MEDICINE NAME -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="0">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Medicine Name"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                              <children>
-                                 <Label text="Batch Number" styleClass="field-label"/>
-                                 <TextField fx:id="batchNumber" promptText="Batch number" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                                    <TextField fx:id="getMedName"
+                                               maxWidth="Infinity"
+                                               promptText="Enter medicine name"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                              <children>
-                                 <Label text="Manufacturing Date" styleClass="field-label"/>
-                                 <DatePicker fx:id="manufacturingDate" promptText="Manufacturing date" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                              <!-- GENERIC NAME -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="0">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Generic Name"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                              <children>
-                                 <Label text="Expiry Date" styleClass="field-label"/>
-                                 <DatePicker fx:id="expiryDate" promptText="Expiry date" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                                    <TextField fx:id="getGenName"
+                                               maxWidth="Infinity"
+                                               promptText="Enter generic name"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                              <children>
-                                 <Label text="Quantity Received" styleClass="field-label"/>
-                                 <TextField fx:id="quantityReceived" promptText="Received quantity" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                              <!-- MANUFACTURER -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="1">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Manufacturer"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                              <children>
-                                 <Label text="Quantity Available" styleClass="field-label"/>
-                                 <TextField fx:id="quantityAvailable" promptText="Available quantity" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                                    <TextField fx:id="getManName"
+                                               maxWidth="Infinity"
+                                               promptText="Enter manufacturer"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                              <children>
-                                 <Label text="Purchase Price" styleClass="field-label"/>
-                                 <TextField fx:id="purchasePrice" promptText="Purchase price" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                              <!-- CATEGORY -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="1">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Category"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                              <children>
-                                 <Label text="Selling Price" styleClass="field-label"/>
-                                 <TextField fx:id="sellingPrice" promptText="Selling price" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                                    <ComboBox fx:id="getCategory"
+                                              editable="true"
+                                              maxWidth="Infinity"
+                                              promptText="Select category"
+                                              styleClass="input-field"/>
+                                 </children>
+                              </VBox>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="4">
-                              <children>
-                                 <Label text="Pharmacy ID" styleClass="field-label"/>
-                                 <TextField fx:id="pharmacyId" text="PHARM-001" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                              <!-- STRENGTH -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="2">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Strength"/>
 
-                           <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                              <children>
-                                 <Label text="Batch Status" styleClass="field-label"/>
-                                 <ComboBox fx:id="batchStatus" promptText="Select status" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                                    <TextField fx:id="getStrength"
+                                               maxWidth="Infinity"
+                                               promptText="e.g. 500 mg"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
 
-                           <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="5">
-                              <children>
-                                 <Label text="Received Date" styleClass="field-label"/>
-                                 <DatePicker fx:id="receivedDate" promptText="Received date" maxWidth="Infinity" styleClass="input-field"/>
-                              </children>
-                           </VBox>
+                              <!-- DOSAGE FORM -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="2">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Dosage Form"/>
 
-                        </children>
-                     </GridPane>
+                                    <ComboBox fx:id="getDosage"
+                                              editable="true"
+                                              maxWidth="Infinity"
+                                              promptText="Select dosage form"
+                                              styleClass="input-field"/>
+                                 </children>
+                              </VBox>
 
-                     <VBox spacing="9">
-                        <children>
-                           <HBox spacing="9">
-                              <children>
-                                 <Button fx:id="saveBatchBtn"
-                                         text="Save Batch"
-                                         onAction="#doSaveBatch"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #0d9488; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
+                              <!-- DESCRIPTION -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.columnSpan="2"
+                                    GridPane.rowIndex="3">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Description"/>
 
-                                 <Button fx:id="updateBatchBtn"
-                                         text="Update Batch"
-                                         onAction="#doUpdateBatch"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
-                              </children>
-                           </HBox>
+                                    <TextArea fx:id="getDescription"
+                                              maxWidth="Infinity"
+                                              prefHeight="90.0"
+                                              promptText="Enter medicine description..."
+                                              styleClass="input-field"
+                                              wrapText="true"/>
+                                 </children>
+                              </VBox>
 
-                           <HBox spacing="9">
-                              <children>
-                                 <Button fx:id="fetchBatchBtn"
-                                         text="Fetch Batch"
-                                         onAction="#doFetchBatch"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #e8eef6; -fx-text-fill: #263d59; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
+                           </children>
 
-                                 <Button fx:id="deleteBatchBtn"
-                                         text="Delete Batch"
-                                         onAction="#doDeleteBatch"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
+                           <rowConstraints>
+                              <RowConstraints/>
+                              <RowConstraints/>
+                              <RowConstraints/>
+                              <RowConstraints/>
+                           </rowConstraints>
 
-                                 <Button fx:id="clearBatchBtn"
-                                         text="Clear"
-                                         onAction="#doClearBatch"
-                                         maxWidth="Infinity"
-                                         HBox.hgrow="ALWAYS"
-                                         style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 10 12; -fx-cursor: hand;"/>
-                              </children>
-                           </HBox>
-                        </children>
-                     </VBox>
-                  </children>
-               </VBox>
+                        </GridPane>
 
+                        <!-- MEDICINE ACTIONS -->
+                        <GridPane hgap="10.0" vgap="10.0">
+
+                           <columnConstraints>
+                              <ColumnConstraints percentWidth="50.0"/>
+                              <ColumnConstraints percentWidth="50.0"/>
+                           </columnConstraints>
+
+                           <children>
+
+                              <Button fx:id="saveBtn"
+                                      onAction="#doSave"
+                                      styleClass="btn-primary"
+                                      maxWidth="Infinity"
+                                      text="Save Medicine"
+                                      GridPane.columnIndex="0"
+                                      GridPane.rowIndex="0"/>
+
+                              <Button fx:id="fetchBtn"
+                                      onAction="#doFetch"
+                                      styleClass="btn-secondary"
+                                      maxWidth="Infinity"
+                                      text="Fetch Medicine"
+                                      GridPane.columnIndex="1"
+                                      GridPane.rowIndex="0"/>
+
+                              <Button fx:id="delBtn"
+                                      onAction="#doDelete"
+                                      styleClass="btn-danger"
+                                      maxWidth="Infinity"
+                                      text="Delete Medicine"
+                                      GridPane.columnIndex="0"
+                                      GridPane.rowIndex="1"/>
+
+                              <Button fx:id="updateBtn"
+                                      onAction="#doUpdate"
+                                      styleClass="btn-secondary"
+                                      maxWidth="Infinity"
+                                      text="Update Medicine"
+                                      GridPane.columnIndex="1"
+                                      GridPane.rowIndex="1"/>
+
+                              <Button fx:id="clearBtn"
+                                      onAction="#doClear"
+                                      styleClass="btn-secondary"
+                                      maxWidth="Infinity"
+                                      text="Clear All"
+                                      GridPane.columnIndex="0"
+                                      GridPane.rowIndex="2"/>
+
+                           </children>
+
+                        </GridPane>
+
+                     </children>
+                  </VBox>
+
+                  <!-- BATCH MANAGEMENT -->
+                  <VBox spacing="18.0"
+                        prefWidth="0.0"
+                        maxWidth="Infinity"
+                        HBox.hgrow="ALWAYS"
+                        styleClass="form-card">
+
+                     <children>
+
+                        <Label styleClass="section-header"
+                               text="Medicine Batch Management"/>
+
+                        <Label styleClass="view-subtitle"
+                               text="Manage batch details and stock."/>
+
+                        <GridPane hgap="14.0" vgap="16.0">
+
+                           <columnConstraints>
+                              <ColumnConstraints percentWidth="50.0"/>
+                              <ColumnConstraints percentWidth="50.0"/>
+                           </columnConstraints>
+
+                           <children>
+
+                              <!-- SELECT MEDICINE -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="0">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Select Medicine"/>
+
+                                    <ComboBox fx:id="batchMedicine"
+                                              maxWidth="Infinity"
+                                              promptText="Select medicine"
+                                              styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- BATCH NUMBER -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="0">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Batch Number"/>
+
+                                    <TextField fx:id="batchNumber"
+                                               maxWidth="Infinity"
+                                               promptText="Enter batch number"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- MANUFACTURING DATE -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="1">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Manufacturing Date"/>
+
+                                    <DatePicker fx:id="manufacturingDate"
+                                                maxWidth="Infinity"
+                                                promptText="Manufacturing date"
+                                                styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- EXPIRY DATE -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="1">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Expiry Date"/>
+
+                                    <DatePicker fx:id="expiryDate"
+                                                maxWidth="Infinity"
+                                                promptText="Expiry date"
+                                                styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- QUANTITY RECEIVED -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="2">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Quantity Received"/>
+
+                                    <TextField fx:id="quantityReceived"
+                                               maxWidth="Infinity"
+                                               promptText="Received quantity"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- QUANTITY AVAILABLE -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="2">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Quantity Available"/>
+
+                                    <TextField fx:id="quantityAvailable"
+                                               maxWidth="Infinity"
+                                               promptText="Available quantity"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- PURCHASE PRICE -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="3">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Purchase Price"/>
+
+                                    <TextField fx:id="purchasePrice"
+                                               maxWidth="Infinity"
+                                               promptText="Purchase price"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- SELLING PRICE -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="3">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Selling Price"/>
+
+                                    <TextField fx:id="sellingPrice"
+                                               maxWidth="Infinity"
+                                               promptText="Selling price"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- PHARMACY ID -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="4">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Pharmacy ID"/>
+
+                                    <TextField fx:id="pharmacyId"
+                                               maxWidth="Infinity"
+                                               text="PHARM-001"
+                                               styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- BATCH STATUS -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="4">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Batch Status"/>
+
+                                    <ComboBox fx:id="batchStatus"
+                                              maxWidth="Infinity"
+                                              promptText="Select status"
+                                              styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                              <!-- RECEIVED DATE -->
+                              <VBox spacing="7.0"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="5">
+                                 <children>
+                                    <Label styleClass="field-label"
+                                           text="Received Date"/>
+
+                                    <DatePicker fx:id="receivedDate"
+                                                maxWidth="Infinity"
+                                                promptText="Received date"
+                                                styleClass="input-field"/>
+                                 </children>
+                              </VBox>
+
+                           </children>
+
+                           <rowConstraints>
+                              <RowConstraints/>
+                              <RowConstraints/>
+                              <RowConstraints/>
+                              <RowConstraints/>
+                              <RowConstraints/>
+                              <RowConstraints/>
+                           </rowConstraints>
+
+                        </GridPane>
+
+                        <!-- BATCH ACTIONS -->
+                        <GridPane hgap="10.0" vgap="10.0">
+
+                           <columnConstraints>
+                              <ColumnConstraints percentWidth="50.0"/>
+                              <ColumnConstraints percentWidth="50.0"/>
+                           </columnConstraints>
+
+                           <children>
+
+                              <Button fx:id="saveBatchBtn"
+                                      onAction="#doSaveBatch"
+                                      styleClass="btn-primary"
+                                      maxWidth="Infinity"
+                                      text="Save Batch"
+                                      GridPane.columnIndex="0"
+                                      GridPane.rowIndex="0"/>
+
+                              <Button fx:id="fetchBatchBtn"
+                                      onAction="#doFetchBatch"
+                                      styleClass="btn-secondary"
+                                      maxWidth="Infinity"
+                                      text="Fetch Batch"
+                                      GridPane.columnIndex="1"
+                                      GridPane.rowIndex="0"/>
+
+                              <Button fx:id="updateBatchBtn"
+                                      onAction="#doUpdateBatch"
+                                      styleClass="btn-secondary"
+                                      maxWidth="Infinity"
+                                      text="Update Batch"
+                                      GridPane.columnIndex="0"
+                                      GridPane.rowIndex="1"/>
+
+                              <Button fx:id="deleteBatchBtn"
+                                      onAction="#doDeleteBatch"
+                                      styleClass="btn-danger"
+                                      maxWidth="Infinity"
+                                      text="Delete Batch"
+                                      GridPane.columnIndex="1"
+                                      GridPane.rowIndex="1"/>
+
+                              <Button fx:id="clearBatchBtn"
+                                      onAction="#doClearBatch"
+                                      styleClass="btn-secondary"
+                                      maxWidth="Infinity"
+                                      text="Clear"
+                                      GridPane.columnIndex="0"
+                                      GridPane.rowIndex="2"/>
+
+                           </children>
+
+                        </GridPane>
+
+                     </children>
+                  </VBox>
+
+               </children>
             </HBox>
 
          </children>
