@@ -92,6 +92,9 @@ public class MarketplaceController implements Initializable {
     public void loadListings() {
         List<ExchangeListing> listings = exchangeService.getAllListings();
         listingsData.setAll(listings);
+        if (listingsTable != null) {
+            listingsTable.refresh();
+        }
 
         Pharmacy cur = getActivePharmacy();
         long activeCount = listings.stream().filter(l -> l.getStatus() == ExchangeListing.ListingStatus.AVAILABLE).count();
@@ -121,6 +124,9 @@ public class MarketplaceController implements Initializable {
         } else {
             List<ExchangeListing> filtered = exchangeService.searchListings(query);
             listingsData.setAll(filtered);
+            if (listingsTable != null) {
+                listingsTable.refresh();
+            }
             if (statusLabel != null) {
                 statusLabel.setText("Found " + filtered.size() + " matching listings.");
             }

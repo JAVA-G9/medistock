@@ -143,12 +143,21 @@ public class RequestsController implements Initializable {
         Pharmacy cur = getActivePharmacy();
         List<ExchangeRequest> incoming = exchangeService.getRequestsForSeller(cur.getId());
         incomingData.setAll(incoming);
+        if (incomingTable != null) {
+            incomingTable.refresh();
+        }
 
         List<ExchangeRequest> outgoing = exchangeService.getRequestsByRequester(cur.getId());
         outgoingData.setAll(outgoing);
+        if (outgoingTable != null) {
+            outgoingTable.refresh();
+        }
 
         List<StockTransfer> transfers = exchangeService.getTransfersForPharmacy(cur.getId());
         transfersData.setAll(transfers);
+        if (transfersTable != null) {
+            transfersTable.refresh();
+        }
 
         long pendingIncoming = incoming.stream().filter(r -> r.getStatus() == ExchangeRequest.RequestStatus.PENDING).count();
 
