@@ -117,6 +117,53 @@ public class ReportsService {
         return r;
     }
 
+    /**
+     * Non-blocking cached calculation for 0ms UI rendering.
+     */
+    public InventoryHealthReport generateCachedReport(String pharmacyId) {
+        InventoryHealthReport r = new InventoryHealthReport();
+        List<ExpiryRecord> records = expiryService.getCachedExpiryRecordsOnly(pharmacyId);
+
+        r.totalBatches = records.size();
+        for (ExpiryRecord rec : records) {
+            r.totalUnits += rec.getQuantity();
+            r.totalInventoryValue += rec.getTotalValue();
+
+            switch (rec.getStatus()) {
+                case EXPIRED -> {
+                    r.expiredCount++;
+                    r.atRiskValue += rec.getTotalValue();
+                }
+                case CRITICAL -> {
+                    r.criticalCount++;
+                    r.atRiskValue += rec.getTotalValue();
+                }
+                case EXPIRING_SOON -> {
+                    r.nearExpiryCount++;
+                    r.atRiskValue += rec.getTotalValue() * 0.75;
+                }
+                case ATTENTION -> r.atRiskValue += rec.getTotalValue() * 0.25;
+                case SAFE -> r.safeCount++;
+            }
+        }
+
+        if (r.totalBatches > 0) {
+            double penalty = ((r.expiredCount * 30.0) + (r.criticalCount * 15.0) + (r.nearExpiryCount * 5.0)) / r.totalBatches;
+            r.healthScorePercent = Math.max(0.0, Math.min(100.0, 100.0 - penalty));
+        } else {
+            r.healthScorePercent = 100.0;
+        }
+
+        r.unreadNotifications = notificationService.getCachedUnreadCount(pharmacyId);
+        r.queueSize = eventQueue.size();
+        r.queueCapacity = eventQueue.getCapacity();
+        r.eventsProcessed = eventConsumer.getProcessedCount();
+        r.isMonitorRunning = expiryMonitor.isMonitoring();
+        r.isConsumerRunning = eventConsumer.isRunning();
+
+        return r;
+    }
+
     public Map<String, Integer> getStatusBreakdown(String pharmacyId) {
         Map<String, Integer> map = new HashMap<>();
         List<ExpiryRecord> records = expiryService.getAllExpiryRecords(pharmacyId);

@@ -50,7 +50,7 @@
                 <Button fx:id="btnNavMarketplace" text="🔄  Surplus Marketplace" onAction="#handleNavMarketplace" maxWidth="Infinity" styleClass="nav-button"/>
                 <Button fx:id="btnNavRequests" text="📬  Exchange Requests" onAction="#handleNavRequests" maxWidth="Infinity" styleClass="nav-button"/>
                 <Button fx:id="btnNavExpiry" text="⏳  Expiry &amp; Alerts" onAction="#handleNavExpiry" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button fx:id="btnNavReports" text="📈  Reports &amp; Queue" onAction="#handleNavReports" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button fx:id="btnNavNotifications" text="🔔  Notifications" onAction="#handleNavNotifications" maxWidth="Infinity" styleClass="nav-button"/>
             </VBox>
         </ScrollPane>
 
