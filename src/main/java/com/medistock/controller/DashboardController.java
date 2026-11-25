@@ -27,7 +27,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
-import org.example.medistock.controller.exchange.ExchangeController;
 import org.example.medistock.controller.expiry.ExpiryController;
 import org.example.medistock.controller.notifications.NotificationsController;
 import org.example.medistock.service.expiry.ExpiryService;
