@@ -76,7 +76,7 @@
                     <Label text="Showing listings across participating network" styleClass="text-muted" minWidth="-Infinity"/>
                 </HBox>
 
-                <TableView fx:id="listingsTable" fixedCellSize="32.0" prefHeight="290.0" minHeight="290.0" maxHeight="290.0" styleClass="medistock-table">
+                <TableView fx:id="listingsTable" fixedCellSize="32.0" prefHeight="350.0" minHeight="290.0" styleClass="medistock-table">
                     <columns>
                         <TableColumn fx:id="colListingId" prefWidth="75.0" minWidth="65.0" text="List ID" />
                         <TableColumn fx:id="colMedicine" prefWidth="155.0" minWidth="120.0" text="Medicine" />
@@ -104,16 +104,6 @@
                     <Region HBox.hgrow="ALWAYS"/>
                     <Label fx:id="statusLabel" text="Ready" styleClass="text-muted" minWidth="-Infinity"/>
                 </HBox>
-            </VBox>
-
-            <!-- Multithreading & Event Execution Trace (Info Card) -->
-            <VBox spacing="4.0" styleClass="info-card">
-                <HBox alignment="CENTER_LEFT" spacing="8.0">
-                    <Label text="⚡ Multithreading &amp; Concurrency Trace" styleClass="info-title" minWidth="-Infinity"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label text="Intrinsic monitor locks • Atomic reservations • EventProducer daemon" styleClass="info-bullet"/>
-                </HBox>
-                <TextArea fx:id="logArea" editable="false" prefHeight="44.0" minHeight="38.0" styleClass="console-area" wrapText="true"/>
             </VBox>
 
         </VBox>

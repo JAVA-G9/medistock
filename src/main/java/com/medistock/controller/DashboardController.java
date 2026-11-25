@@ -288,6 +288,8 @@ public class DashboardController {
             );
             highlightActiveNavButton(btnNavMarketplace);
         }
+        loadSubView(AppConfig.MARKETPLACE_VIEW);
+        highlightActiveNavButton(btnNavMarketplace);
     }
 
     @FXML
@@ -309,9 +311,9 @@ public class DashboardController {
             );
             highlightActiveNavButton(btnNavRequests);
         }
+        loadSubView(AppConfig.REQUESTS_VIEW);
+        highlightActiveNavButton(btnNavRequests);
     }
-
-
 
     @FXML
     private void handleNavExpiry(ActionEvent event) {

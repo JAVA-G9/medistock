@@ -71,7 +71,6 @@ public class RequestsController implements Initializable {
     @FXML private TableColumn<StockTransfer, String> colTrfCreated;
 
     @FXML private Label statusLabel;
-    @FXML private TextArea logArea;
 
     private final ExchangeService exchangeService = ExchangeService.getInstance();
     private final PharmacyService pharmacyService = PharmacyService.getInstance();
@@ -143,6 +142,7 @@ public class RequestsController implements Initializable {
         colIncStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().name()));
         colIncDate.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toString().substring(0, 16)));
 
+        incomingTable.setPlaceholder(new Label("No incoming requests pending for this facility's listings."));
         incomingTable.setItems(incomingData);
     }
 
@@ -157,6 +157,7 @@ public class RequestsController implements Initializable {
         colOutStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().name()));
         colOutDate.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toString().substring(0, 16)));
 
+        outgoingTable.setPlaceholder(new Label("No outgoing requests placed by this facility."));
         outgoingTable.setItems(outgoingData);
     }
 
@@ -170,6 +171,7 @@ public class RequestsController implements Initializable {
         colTrfStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().name()));
         colTrfCreated.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toString().substring(0, 16)));
 
+        transfersTable.setPlaceholder(new Label("No stock transfers recorded for this facility yet."));
         transfersTable.setItems(transfersData);
     }
 
@@ -254,7 +256,8 @@ public class RequestsController implements Initializable {
         dialog.setContentText("Enter rejection reason:");
 
         Optional<String> reasonOpt = dialog.showAndWait();
-        reasonOpt.ifPresent(reason -> {
+        if (reasonOpt.isPresent()) {
+            String reason = reasonOpt.get();
             try {
                 Pharmacy currentPharmacy = getActivePharmacy();
                 exchangeService.rejectRequest(selected.getRequestId(), currentPharmacy.getId(), reason);
@@ -265,7 +268,7 @@ public class RequestsController implements Initializable {
                 showError("Rejection Error", e.getMessage());
                 logMessage("REJECT ERROR: " + e.getMessage());
             }
-        });
+        }
     }
 
     @FXML
@@ -346,12 +349,7 @@ public class RequestsController implements Initializable {
     }
 
     private void logMessage(String msg) {
-        String logLine = String.format("[%s] %s%n", java.time.LocalTime.now().withNano(0), msg);
-        if (logArea != null) {
-            logArea.appendText(logLine);
-        } else {
-            System.out.println(logLine);
-        }
+        System.out.printf("[%s] %s%n", java.time.LocalTime.now().withNano(0), msg);
     }
 
     private void showError(String title, String content) {
