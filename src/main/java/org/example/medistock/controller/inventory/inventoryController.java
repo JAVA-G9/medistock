@@ -2,6 +2,7 @@
 package org.example.medistock.controller.inventory;
 
 import org.example.medistock.util.DBConnection;
+import java.util.concurrent.CountDownLatch;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -284,12 +285,15 @@ public class inventoryController {
 
 
     private void loadInventoryTable() {
-
-        inventoryTable.setItems(null);
-
-        inventoryList = getAllInventoryRecords();
-
-        inventoryTable.setItems(inventoryList);
+        new Thread(() -> {
+            if (con == null) con = DBConnection.connectToMySql();
+            if (con == null) return;
+            ObservableList<showBean> list = getAllInventoryRecords();
+            javafx.application.Platform.runLater(() -> {
+                inventoryList = list;
+                inventoryTable.setItems(inventoryList);
+            });
+        }, "Inventory-TableLoader").start();
     }
 
 
@@ -557,30 +561,28 @@ public class inventoryController {
     // =====================================================
 
     private void loadBatchMedicines() {
+        new Thread(() -> {
+            if (con == null) con = DBConnection.connectToMySql();
+            if (con == null) return;
 
-        batchMedicine.getItems().clear();
+            java.util.List<String> items = new java.util.ArrayList<>();
+            String sql = "SELECT medicine_id, medicine_name FROM medicine ORDER BY medicine_name";
 
-        String sql = "SELECT medicine_id, medicine_name "
-                + "FROM medicine ORDER BY medicine_name";
+            try (PreparedStatement pst = con.prepareStatement(sql);
+                 ResultSet rs = pst.executeQuery()) {
 
-        try (PreparedStatement pst = con.prepareStatement(sql);
-             ResultSet rs = pst.executeQuery()) {
-
-            while (rs.next()) {
-
-                int id = rs.getInt("medicine_id");
-                String name = rs.getString("medicine_name");
-
-                batchMedicine.getItems().add(id + " - " + name);
+                while (rs.next()) {
+                    int id = rs.getInt("medicine_id");
+                    String name = rs.getString("medicine_name");
+                    items.add(id + " - " + name);
+                }
+                System.out.println("Medicine dropdown loaded");
+            } catch (SQLException e) {
+                System.out.println("Error loading medicines: " + e.getMessage());
             }
 
-            System.out.println("Medicine dropdown loaded");
-
-        } catch (SQLException e) {
-
-            System.out.println("Error loading medicines");
-            e.printStackTrace();
-        }
+            javafx.application.Platform.runLater(() -> batchMedicine.getItems().setAll(items));
+        }, "Inventory-BatchMedicineLoader").start();
     }
 
 
@@ -1094,6 +1096,151 @@ public class inventoryController {
 
 
     // =====================================================
+//          INVENTORY CONCURRENCY TEST
+// =====================================================
+
+    @FXML
+    void runInventoryConcurrencyTest(ActionEvent event) {
+
+        System.out.println("\n========== UNSAFE TEST ==========");
+
+        StockTest unsafeStock = new StockTest(10);
+
+        CountDownLatch bothReadStock = new CountDownLatch(2);
+        CountDownLatch allowUpdate = new CountDownLatch(1);
+
+        Thread t1 = new Thread(() ->
+                unsafeStock.unsafeIssue(7, bothReadStock, allowUpdate));
+
+        Thread t2 = new Thread(() ->
+                unsafeStock.unsafeIssue(7, bothReadStock, allowUpdate));
+
+        t1.start();
+        t2.start();
+
+        try {
+
+            bothReadStock.await();
+            allowUpdate.countDown();
+
+            t1.join();
+            t2.join();
+
+        } catch (InterruptedException e) {
+
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Final unsafe stock: "
+                + unsafeStock.getStock());
+
+
+        System.out.println("\n========== SAFE TEST ==========");
+
+        StockTest safeStock = new StockTest(10);
+
+        Thread t3 = new Thread(() ->
+                safeStock.safeIssue(7));
+
+        Thread t4 = new Thread(() ->
+                safeStock.safeIssue(7));
+
+        t3.start();
+        t4.start();
+
+        try {
+
+            t3.join();
+            t4.join();
+
+        } catch (InterruptedException e) {
+
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Final safe stock: "
+                + safeStock.getStock());
+
+        System.out.println("========== TEST COMPLETE ==========");
+    }
+
+
+// =====================================================
+//              SHARED STOCK TEST CLASS
+// =====================================================
+
+    private static class StockTest {
+
+        private int stock;
+
+        StockTest(int stock) {
+            this.stock = stock;
+        }
+
+
+        // Unsafe stock issue
+
+        void unsafeIssue(int amount,
+                         CountDownLatch bothReadStock,
+                         CountDownLatch allowUpdate) {
+
+            int currentStock = stock;
+
+            System.out.println(Thread.currentThread().getName()
+                    + " read stock: " + currentStock);
+
+            bothReadStock.countDown();
+
+            try {
+
+                allowUpdate.await();
+
+            } catch (InterruptedException e) {
+
+                Thread.currentThread().interrupt();
+                return;
+            }
+
+            if (currentStock >= amount) {
+
+                stock = currentStock - amount;
+
+                System.out.println(Thread.currentThread().getName()
+                        + " issued " + amount + " units");
+
+            } else {
+
+                System.out.println(Thread.currentThread().getName()
+                        + " failed: insufficient stock");
+            }
+        }
+
+
+        // Safe stock issue
+
+        synchronized void safeIssue(int amount) {
+
+            if (stock >= amount) {
+
+                stock = stock - amount;
+
+                System.out.println(Thread.currentThread().getName()
+                        + " issued " + amount + " units");
+
+            } else {
+
+                System.out.println(Thread.currentThread().getName()
+                        + " failed: insufficient stock");
+            }
+        }
+
+
+        int getStock() {
+            return stock;
+        }
+    }
+
+    // =====================================================
     //                    INITIALIZE
     // =====================================================
 
@@ -1148,16 +1295,15 @@ public class inventoryController {
 
         // Default values
         pharmacyId.setText("PHARM-001");
-
         batchStatus.setValue("AVAILABLE");
-
         receivedDate.setValue(LocalDate.now());
 
-        // Load medicine dropdown
-        loadBatchMedicines();
-
-        // Load inventory table
-        loadInventoryTable();
+        // Connect and load database records asynchronously so tab opens with 0ms lag
+        new Thread(() -> {
+            con = DBConnection.connectToMySql();
+            loadBatchMedicines();
+            loadInventoryTable();
+        }, "Inventory-DataLoader").start();
 
 
         assert clearBtn != null;

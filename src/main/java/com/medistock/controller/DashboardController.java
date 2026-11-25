@@ -11,6 +11,7 @@ import com.medistock.util.NavigationManager;
 import com.medistock.util.SessionContext;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -33,6 +34,11 @@ import org.example.medistock.service.expiry.ExpiryService;
 import org.example.medistock.repository.notification.NotificationRepository;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Main application dashboard controller.
@@ -121,12 +127,10 @@ public class DashboardController {
     private final PharmacyService pharmacyService = PharmacyService.getInstance();
     private final ThreadManager threadManager = ThreadManager.getInstance();
     private Timeline liveUpdateTimeline;
+    private ScheduledExecutorService metricScheduler;
 
-    // View caching for instant Member 4 navigation
-    private Parent cachedExpiryView;
-    private ExpiryController cachedExpiryController;
-    private Parent cachedNotificationsView;
-    private NotificationsController cachedNotificationsController;
+    // View caching for instant 0ms tab switching across all modules
+    private final Map<String, Parent> viewCache = new ConcurrentHashMap<>();
 
     @FXML
     private void initialize() {
@@ -150,12 +154,34 @@ public class DashboardController {
             threadManager.startDaemonExpiryMonitor();
         }
 
-        // Live status refresh ticker (every 2 seconds)
+        // Live status refresh ticker (reads local memory snapshot every 2 seconds - 0ms UI load)
         liveUpdateTimeline = new Timeline(new KeyFrame(Duration.millis(2000), e -> {
             refreshKpiMetrics();
         }));
         liveUpdateTimeline.setCycleCount(Timeline.INDEFINITE);
         liveUpdateTimeline.play();
+
+        // Background metric sync scheduler (every 10s on separate thread to prevent any UI freeze)
+        metricScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "Dashboard-MetricRefresher");
+            t.setDaemon(true);
+            return t;
+        });
+        metricScheduler.scheduleWithFixedDelay(() -> {
+            try {
+                Pharmacy p = SessionContext.getCurrentPharmacy();
+                if (p != null) {
+                    pharmacyService.refreshPharmacyMetrics(p);
+                    Platform.runLater(() -> {
+                        refreshKpiMetrics();
+                        if (partnerPharmaciesTable != null) {
+                            partnerPharmaciesTable.refresh();
+                        }
+                    });
+                }
+            } catch (Throwable ignored) {
+            }
+        }, 3, 10, TimeUnit.SECONDS);
 
         highlightActiveNavButton(btnNavDashboard);
     }
@@ -212,7 +238,7 @@ public class DashboardController {
         daemonStatusMini.setStyle(daemonRunning ? "-fx-text-fill: #10b981;" : "-fx-text-fill: #f87171;");
     }
 
-    // Navigation Handlers
+    // Navigation Handlers with 0ms Instant View Caching
     @FXML
     private void handleNavDashboard(ActionEvent event) {
         showDashboardHome();
@@ -221,180 +247,72 @@ public class DashboardController {
 
     @FXML
     private void handleNavProfile(ActionEvent event) {
-        loadSubView(AppConfig.PROFILE_VIEW);
-        highlightActiveNavButton(btnNavProfile);
+        showCachedView(AppConfig.PROFILE_VIEW, btnNavProfile);
     }
 
     @FXML
     private void handleNavThreadMonitor(ActionEvent event) {
-        loadSubView(AppConfig.THREAD_MONITOR_VIEW);
-        highlightActiveNavButton(btnNavThreadMonitor);
+        showCachedView(AppConfig.THREAD_MONITOR_VIEW, btnNavThreadMonitor);
     }
 
     @FXML
     private void handleNavInventory(ActionEvent event) {
-        String fxmlPath =
-                "/org/example/medistock/view/InventoryV/InventoryView.fxml";
-        try {
-            URL fxmlURL = getClass().getResource(fxmlPath);
-
-            if (fxmlURL == null) {
-                throw new IOException("FXML file not found at: " + fxmlPath);
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlURL);
-            Parent view = loader.load();
-
-            contentArea.getChildren().setAll(view);
-
-            highlightActiveNavButton(btnNavInventory);
-
-            System.out.println("Inventory page loaded successfully!");
-
-        } catch (Exception e) {
-
-            System.err.println("Could not load Inventory page:");
-            e.printStackTrace();
-
-            showPlaceholder(
-                    "My Inventory & Batch Management",
-                    "Member 2 — Inventory Management",
-                    "Central inventory management allowing pharmacies to manage medicine catalogs, batch numbers, manufacture & expiry dates, and real-time stock levels.",
-                    "Owned Classes: InventoryController, Medicine, MedicineBatch, InventoryItem, InventoryService, InventoryRepository, StockManager, InventoryWorker",
-                    "Multithreading Syllabus: Race conditions, critical sections, synchronized methods/blocks, intrinsic locks, atomicity, and visibility (volatile)."
-            );
-
-            highlightActiveNavButton(btnNavInventory);
-        }
+        showCachedView(AppConfig.INVENTORY_VIEW, btnNavInventory);
     }
 
     @FXML
     private void handleNavMarketplace(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.MARKETPLACE_VIEW));
-            Parent view = loader.load();
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
-            highlightActiveNavButton(btnNavMarketplace);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showPlaceholder(
-                    "Stock Marketplace & Listings",
-                    "Member 3 - Stock Exchange & Requests",
-                    "Marketplace allowing pharmacies to browse surplus medicine batches from other licensed facilities and publish surplus listings with discounted unit rates.",
-                    "Owned Classes: MarketplaceController, RequestsController, ExchangeListing, ExchangeRequest, StockTransfer, ExchangeService, ExchangeRepository, EventProducer, ExchangeWorker",
-                    "Multithreading Syllabus: Concurrent exchange requests, stock reservation coordination, event production, shared-resource access, and notification queue dispatch."
-            );
-            highlightActiveNavButton(btnNavMarketplace);
-        }
-        loadSubView(AppConfig.MARKETPLACE_VIEW);
-        highlightActiveNavButton(btnNavMarketplace);
+        showCachedView(AppConfig.MARKETPLACE_VIEW, btnNavMarketplace);
     }
 
     @FXML
     private void handleNavRequests(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.REQUESTS_VIEW));
-            Parent view = loader.load();
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
-            highlightActiveNavButton(btnNavRequests);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showPlaceholder(
-                    "Exchange Requests & Transfer Tracking",
-                    "Member 3 - Stock Exchange & Requests",
-                    "Track inbound and outbound medicine transfer requests, approve or reject stock reservations, and track secure medicine transfers.",
-                    "Owned Classes: RequestsController, ExchangeRequest, StockTransfer, ExchangeService",
-                    "Multithreading Syllabus: Multi-pharmacy concurrent reservation locks and transactional consistency."
-            );
-            highlightActiveNavButton(btnNavRequests);
-        }
-        loadSubView(AppConfig.REQUESTS_VIEW);
-        highlightActiveNavButton(btnNavRequests);
+        showCachedView(AppConfig.REQUESTS_VIEW, btnNavRequests);
     }
 
     @FXML
     private void handleNavExpiry(ActionEvent event) {
-        try {
-            if (cachedExpiryView == null) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.EXPIRY_VIEW));
-                cachedExpiryView = loader.load();
-                cachedExpiryController = loader.getController();
-            }
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(cachedExpiryView);
-            highlightActiveNavButton(btnNavExpiry);
-            if (cachedExpiryController != null) {
-                cachedExpiryController.loadRecords();
-                cachedExpiryController.loadRecordsAsync();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            showPlaceholder(
-                    "Expiry Monitoring & Notifications",
-                    "Member 4 — Expiry, Notifications & Reports",
-                    "Real-time monitoring of medicine batches nearing expiry with automatic threshold alerts and notifications.",
-                    "Owned Classes: ExpiryController, Notification, AppEvent, ExpiryService, NotificationService, CustomEventQueue, EventConsumer, NotificationWorker",
-                    "Multithreading Syllabus: wait(), notify(), notifyAll(), guarded blocks with while loops, producer-consumer pattern, and custom bounded event queue."
-            );
-            highlightActiveNavButton(btnNavExpiry);
-        }
+        showCachedView(AppConfig.EXPIRY_VIEW, btnNavExpiry);
     }
 
     @FXML
     private void handleNavNotifications(ActionEvent event) {
-        try {
-            if (cachedNotificationsView == null) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.NOTIFICATIONS_VIEW));
-                cachedNotificationsView = loader.load();
-                cachedNotificationsController = loader.getController();
-            }
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(cachedNotificationsView);
-            highlightActiveNavButton(btnNavNotifications);
-            if (cachedNotificationsController != null) {
-                cachedNotificationsController.refreshData();
-                cachedNotificationsController.refreshDataAsync();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            showPlaceholder(
-                    "Centralized Notifications Feed",
-                    "Member 4 — Expiry, Notifications & Reports",
-                    "Real-time alerts, system notifications, and asynchronous batch expiry status updates.",
-                    "Owned Classes: NotificationsController, NotificationService, NotificationRepository, NotificationWorker",
-                    "Multithreading Syllabus: Asynchronous background worker threads and thread-safe notification persistence."
-            );
-            highlightActiveNavButton(btnNavNotifications);
-        }
+        showCachedView(AppConfig.NOTIFICATIONS_VIEW, btnNavNotifications);
     }
 
     @FXML
     private void handleNavReports(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(AppConfig.REPORTS_VIEW));
-            Parent view = loader.load();
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
-            highlightActiveNavButton(btnNavReports);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showPlaceholder(
-                    "Reports & Asynchronous Event Queue Monitor",
-                    "Member 4 — Expiry, Notifications & Reports",
-                    "Asynchronous bounded event queue metrics, consumer worker tracking, and pharmacy transfer reporting.",
-                    "Owned Classes: ReportsController, CustomEventQueue, EventConsumer, NotificationWorker",
-                    "Multithreading Syllabus: Custom bounded blocking queue with wait/notify coordination and safe thread shutdown strategy."
-            );
-            highlightActiveNavButton(btnNavReports);
+        showCachedView(AppConfig.REPORTS_VIEW, btnNavReports);
+    }
+
+    private void showCachedView(String fxmlPath, Button navButton) {
+        Parent view = viewCache.get(fxmlPath);
+        if (view == null) {
+            try {
+                URL fxmlURL = getClass().getResource(fxmlPath);
+                if (fxmlURL == null) {
+                    throw new IOException("FXML file not found: " + fxmlPath);
+                }
+                FXMLLoader loader = new FXMLLoader(fxmlURL);
+                view = loader.load();
+                viewCache.put(fxmlPath, view);
+            } catch (Exception e) {
+                System.err.println("[DashboardController] Error loading view: " + fxmlPath + " -> " + e.getMessage());
+                e.printStackTrace();
+                return;
+            }
         }
+        contentArea.getChildren().setAll(view);
+        highlightActiveNavButton(navButton);
     }
 
     @FXML
     private void handleLogout(ActionEvent event) {
         if (liveUpdateTimeline != null) {
             liveUpdateTimeline.stop();
+        }
+        if (metricScheduler != null) {
+            metricScheduler.shutdownNow();
         }
         SessionContext.clearSession();
         NavigationManager.switchScene(event, AppConfig.LOGIN_VIEW);

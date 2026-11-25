@@ -2,10 +2,13 @@ package com.medistock.service;
 
 import com.medistock.model.Pharmacy;
 import com.medistock.model.User;
+import com.medistock.repository.JdbcPharmacyRepository;
 import com.medistock.repository.PharmacyRepository;
 import com.medistock.repository.memory.InMemoryPharmacyRepository;
 import com.medistock.util.SessionContext;
+import org.example.medistock.util.DBConnection;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +23,7 @@ public class PharmacyService {
     private final PharmacyRepository pharmacyRepository;
 
     public PharmacyService() {
-        this(new InMemoryPharmacyRepository());
+        this(new JdbcPharmacyRepository());
     }
 
     public PharmacyService(PharmacyRepository pharmacyRepository) {
@@ -117,6 +120,19 @@ public class PharmacyService {
 
     public Optional<Pharmacy> getPharmacyById(String id) {
         return pharmacyRepository.findById(id);
+    }
+
+    public void refreshPharmacyMetrics(Pharmacy pharmacy) {
+        if (pharmacy == null) return;
+        if (pharmacyRepository instanceof JdbcPharmacyRepository jdbcRepo) {
+            try (Connection con = DBConnection.connectToMySql()) {
+                if (con != null) {
+                    jdbcRepo.calculateLiveMetrics(con, pharmacy);
+                }
+            } catch (Exception e) {
+                System.err.println("[PharmacyService] Error refreshing metrics: " + e.getMessage());
+            }
+        }
     }
 
     public PharmacyRepository getRepository() {

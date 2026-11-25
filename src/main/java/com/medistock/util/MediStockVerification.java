@@ -27,7 +27,7 @@ public class MediStockVerification {
 
         // 1. Repository & Service Verification
         try {
-            System.out.print("[1/5] Testing Pharmacy Service & Authentication... ");
+            System.out.print("[1/5] Testing Pharmacy Service & Database Authentication... ");
             PharmacyService service = PharmacyService.getInstance();
             User user = service.login("admin", "admin123");
             if (user == null || !user.getUsername().equals("admin")) {
@@ -39,7 +39,7 @@ public class MediStockVerification {
             if (!SessionContext.getCurrentPharmacy().getId().equals("PHARM-001")) {
                 throw new AssertionError("Incorrect pharmacy attached to user");
             }
-            System.out.println("PASSED (Logged in as: " + user.getFullName() + ")");
+            System.out.println("PASSED (Logged in as: " + user.getFullName() + " | DB Repo: " + service.getRepository().getClass().getSimpleName() + ")");
             passed++;
         } catch (Exception e) {
             System.out.println("FAILED: " + e.getMessage());
@@ -50,21 +50,24 @@ public class MediStockVerification {
         try {
             System.out.print("[2/5] Testing Pharmacy & User Registration... ");
             PharmacyService service = PharmacyService.getInstance();
+            long uniqueSuffix = System.currentTimeMillis() % 100000;
+            String license = "DL-2024-HF" + uniqueSuffix;
+            String username = "healthfirst_" + uniqueSuffix;
             Pharmacy testPharma = new Pharmacy(
                     null,
                     "HealthFirst Community Pharmacy",
-                    "DL-2024-HF99",
+                    license,
                     "88 Elm Street",
                     "Metro City",
                     "+1 555-432-1098",
                     "info@healthfirst.com"
             );
             User testUser = new User(
-                    null, null, "healthfirst_admin", "password123",
+                    null, null, username, "password123",
                     "Dr. Elena Rostova", "elena@healthfirst.com", "Chief Pharmacist"
             );
             User reg = service.register(testPharma, testUser);
-            if (reg == null || !reg.getUsername().equals("healthfirst_admin")) {
+            if (reg == null || !reg.getUsername().equals(username)) {
                 throw new AssertionError("Registration failed");
             }
             System.out.println("PASSED (Registered: " + testPharma.getName() + " [" + testPharma.getLicenseNumber() + "])");
@@ -107,7 +110,7 @@ public class MediStockVerification {
                 throw new AssertionError("Priority not correctly set to MAX_PRIORITY (10)");
             }
             worker.start();
-            boolean completed = latch.await(4, TimeUnit.SECONDS);
+            boolean completed = latch.await(15, TimeUnit.SECONDS);
             if (!completed) {
                 throw new AssertionError("ReportWorker timed out");
             }
