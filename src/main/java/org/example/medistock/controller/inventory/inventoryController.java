@@ -485,32 +485,22 @@ public class inventoryController {
 
     @FXML
     void doUpdate(ActionEvent event) {
-
         if (fetchedMedicineId == -1) {
-            System.out.println(
-                    "Fetch a medicine first before updating");
-
+            System.out.println("Fetch a medicine first before updating");
             return;
         }
-
         String medName = getMedName.getText().trim();
         String genName = getGenName.getText().trim();
         String manName = getManName.getText().trim();
-
         String category = getCategory.getValue();
         String strength = getStrength.getText().trim();
         String dosage = getDosage.getValue();
         String description = getDescription.getText().trim();
-
-        if (medName.isEmpty() || manName.isEmpty()
-                || category == null || dosage == null) {
-
+        if (medName.isEmpty() || manName.isEmpty() || category == null || dosage == null) {
             System.out.println(
                     "Please fill all required medicine fields");
-
             return;
         }
-
         String sql = "UPDATE medicine SET "
                 + "medicine_name = ?, "
                 + "generic_name = ?, "
@@ -820,34 +810,20 @@ public class inventoryController {
 
     @FXML
     void doFetchBatch(ActionEvent event) {
-
         try {
-
             String number = batchNumber.getText().trim();
             String pharmacy = pharmacyId.getText().trim();
-
             if (number.isEmpty() || pharmacy.isEmpty()) {
-
-                System.out.println(
-                        "Enter batch number and pharmacy ID first");
-
+                System.out.println("Enter batch number and pharmacy ID first");
                 return;
             }
-
-            String sql = "SELECT * FROM medicine_batch "
-                    + "WHERE batch_number = ? AND pharmacy_id = ?";
-
+            String sql = "SELECT * FROM medicine_batch WHERE batch_number = ? AND pharmacy_id = ?";
             try (PreparedStatement pst = con.prepareStatement(sql)) {
-
                 pst.setString(1, number);
                 pst.setString(2, pharmacy);
-
                 try (ResultSet rs = pst.executeQuery()) {
-
                     if (rs.next()) {
-
                         int medicineId = rs.getInt("medicine_id");
-
                         for (String item : batchMedicine.getItems()) {
 
                             if (item.startsWith(medicineId + " - ")) {
@@ -856,7 +832,6 @@ public class inventoryController {
                                 break;
                             }
                         }
-
                         manufacturingDate.setValue(
                                 rs.getDate("manufacturing_date")
                                         .toLocalDate());
@@ -909,24 +884,17 @@ public class inventoryController {
             e.printStackTrace();
         }
     }
-
-
     // =====================================================
     //                 UPDATE MEDICINE BATCH
     // =====================================================
-
     @FXML
     void doUpdateBatch(ActionEvent event) {
-
         try {
-
             if (!validateBatchFields()) {
                 return;
             }
-
             String number = batchNumber.getText().trim();
             String pharmacy = pharmacyId.getText().trim();
-
             int medicineId = getSelectedMedicineId();
             String medicineName = getSelectedMedicineName();
 
@@ -941,10 +909,8 @@ public class inventoryController {
                 available = Integer.parseInt(
                         quantityAvailable.getText().trim());
             }
-
             double purchase = Double.parseDouble(
                     purchasePrice.getText().trim());
-
             double selling = Double.parseDouble(
                     sellingPrice.getText().trim());
 
@@ -1001,100 +967,63 @@ public class inventoryController {
                     loadInventoryTable();
 
                 } else {
-
                     System.out.println("Batch Not Found");
                 }
             }
-
         } catch (Exception e) {
-
             System.out.println("Could not update batch");
             e.printStackTrace();
         }
     }
-
-
     // =====================================================
     //                 DELETE MEDICINE BATCH
     // =====================================================
 
     @FXML
     void doDeleteBatch(ActionEvent event) {
-
         try {
-
             String number = batchNumber.getText().trim();
             String pharmacy = pharmacyId.getText().trim();
-
             if (number.isEmpty() || pharmacy.isEmpty()) {
-
-                System.out.println(
-                        "Enter batch number and pharmacy ID first");
-
+                System.out.println("Enter batch number and pharmacy ID first");
                 return;
             }
-
-            String sql = "DELETE FROM medicine_batch "
-                    + "WHERE batch_number = ? AND pharmacy_id = ?";
-
+            String sql = "DELETE FROM medicine_batch WHERE batch_number = ? AND pharmacy_id = ?";
             try (PreparedStatement pst = con.prepareStatement(sql)) {
-
                 pst.setString(1, number);
                 pst.setString(2, pharmacy);
-
                 int count = pst.executeUpdate();
-
                 if (count > 0) {
-
                     System.out.println("Batch Deleted Successfully");
-
                     loadInventoryTable();
-
                     doClearBatch(event);
-
                 } else {
-
                     System.out.println("Batch Not Found");
                 }
             }
-
         } catch (Exception e) {
-
             e.printStackTrace();
         }
     }
-
-
     // =====================================================
     //                 CLEAR MEDICINE BATCH
     // =====================================================
-
     @FXML
     void doClearBatch(ActionEvent event) {
-
         batchMedicine.getSelectionModel().clearSelection();
-
         batchNumber.clear();
-
         manufacturingDate.setValue(null);
         expiryDate.setValue(null);
-
         quantityReceived.clear();
         quantityAvailable.clear();
-
         purchasePrice.clear();
         sellingPrice.clear();
-
         pharmacyId.setText("PHARM-001");
-
         batchStatus.setValue("AVAILABLE");
-
         receivedDate.setValue(LocalDate.now());
 
         System.out.println("Batch form cleared");
     }
-
-
     // =====================================================
 //          INVENTORY CONCURRENCY TEST
 // =====================================================
@@ -1102,26 +1031,19 @@ public class inventoryController {
     @FXML
     void runInventoryConcurrencyTest(ActionEvent event) {
 
-        System.out.println("\n========== UNSAFE TEST ==========");
+        StringBuffer output = new StringBuffer();
 
-        StockTest unsafeStock = new StockTest(10);
+        output.append("========== UNSAFE TEST ==========\n");
 
-        CountDownLatch bothReadStock = new CountDownLatch(2);
-        CountDownLatch allowUpdate = new CountDownLatch(1);
+        StockTest unsafeStock = new StockTest(10, output);
 
-        Thread t1 = new Thread(() ->
-                unsafeStock.unsafeIssue(7, bothReadStock, allowUpdate));
-
-        Thread t2 = new Thread(() ->
-                unsafeStock.unsafeIssue(7, bothReadStock, allowUpdate));
+        Thread t1 = new Thread(() -> unsafeStock.unsafeIssue(7));
+        Thread t2 = new Thread(() -> unsafeStock.unsafeIssue(7));
 
         t1.start();
         t2.start();
 
         try {
-
-            bothReadStock.await();
-            allowUpdate.countDown();
 
             t1.join();
             t2.join();
@@ -1131,19 +1053,17 @@ public class inventoryController {
             Thread.currentThread().interrupt();
         }
 
-        System.out.println("Final unsafe stock: "
-                + unsafeStock.getStock());
+        output.append("Final unsafe stock: ")
+                .append(unsafeStock.getStock())
+                .append("\n\n");
 
 
-        System.out.println("\n========== SAFE TEST ==========");
+        output.append("========== SAFE TEST ==========\n");
 
-        StockTest safeStock = new StockTest(10);
+        StockTest safeStock = new StockTest(10, output);
 
-        Thread t3 = new Thread(() ->
-                safeStock.safeIssue(7));
-
-        Thread t4 = new Thread(() ->
-                safeStock.safeIssue(7));
+        Thread t3 = new Thread(() -> safeStock.safeIssue(7));
+        Thread t4 = new Thread(() -> safeStock.safeIssue(7));
 
         t3.start();
         t4.start();
@@ -1158,10 +1078,22 @@ public class inventoryController {
             Thread.currentThread().interrupt();
         }
 
-        System.out.println("Final safe stock: "
-                + safeStock.getStock());
+        output.append("Final safe stock: ")
+                .append(safeStock.getStock())
+                .append("\n");
 
-        System.out.println("========== TEST COMPLETE ==========");
+        output.append("========== TEST COMPLETE ==========");
+
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+        alert.setTitle("Inventory Concurrency Test");
+        alert.setHeaderText("Unsafe vs Safe Stock Handling");
+        alert.setContentText(output.toString());
+
+        alert.getDialogPane().setPrefWidth(450);
+
+        alert.showAndWait();
     }
 
 
@@ -1172,28 +1104,28 @@ public class inventoryController {
     private static class StockTest {
 
         private int stock;
+        private StringBuffer output;
 
-        StockTest(int stock) {
+        StockTest(int stock, StringBuffer output) {
             this.stock = stock;
+            this.output = output;
         }
 
 
         // Unsafe stock issue
 
-        void unsafeIssue(int amount,
-                         CountDownLatch bothReadStock,
-                         CountDownLatch allowUpdate) {
+        void unsafeIssue(int amount) {
 
             int currentStock = stock;
 
-            System.out.println(Thread.currentThread().getName()
-                    + " read stock: " + currentStock);
-
-            bothReadStock.countDown();
+            output.append(Thread.currentThread().getName())
+                    .append(" read stock: ")
+                    .append(currentStock)
+                    .append("\n");
 
             try {
 
-                allowUpdate.await();
+                Thread.sleep(100);
 
             } catch (InterruptedException e) {
 
@@ -1205,13 +1137,15 @@ public class inventoryController {
 
                 stock = currentStock - amount;
 
-                System.out.println(Thread.currentThread().getName()
-                        + " issued " + amount + " units");
+                output.append(Thread.currentThread().getName())
+                        .append(" issued ")
+                        .append(amount)
+                        .append(" units\n");
 
             } else {
 
-                System.out.println(Thread.currentThread().getName()
-                        + " failed: insufficient stock");
+                output.append(Thread.currentThread().getName())
+                        .append(" failed: insufficient stock\n");
             }
         }
 
@@ -1224,13 +1158,15 @@ public class inventoryController {
 
                 stock = stock - amount;
 
-                System.out.println(Thread.currentThread().getName()
-                        + " issued " + amount + " units");
+                output.append(Thread.currentThread().getName())
+                        .append(" issued ")
+                        .append(amount)
+                        .append(" units\n");
 
             } else {
 
-                System.out.println(Thread.currentThread().getName()
-                        + " failed: insufficient stock");
+                output.append(Thread.currentThread().getName())
+                        .append(" failed: insufficient stock\n");
             }
         }
 
@@ -1239,7 +1175,6 @@ public class inventoryController {
             return stock;
         }
     }
-
     // =====================================================
     //                    INITIALIZE
     // =====================================================
