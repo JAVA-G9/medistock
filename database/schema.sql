@@ -6,6 +6,35 @@
 CREATE DATABASE IF NOT EXISTS medistock;
 USE medistock;
 
+-- 0. Pharmacy & User (Member 1)
+CREATE TABLE IF NOT EXISTS pharmacy (
+    pharmacy_id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    license_number VARCHAR(100) NOT NULL UNIQUE,
+    address VARCHAR(255),
+    city VARCHAR(100),
+    phone VARCHAR(50),
+    email VARCHAR(100),
+    verified BOOLEAN NOT NULL DEFAULT TRUE,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_inventory_items INT DEFAULT 0,
+    near_expiry_count INT DEFAULT 0,
+    active_listing_count INT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS user (
+    user_id VARCHAR(50) PRIMARY KEY,
+    pharmacy_id VARCHAR(50) NOT NULL,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(100),
+    role VARCHAR(100) NOT NULL DEFAULT 'Chief Pharmacist',
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pharmacy_id) REFERENCES pharmacy(pharmacy_id) ON DELETE CASCADE
+);
+
 -- 1. Medicine Catalog (Member 2)
 CREATE TABLE IF NOT EXISTS medicine (
     medicine_id INT AUTO_INCREMENT PRIMARY KEY,

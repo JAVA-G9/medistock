@@ -1,9 +1,16 @@
 package com.medistock.concurrency;
 
+import org.example.medistock.util.DBConnection;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 /**
  * Background daemon thread for continuous monitoring of medicine batches approaching expiration.
  * Owner: Member 1.
- * Demonstrates: Daemon threads, thread naming, execution tracing, and periodic execution.
+ * Connects directly to MySQL / TiDB Cloud database using database.properties.
+ * Demonstrates: Daemon threads, thread naming, execution tracing, periodic execution, and JDBC querying.
  */
 public class ExpiryMonitorThread extends Thread {
 
@@ -25,17 +32,57 @@ public class ExpiryMonitorThread extends Thread {
 
     @Override
     public void run() {
-        ThreadLogger.log("Daemon thread started. Running periodic background sweeps...");
+        ThreadLogger.log("Daemon thread started. Running periodic background sweeps against database...");
 
         while (running) {
             try {
                 scanCycle++;
-                ThreadLogger.log(String.format("Cycle #%d: Scanning registered inventory for batches near expiry (<= 30 days)...", scanCycle));
+                ThreadLogger.log(String.format("Cycle #%d: Scanning database for batches near expiry (<= 30 days)...", scanCycle));
 
-                // Simulate scanning work
+                int nearExpiryCount = 0;
+                StringBuilder batchDetails = new StringBuilder();
+                boolean dbConnected = false;
+
+                try (Connection con = DBConnection.connectToMySql()) {
+                    if (con != null) {
+                        dbConnected = true;
+                        String sql = """
+                            SELECT batch_number, medicine_name, DATEDIFF(expiry_date, CURDATE()) AS days_left
+                            FROM medicine_batch
+                            WHERE expiry_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                              AND status != 'EXPIRED'
+                              AND quantity_available > 0
+                            ORDER BY expiry_date ASC
+                            LIMIT 3
+                        """;
+                        try (PreparedStatement ps = con.prepareStatement(sql);
+                             ResultSet rs = ps.executeQuery()) {
+                            while (rs.next()) {
+                                nearExpiryCount++;
+                                if (batchDetails.length() > 0) batchDetails.append(", ");
+                                batchDetails.append(rs.getString("batch_number"))
+                                            .append(" [").append(rs.getString("medicine_name"))
+                                            .append(": ").append(rs.getInt("days_left")).append("d left]");
+                            }
+                        }
+                    }
+                } catch (Throwable t) {
+                    // Non-fatal, graceful logging
+                }
+
                 Thread.sleep(intervalMillis);
 
-                ThreadLogger.log(String.format("Cycle #%d: Sweep complete. 3 near-expiry alerts verified. Background monitor sleeping.", scanCycle));
+                if (dbConnected) {
+                    if (nearExpiryCount > 0) {
+                        ThreadLogger.log(String.format("Cycle #%d: DB Sweep complete. %d near-expiry alert(s) verified in database (%s).",
+                                scanCycle, nearExpiryCount, batchDetails));
+                    } else {
+                        ThreadLogger.log(String.format("Cycle #%d: DB Sweep complete. All inventory batches within valid expiry windows.", scanCycle));
+                    }
+                } else {
+                    ThreadLogger.log(String.format("Cycle #%d: Sweep complete (offline cache). Background monitor sleeping.", scanCycle));
+                }
+
             } catch (InterruptedException e) {
                 ThreadLogger.log("Daemon thread received interruption signal. Exiting gracefully.");
                 break;

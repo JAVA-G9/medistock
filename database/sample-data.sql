@@ -1,6 +1,19 @@
 -- Sample data for testing and demonstration
 USE medistock;
 
+-- Member 1: Pharmacies and Users
+INSERT IGNORE INTO pharmacy (pharmacy_id, name, license_number, address, city, phone, email, total_inventory_items, near_expiry_count, active_listing_count)
+VALUES
+('PHARM-001', 'Apex Care Pharmacy', 'DL-2024-APEX01', '124 Healthcare Boulevard, Suite A', 'Metro City', '+1 (555) 234-5678', 'contact@apexcare.com', 142, 18, 5),
+('PHARM-002', 'City Health Drugstore', 'DL-2024-CITY02', '45 Commercial Square, Downtown', 'Riverdale', '+1 (555) 345-6789', 'orders@cityhealth.com', 98, 12, 3),
+('PHARM-003', 'GreenCross LifeSciences', 'DL-2024-GCR03', '78 Botanical Way, West End', 'Green Valley', '+1 (555) 456-7890', 'support@greencrosspharma.com', 210, 24, 8);
+
+INSERT IGNORE INTO user (user_id, pharmacy_id, username, password, full_name, email, role, active)
+VALUES
+('USER-001', 'PHARM-001', 'admin', 'admin123', 'Dr. Marcus Vance', 'marcus.vance@apexcare.com', 'Chief Pharmacist', TRUE),
+('USER-002', 'PHARM-002', 'citypharm', 'city123', 'Sarah Jenkins, PharmD', 'sarah.j@cityhealth.com', 'Inventory Director', TRUE),
+('USER-003', 'PHARM-003', 'greencross', 'green123', 'Rajesh Patel', 'rajesh.p@greencrosspharma.com', 'Lead Pharmacist', TRUE);
+
 INSERT IGNORE INTO medicine (medicine_id, medicine_name, generic_name, manufacturer_name, category, strength, dosage_form, description)
 VALUES
 (1, 'Paracetamol', 'Acetaminophen', 'GSK Healthcare', 'Pain Relief', '650mg', 'Tablet', 'Antipyretic and analgesic for fever and pain'),

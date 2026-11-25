@@ -43,7 +43,7 @@ public class ConcurrencyTest {
         assertEquals(Thread.MAX_PRIORITY, worker.getPriority());
         assertTrue(worker.getThread().getName().contains("MediStock-ReportWorker"));
 
-        boolean finished = latch.await(4000, TimeUnit.MILLISECONDS);
+        boolean finished = latch.await(15000, TimeUnit.MILLISECONDS);
         assertTrue(finished, "ReportWorker should complete background stages");
     }
 

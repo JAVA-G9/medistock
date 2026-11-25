@@ -30,6 +30,8 @@ module org.example.medistock {
     exports org.example.medistock.service.expiry;
     exports org.example.medistock.service.notifications;
     exports org.example.medistock.service.reports;
+    exports org.example.medistock.config;
+    exports org.example.medistock.util;
     exports org.example.medistock.repository.exchange;
     exports org.example.medistock.repository.notification;
     exports org.example.medistock.concurrency;
@@ -40,4 +42,5 @@ module org.example.medistock {
     exports com.medistock.service;
     exports com.medistock.repository;
     exports com.medistock.concurrency;
+    exports com.medistock.util;
 }
